@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -22,10 +23,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
 	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException {
+	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex)
+			throws IOException, ServletException {
 		Map<String, String> parameters = new LinkedHashMap<>();
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
 

@@ -71,7 +71,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-		problemDetail.setTitle("Recurso não encontrado");
+		problemDetail.setTitle("Resouce Not Found");
 		problemDetail.setType(URI.create("http://localhost:8080/error/resource-not-found"));
 		return problemDetail;
 	}
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(BusinessException.class)
 	public ProblemDetail handleBusinessException(BusinessException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
-		problemDetail.setTitle("Requisição Inválida");
+		problemDetail.setTitle("Invalid Request");
 		problemDetail.setType(URI.create("http://localhost:8080/error/invalid-request"));
 		return problemDetail;
 	}
@@ -89,7 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = messageSource.getMessage("PasswordComparisonAuthenticator.badCredentials",
 				new Object[]{}, LocaleContextHolder.getLocale());
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
-		problemDetail.setTitle("Autenticação Inválida");
+		problemDetail.setTitle("Invalid Authentication");
 		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
 		return problemDetail;
 	}
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(AuthenticationException.class)
 	public ProblemDetail handleAuthenticationException(AuthenticationException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
-		problemDetail.setTitle("Autenticação Inválida");
+		problemDetail.setTitle("Invalid Authentication");
 		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
 		return problemDetail;
 	}
@@ -123,11 +123,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleNoResourceFoundException(
 			NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
 	) {
-//		ex.getResourcePath()
 		String detail = messageSource.getMessage("noResourceFound",
 				new Object[]{ex.getResourcePath()}, LocaleContextHolder.getLocale());
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
-		problemDetail.setTitle("Inexistent-Resource");
+		problemDetail.setTitle("Inexistent Resource");
 		problemDetail.setType(URI.create("https://localhost:8080/errors/inexistent-resource"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
@@ -167,7 +166,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		if (ex.getCause() instanceof InvalidFormatException) {
 			return handleInvalidFormat((InvalidFormatException) ex.getCause(), headers, status, request);
 		}
-		var detail = messageSource.getMessage("httpMessageNotReadable",null, LocaleContextHolder.getLocale());
+		var detail = messageSource.getMessage("httpMessageNotReadable", null, LocaleContextHolder.getLocale());
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Incomprehensible Message");

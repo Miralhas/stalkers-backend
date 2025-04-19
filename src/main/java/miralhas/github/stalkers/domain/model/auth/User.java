@@ -1,9 +1,7 @@
 package miralhas.github.stalkers.domain.model.auth;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +14,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
 	@Id
