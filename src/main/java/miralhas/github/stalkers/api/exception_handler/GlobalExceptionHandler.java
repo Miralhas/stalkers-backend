@@ -71,7 +71,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-		problemDetail.setTitle("Resouce Not Found");
+		problemDetail.setTitle("Resource Not Found");
 		problemDetail.setType(URI.create("http://localhost:8080/error/resource-not-found"));
 		return problemDetail;
 	}
