@@ -29,7 +29,7 @@ public class SecurityConfig {
 
 	private final JwtDecoder jwtDecoder;
 	private final JwtAuthenticationConverter jwtAuthenticationConverter;
-	private final CustomAccessDeniedHandlerImpl customAccessDeniendHandlerImpl;
+	private final CustomAccessDeniedHandlerImpl customAccessDeniedHandlerImpl;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	@Bean
