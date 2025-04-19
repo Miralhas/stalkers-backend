@@ -1,7 +1,5 @@
 package miralhas.github.stalkers.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +14,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -35,7 +29,8 @@ public class SecurityConfig {
 
 	private final JwtDecoder jwtDecoder;
 	private final JwtAuthenticationConverter jwtAuthenticationConverter;
-	private final CustomAccessDeniedHandlerImpl CustomAccessDeniedHandlerImpl;
+	private final CustomAccessDeniedHandlerImpl customAccessDeniedHandlerImpl;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 	@Bean
 	public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
@@ -45,7 +40,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	public SecurityFilterChain securityFilterChain(
+			HttpSecurity httpSecurity,
+			CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
+			CustomOauth2FailureHandler customOauth2FailureHandler
+	) throws Exception {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(cors -> {
@@ -61,43 +60,20 @@ public class SecurityConfig {
 				.sessionManagement(session ->
 						session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(ex -> ex
-						.accessDeniedHandler(CustomAccessDeniedHandlerImpl)
-						.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+						.accessDeniedHandler(customAccessDeniendHandlerImpl)
+						.authenticationEntryPoint(customAuthenticationEntryPoint)
 				)
 				.oauth2ResourceServer(resourceServer -> {
 					resourceServer.jwt(jwt -> {
 						jwt.decoder(jwtDecoder);
 						jwt.jwtAuthenticationConverter(jwtAuthenticationConverter);
 					});
-					resourceServer.accessDeniedHandler(CustomAccessDeniedHandlerImpl);
-					resourceServer.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+					resourceServer.accessDeniedHandler(customAccessDeniendHandlerImpl);
+					resourceServer.authenticationEntryPoint(customAuthenticationEntryPoint);
 				})
 				.oauth2Login(oauth2 -> oauth2
-
-						.successHandler((request, response, authentication) -> {
-							OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-							OAuth2User oauthUser = oauthToken.getPrincipal();
-							String email = oauthUser.getAttribute("email");
-							String name = oauthUser.getAttribute("name");
-							Map<String, Object> responseBody = new HashMap<>();
-							responseBody.put("user", Map.of(
-									"email", email,
-									"name", name
-							));
-							response.setStatus(HttpServletResponse.SC_OK);
-							response.setContentType("application/json");
-							response.setCharacterEncoding("UTF-8");
-
-							ObjectMapper mapper = new ObjectMapper();
-							mapper.writeValue(response.getWriter(), responseBody);
-						})
-						.failureHandler(((request, response, exception) -> {
-							response.setStatus(401);
-							response.setContentType("application/json");
-							response.setCharacterEncoding("UTF-8");
-							ObjectMapper mapper = new ObjectMapper();
-							mapper.writeValue(response.getWriter(), "error google oauth2");
-						}))
+						.successHandler(customOAuth2SuccessHandler)
+						.failureHandler((customOauth2FailureHandler))
 				)
 				.authorizeHttpRequests(authz -> {
 					authz.requestMatchers("/secured").authenticated();
