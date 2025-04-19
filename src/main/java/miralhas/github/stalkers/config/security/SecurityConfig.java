@@ -21,8 +21,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -32,6 +35,7 @@ public class SecurityConfig {
 
 	private final JwtDecoder jwtDecoder;
 	private final JwtAuthenticationConverter jwtAuthenticationConverter;
+	private final CustomAccessDeniedHandlerImpl CustomAccessDeniedHandlerImpl;
 
 	@Bean
 	public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
@@ -44,11 +48,20 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
-				.cors(AbstractHttpConfigurer::disable)
+				.cors(cors -> {
+					CorsConfigurationSource source = request -> {
+						CorsConfiguration config = new CorsConfiguration();
+						config.setAllowedOrigins(List.of("*"));
+						config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+						config.setAllowedHeaders(List.of("*"));
+						return config;
+					};
+					cors.configurationSource(source);
+				})
 				.sessionManagement(session ->
 						session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(ex -> ex
-						.accessDeniedHandler(new CustomAccessDeniedHandlerImpl())
+						.accessDeniedHandler(CustomAccessDeniedHandlerImpl)
 						.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 				)
 				.oauth2ResourceServer(resourceServer -> {
@@ -56,7 +69,7 @@ public class SecurityConfig {
 						jwt.decoder(jwtDecoder);
 						jwt.jwtAuthenticationConverter(jwtAuthenticationConverter);
 					});
-					resourceServer.accessDeniedHandler(new CustomAccessDeniedHandlerImpl());
+					resourceServer.accessDeniedHandler(CustomAccessDeniedHandlerImpl);
 					resourceServer.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 				})
 				.oauth2Login(oauth2 -> oauth2

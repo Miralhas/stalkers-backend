@@ -8,12 +8,12 @@ import miralhas.github.stalkers.api.dto.input.CreateUserInput;
 import miralhas.github.stalkers.api.dto.input.RefreshTokenInput;
 import miralhas.github.stalkers.api.dto.input.SigninInput;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
+import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.service.AuthenticationService;
 import miralhas.github.stalkers.domain.service.RefreshTokenService;
 import miralhas.github.stalkers.domain.service.TokenService;
 import miralhas.github.stalkers.domain.service.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-	@Value("${access.token.expiration.time}")
-	private Long accessTokenExpirationTime;
-
-	@Value("${refresh.token.expiration.time}")
-	private Long refreshTokenExpirationTime;
+	private final TokenPropertiesConfig tokenPropertiesConfig;
 
 	private final UserMapper userMapper;
 	private final UserService userService;
@@ -58,8 +54,8 @@ public class AuthenticationController {
 		return new AuthenticationDTO(
 				newAccessToken.getTokenValue(),
 				newRefreshToken.getId().toString(),
-				accessTokenExpirationTime,
-				refreshTokenExpirationTime
+				tokenPropertiesConfig.accessToken().expirationTime(),
+				tokenPropertiesConfig.accessToken().expirationTime()
 		);
 	}
 }

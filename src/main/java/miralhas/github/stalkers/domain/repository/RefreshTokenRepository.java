@@ -1,5 +1,7 @@
-package miralhas.github.stalkers.domain.model.auth;
+package miralhas.github.stalkers.domain.repository;
 
+import miralhas.github.stalkers.domain.model.auth.RefreshToken;
+import miralhas.github.stalkers.domain.model.auth.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

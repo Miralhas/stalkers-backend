@@ -1,12 +1,12 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.exception.RefreshTokenExpiredException;
 import miralhas.github.stalkers.domain.exception.RefreshTokenNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.RefreshToken;
-import miralhas.github.stalkers.domain.model.auth.RefreshTokenRepository;
+import miralhas.github.stalkers.domain.repository.RefreshTokenRepository;
 import miralhas.github.stalkers.domain.model.auth.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class RefreshTokenService {
 
-	@Value("${refresh.token.expiration.time}")
-	private Long refreshTokenExpirationTime;
-
+	private final TokenPropertiesConfig tokenPropertiesConfig;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final MessageSource messageSource;
 
@@ -54,7 +52,7 @@ public class RefreshTokenService {
 	public RefreshToken save(User user) {
 		var refreshToken = RefreshToken.builder()
 				.user(user)
-				.expiresAt(OffsetDateTime.now().plusSeconds(refreshTokenExpirationTime))
+				.expiresAt(OffsetDateTime.now().plusSeconds(tokenPropertiesConfig.refreshToken().expirationTime()))
 				.build();
 		return refreshTokenRepository.save(refreshToken);
 	}
