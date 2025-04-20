@@ -29,7 +29,7 @@ public class CustomOauth2FailureHandler implements AuthenticationFailureHandler 
 			HttpServletRequest request, HttpServletResponse response, AuthenticationException exception
 	) throws IOException, ServletException {
 
-		var detail = errorMessages.get("oauth2.failureHandler", null);
+		var detail = errorMessages.get("oauth2.failureHandler");
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
 		problem.setTitle("OAuth2 Authentication Failure");
 		problem.setInstance(URI.create(request.getRequestURI()));
