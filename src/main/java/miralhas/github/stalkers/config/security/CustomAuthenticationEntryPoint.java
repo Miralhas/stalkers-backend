@@ -34,7 +34,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
 		if (ex instanceof OAuth2AuthenticationException oauth2Exception) {
 			problem.setProperty("isTokenInvalid", true);
-			problem.setProperty("error", oauth2Exception.getMessage());
 			OAuth2Error error = oauth2Exception.getError();
 			parameters.put("error", error.getErrorCode());
 			if (StringUtils.hasText(error.getDescription())) {

@@ -31,7 +31,7 @@ public class AuthenticationController {
 	private final TokenService tokenService;
 
 	@PostMapping("/signup")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public UserDTO signUp(@RequestBody @Valid CreateUserInput createUserInput) {
 		User user = userMapper.fromInput(createUserInput);
 		user = userService.create(user);

@@ -77,7 +77,7 @@ public class SecurityConfig {
 				)
 				.authorizeHttpRequests(authz -> {
 					authz.requestMatchers("/secured").authenticated();
-					authz.requestMatchers(HttpMethod.POST, "/api/auth/signup", "api/auth/signin").permitAll();
+					authz.requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/signin").permitAll();
 					authz.requestMatchers(HttpMethod.GET, "/**").permitAll();
 					authz.anyRequest().authenticated();
 				})

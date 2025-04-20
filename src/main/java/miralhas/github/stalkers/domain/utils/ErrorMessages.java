@@ -14,4 +14,8 @@ public class ErrorMessages {
 	public String get(String code, @Nullable Object... args) {
 		return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
 	}
+
+	public String get(String code) {
+		return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
+	}
 }

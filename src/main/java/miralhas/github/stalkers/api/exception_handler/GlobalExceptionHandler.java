@@ -42,7 +42,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ProblemDetail handleUncaughtException(Exception ex, WebRequest webRequest) {
 		log.error("Internal Server Error Exception:", ex);
 		var status = HttpStatus.INTERNAL_SERVER_ERROR;
-		var detail = errorMessages.get("internalServerError", null);
+		var detail = errorMessages.get("internalServerError");
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Internal Server Error");
 		problemDetail.setType(URI.create("https://localhost:8080/errors/internal-server-error"));
@@ -52,14 +52,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(UserAlreadyExistsException.class)
 	public ProblemDetail handleUserAlreadyExistsException(UserAlreadyExistsException ex, WebRequest webRequest) {
 		var errors = ex.getErrors();
-		var detail = errorMessages.get("user.alreadyExists", null);
+		var detail = ex.getMessage();
 		var status = HttpStatus.CONFLICT;
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
-		problemDetail.setTitle("User Already Exists");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/user-already-exists"));
-		problemDetail.setProperty("errors", errors);
+		problemDetail.setTitle("Authentication Conflict");
+		problemDetail.setType(URI.create("https://localhost:8080/errors/authentication-conflict"));
+		if (Objects.nonNull(errors)) {
+			problemDetail.setProperty("errors", errors);
+		}
 		return problemDetail;
 	}
+
+
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ProblemDetail handleAccessDeniedException(AccessDeniedException ex, WebRequest webRequest) {
@@ -88,7 +92,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(BadCredentialsException.class)
 	public ProblemDetail handleBadCredentialsException(BadCredentialsException ex, WebRequest webRequest) {
-		String detail = errorMessages.get("PasswordComparisonAuthenticator.badCredentials", null);
+		String detail = errorMessages.get("PasswordComparisonAuthenticator.badCredentials");
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
 		problemDetail.setTitle("Invalid Authentication");
 		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
@@ -112,7 +116,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			String message = messageSource.getMessage(error, LocaleContextHolder.getLocale());
 			errorsMap.put(error.getField(), message);
 		});
-		var detail = errorMessages.get("methodArgumentNotValid", null);
+		var detail = errorMessages.get("methodArgumentNotValid");
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
 		problemDetail.setTitle("Invalid Fields");
 		problemDetail.setType(URI.create("http://localhost:8080/error/invalid-fields"));
@@ -164,7 +168,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		if (ex.getCause() instanceof InvalidFormatException) {
 			return handleInvalidFormat((InvalidFormatException) ex.getCause(), headers, status, request);
 		}
-		var detail = errorMessages.get("httpMessageNotReadable", null);
+		var detail = errorMessages.get("httpMessageNotReadable");
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Incomprehensible Message");
