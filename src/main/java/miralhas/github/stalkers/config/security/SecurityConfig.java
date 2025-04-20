@@ -60,7 +60,7 @@ public class SecurityConfig {
 				.sessionManagement(session ->
 						session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.exceptionHandling(ex -> ex
-						.accessDeniedHandler(customAccessDeniendHandlerImpl)
+						.accessDeniedHandler(customAccessDeniedHandlerImpl)
 						.authenticationEntryPoint(customAuthenticationEntryPoint)
 				)
 				.oauth2ResourceServer(resourceServer -> {
@@ -68,7 +68,7 @@ public class SecurityConfig {
 						jwt.decoder(jwtDecoder);
 						jwt.jwtAuthenticationConverter(jwtAuthenticationConverter);
 					});
-					resourceServer.accessDeniedHandler(customAccessDeniendHandlerImpl);
+					resourceServer.accessDeniedHandler(customAccessDeniedHandlerImpl);
 					resourceServer.authenticationEntryPoint(customAuthenticationEntryPoint);
 				})
 				.oauth2Login(oauth2 -> oauth2

@@ -55,7 +55,7 @@ public class AuthenticationController {
 				newAccessToken.getTokenValue(),
 				newRefreshToken.getId().toString(),
 				tokenPropertiesConfig.accessToken().expirationTime(),
-				tokenPropertiesConfig.accessToken().expirationTime()
+				tokenPropertiesConfig.refreshToken().expirationTime()
 		);
 	}
 }
