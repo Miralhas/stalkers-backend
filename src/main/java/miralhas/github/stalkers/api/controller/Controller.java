@@ -3,6 +3,7 @@ package miralhas.github.stalkers.api.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +13,7 @@ public class Controller {
 
 	@GetMapping("/")
 	@ResponseStatus(HttpStatus.OK)
-	public String home() {
+	public String home(@RequestParam(required = false) Integer number) {
 		return "hello";
 	}
 

@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.domain.exception.RoleNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.Role;
 import miralhas.github.stalkers.domain.repository.RoleRepository;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleService {
 
 	private final RoleRepository roleRepository;
-	private final MessageSource messageSource;
+	private final ErrorMessages errorMessages;
 
 	public Role getUserRole() {
 		return roleRepository.findRoleByName(Role.Value.USER).orElseThrow(() -> new RoleNotFoundException(
-				messageSource.getMessage("role.notFound", new Object[]{"USER"}, LocaleContextHolder.getLocale())
+				errorMessages.get("role.notFound", "USER")
 		));
 	}
 
 	public Role getAdminRole() {
 		return roleRepository.findRoleByName(Role.Value.ADMIN).orElseThrow(() -> new RoleNotFoundException(
-				messageSource.getMessage("role.notFound", new Object[]{"ADMIN"}, LocaleContextHolder.getLocale())
+				errorMessages.get("role.notFound", "ADMIN")
 		));
 	}
 

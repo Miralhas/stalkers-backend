@@ -6,8 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -23,16 +22,14 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class CustomOauth2FailureHandler implements AuthenticationFailureHandler {
 
-	private final MessageSource messageSource;
+	private final ErrorMessages errorMessages;
 
 	@Override
 	public void onAuthenticationFailure(
 			HttpServletRequest request, HttpServletResponse response, AuthenticationException exception
 	) throws IOException, ServletException {
 
-		var detail = messageSource.getMessage(
-				"oauth2.failureHandler", new Object[]{}, LocaleContextHolder.getLocale()
-		);
+		var detail = errorMessages.get("oauth2.failureHandler", null);
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
 		problem.setTitle("OAuth2 Authentication Failure");
 		problem.setInstance(URI.create(request.getRequestURI()));

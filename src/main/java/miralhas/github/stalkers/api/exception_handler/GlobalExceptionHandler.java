@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import miralhas.github.stalkers.domain.exception.BusinessException;
 import miralhas.github.stalkers.domain.exception.ResourceNotFoundException;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -35,12 +36,13 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private final MessageSource messageSource;
+	private final ErrorMessages errorMessages;
 
 	@ExceptionHandler(Exception.class)
 	public ProblemDetail handleUncaughtException(Exception ex, WebRequest webRequest) {
 		log.error("Internal Server Error Exception:", ex);
 		var status = HttpStatus.INTERNAL_SERVER_ERROR;
-		var detail = messageSource.getMessage("internalServerError", null, LocaleContextHolder.getLocale());
+		var detail = errorMessages.get("internalServerError", null);
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Internal Server Error");
 		problemDetail.setType(URI.create("https://localhost:8080/errors/internal-server-error"));
@@ -50,7 +52,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(UserAlreadyExistsException.class)
 	public ProblemDetail handleUserAlreadyExistsException(UserAlreadyExistsException ex, WebRequest webRequest) {
 		var errors = ex.getErrors();
-		var detail = messageSource.getMessage("user.alreadyExists", null, LocaleContextHolder.getLocale());
+		var detail = errorMessages.get("user.alreadyExists", null);
 		var status = HttpStatus.CONFLICT;
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("User Already Exists");
@@ -86,8 +88,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(BadCredentialsException.class)
 	public ProblemDetail handleBadCredentialsException(BadCredentialsException ex, WebRequest webRequest) {
-		String detail = messageSource.getMessage("PasswordComparisonAuthenticator.badCredentials",
-				new Object[]{}, LocaleContextHolder.getLocale());
+		String detail = errorMessages.get("PasswordComparisonAuthenticator.badCredentials", null);
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
 		problemDetail.setTitle("Invalid Authentication");
 		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
@@ -111,7 +112,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			String message = messageSource.getMessage(error, LocaleContextHolder.getLocale());
 			errorsMap.put(error.getField(), message);
 		});
-		var detail = messageSource.getMessage("methodArgumentNotValid", null, LocaleContextHolder.getLocale());
+		var detail = errorMessages.get("methodArgumentNotValid", null);
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
 		problemDetail.setTitle("Invalid Fields");
 		problemDetail.setType(URI.create("http://localhost:8080/error/invalid-fields"));
@@ -123,8 +124,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleNoResourceFoundException(
 			NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
 	) {
-		String detail = messageSource.getMessage("noResourceFound",
-				new Object[]{ex.getResourcePath()}, LocaleContextHolder.getLocale());
+		String detail = errorMessages.get("noResourceFound", ex.getResourcePath());
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Inexistent Resource");
 		problemDetail.setType(URI.create("https://localhost:8080/errors/inexistent-resource"));
@@ -136,9 +136,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
 			HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
 	) {
-		String detail = messageSource.getMessage("httpMethodNotSupported",
-				new Object[]{ex.getMethod(), ex.getSupportedHttpMethods()}, LocaleContextHolder.getLocale());
-
+		String detail = errorMessages.get("httpMethodNotSupported", ex.getMethod(), ex.getSupportedHttpMethods());
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, detail);
 		problemDetail.setTitle("HTTP Method not supported");
 		problemDetail.setType(URI.create("https://localhost:8080/errors/http-method-not-supported"));
@@ -149,8 +147,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleTypeMismatch(
 			TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
 	) {
-		Object[] args = new Object[]{ex.getPropertyName(), ex.getValue(), ex.getRequiredType().getSimpleName()};
-		String detail = messageSource.getMessage("typeMismatch", args, LocaleContextHolder.getLocale());
+		String detail = errorMessages.get("typeMismatch", ex.getPropertyName(),
+				ex.getValue(), ex.getRequiredType().getSimpleName());
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
 		problemDetail.setTitle("Type Mismatch");
@@ -166,7 +164,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		if (ex.getCause() instanceof InvalidFormatException) {
 			return handleInvalidFormat((InvalidFormatException) ex.getCause(), headers, status, request);
 		}
-		var detail = messageSource.getMessage("httpMessageNotReadable", null, LocaleContextHolder.getLocale());
+		var detail = errorMessages.get("httpMessageNotReadable", null);
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Incomprehensible Message");
@@ -178,8 +176,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			InvalidFormatException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
 	) {
 		String path = joinPath(ex.getPath());
-		String detail = messageSource.getMessage("invalidFormat",
-				new Object[]{path, ex.getValue(), ex.getTargetType().getSimpleName()}, LocaleContextHolder.getLocale());
+		String detail = errorMessages.get("invalidFormat", path, ex.getValue(), ex.getTargetType().getSimpleName());
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Invalid Property Format");

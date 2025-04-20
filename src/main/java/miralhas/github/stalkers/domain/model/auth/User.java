@@ -1,5 +1,6 @@
 package miralhas.github.stalkers.domain.model.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,6 +33,7 @@ public class User {
 
 	private String password;
 
+	@Builder.Default
 	@Column(nullable = false, name = "is_oauth2_authenticated")
 	private Boolean isOAuth2Authenticated = false;
 
@@ -43,10 +45,12 @@ public class User {
 	@ToString.Exclude
 	private Set<Role> roles;
 
+	@JsonIgnore
 	public List<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream().map(r -> r.getName().getAuthority()).toList();
 	}
 
+	@JsonIgnore
 	public boolean isAdmin() {
 		return roles.stream().anyMatch(r -> r.getName().equals(Role.Value.ADMIN));
 	}

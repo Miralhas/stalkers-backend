@@ -2,12 +2,10 @@ package miralhas.github.stalkers.config.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -23,13 +21,11 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class CustomAccessDeniedHandlerImpl implements AccessDeniedHandler {
 
-	private final MessageSource messageSource;
+	private final ErrorMessages errorMessages;
 
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex) throws IOException {
-		var detail = messageSource.getMessage(
-				"AbstractAccessDecisionManager.accessDenied", new Object[]{}, LocaleContextHolder.getLocale()
-		);
+		var detail = errorMessages.get("AbstractAccessDecisionManager.accessDenied", null);
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
 		problem.setTitle("Forbidden");
 		problem.setInstance(URI.create(request.getRequestURI()));
