@@ -58,18 +58,16 @@ public class UserService {
 	@Transactional
 	public User update(UpdateUserInput updateUserInput, JwtAuthenticationToken authToken) {
 		var user = findUserByEmailOrException(authToken.getName());
-		checkIfUsernameIsAvailiable(updateUserInput.username(), user);
+		checkIfCanUpdateUsername(updateUserInput.username(), user);
 		userMapper.update(updateUserInput, user);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return user;
 	}
 
-	private void checkIfUsernameIsAvailiable(String username, User user) {
+	private void checkIfCanUpdateUsername(String username, User user) {
 		userRepository.findUserByUsername(username).ifPresent(u -> {
 			if (!u.getUsername().equals(user.getUsername())) {
-				throw new UserAlreadyExistsException(errorMessages.get(
-						"user.alreadyExists.username", username), null
-				);
+				throw new UserAlreadyExistsException(errorMessages.get("user.alreadyExists.username", username));
 			}
 		});
 	}
