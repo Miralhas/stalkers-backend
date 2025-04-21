@@ -1,4 +1,17 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    hostname: stalkers-messages
+    networks:
+      - stalkers-network
+
   mysqldb:
     image: mysql:8.0.33
     command: --skip-performance-schema --skip-mysqlx
@@ -18,10 +31,10 @@ services:
       timeout: 30s
 
   stalkers-api:
-    container_name: stalkers-api
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: stalkers-api
     image: stalkers-api:latest
     ports:
       - "8080:8080"
@@ -33,6 +46,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_RABBITMQ_HOST=rabbitmq
 #      - LOCAL_IMAGE_DIRECTORY=/app/images
 #      - SMTP_PASSWORD=${SMTP}
 #    volumes:
