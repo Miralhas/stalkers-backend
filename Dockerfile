@@ -7,7 +7,7 @@ COPY src ./src
 
 RUN mvn clean install -DskipTests
 
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 
 ARG JAR_FILE=target/*.jar
 
