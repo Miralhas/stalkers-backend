@@ -44,7 +44,7 @@ public class EmailServiceImpl implements SendEmailService {
 		helper.setText(body, true);
 		helper.setSubject(message.getSubject());
 		helper.setTo(recipients);
-		helper.addInline("logo", new ClassPathResource("static/images/stalkers-logo.png"));
+		helper.addInline("logo", new ClassPathResource("static/images/stalkers-logo-resized.png"));
 		return mimeMessage;
 	}
 
