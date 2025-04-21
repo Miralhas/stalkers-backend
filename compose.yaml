@@ -1,0 +1,48 @@
+services:
+  mysqldb:
+    image: mysql:8.0.33
+    command: --skip-performance-schema --skip-mysqlx
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=stalkers
+      - MYSQL_ROOT_PASSWORD=admin
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - stalkers-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 10
+      interval: 3s
+      timeout: 30s
+
+  stalkers-api:
+    container_name: stalkers-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: stalkers-api:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=dev
+#      - LOCAL_IMAGE_DIRECTORY=/app/images
+#      - SMTP_PASSWORD=${SMTP}
+#    volumes:
+#      - api-images:/app/images
+    networks:
+      - stalkers-network
+
+volumes:
+  mysql-data:
+#  api-images:
+networks:
+  stalkers-network:
+    name: stalkers-network
