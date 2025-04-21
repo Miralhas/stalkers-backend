@@ -8,6 +8,7 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    hostname: stalkers-messages
     networks:
       - stalkers-network
 

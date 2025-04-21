@@ -7,6 +7,7 @@ import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -27,6 +28,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final ErrorMessages errorMessages;
 	private final UserMapper userMapper;
+	private final RabbitTemplate rabbitTemplate;
 
 	public User findUserByEmailOrException(String email) {
 		return userRepository.findUserByEmail(email).orElseThrow(() -> {
@@ -52,6 +54,9 @@ public class UserService {
 		user.setRoles(Set.of(userRole));
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user = userRepository.save(user);
+
+		rabbitTemplate.convertAndSend("stalkers","rk.password.reset", userMapper.toResponse(user));
+
 		return user;
 	}
 
