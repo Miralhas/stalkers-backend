@@ -50,7 +50,7 @@ public class AuthenticationController {
 	@PutMapping("/resetPassword/{token}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void resetPassword(
-			@PathVariable Integer token,
+			@PathVariable String token,
 			@RequestBody @Valid ChangePasswordInput changePasswordInput
 	) {
 		passwordResetService.resetPassword(token, changePasswordInput);

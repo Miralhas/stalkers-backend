@@ -28,15 +28,15 @@ public class PasswordResetService {
 	private final UserMapper userMapper;
 	private final ApplicationEventPublisher events;
 
-	public PasswordResetToken findResetPasswordToken(Integer token) {
-		return passwordResetTokenRepository.findByToken(token.toString())
+	public PasswordResetToken findResetPasswordToken(String token) {
+		return passwordResetTokenRepository.findByToken(token)
 				.orElseThrow(() -> new PasswordResetTokenNotFoundException(
 						errorMessages.get("user.passwordResetToken.notFound", token)
 				));
 	}
 
 	@Transactional
-	public void resetPassword(Integer resetPasswordToken, ChangePasswordInput changePasswordInput) {
+	public void resetPassword(String resetPasswordToken, ChangePasswordInput changePasswordInput) {
 		var token = findResetPasswordToken(resetPasswordToken);
 		var user = token.getUser();
 		user.setPassword(passwordEncoder.encode(changePasswordInput.newPassword()));
@@ -55,7 +55,7 @@ public class PasswordResetService {
 
 	private PasswordResetToken createResetTokenObject(User user) {
 		PasswordResetToken resetToken = new PasswordResetToken();
-		resetToken.setToken(OneTimePasswordUtils.getOTP());
+		resetToken.setToken(OneTimePasswordUtils.generate());
 		resetToken.setUser(user);
 		return resetToken;
 	}

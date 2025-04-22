@@ -9,7 +9,7 @@ public class OneTimePasswordUtils {
 
 	public static final int OTP_LENGTH = 6;
 
-	public static String getOTP() {
+	public static String generate() {
 		Random random = new Random();
 		StringBuilder oneTimePassword = new StringBuilder();
 		for (int i = 0; i < OTP_LENGTH; i++) {
