@@ -1,6 +1,7 @@
 set foreign_key_checks = 0;
 
 delete from refresh_token;
+delete from password_reset_token;
 delete from role;
 delete from user_roles;
 delete from user;
@@ -8,6 +9,7 @@ delete from user;
 set foreign_key_checks = 1;
 
 alter table refresh_token auto_increment = 1;
+alter table password_reset_token auto_increment = 1;
 alter table role auto_increment = 1;
 alter table user auto_increment = 1;
 

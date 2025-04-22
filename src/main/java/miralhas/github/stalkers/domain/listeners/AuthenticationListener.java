@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.listeners;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import miralhas.github.stalkers.api.dto.PasswordResetDTO;
 import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.domain.service.interfaces.SendEmailService;
 import miralhas.github.stalkers.domain.service.interfaces.SendEmailService.Message;
@@ -10,8 +11,6 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Log4j2
 @Component
@@ -25,15 +24,15 @@ public class AuthenticationListener {
 			value = @Queue("queue.password_reset"),
 			key = "rk.password.reset"
 	))
-	public void passwordResetListener(UserDTO user) {
-		log.info("Password reset request received: {}", user);
+	public void passwordResetListener(PasswordResetDTO passwordReset) {
+		log.info("Password reset request received for user: {}", passwordReset.user().username());
 
 		var message = Message.builder()
 				.body("reset-password-token-created")
-				.recipient(user.email())
-				.subject("%s - Password Reset".formatted(user.username()))
-				.model("user", user)
-				.model("token", UUID.randomUUID().toString())
+				.recipient(passwordReset.user().email())
+				.subject("%s - Password Reset".formatted(passwordReset.user().username()))
+				.model("user", passwordReset.user())
+				.model("token", passwordReset.token())
 				.build();
 
 		sendEmailService.send(message);

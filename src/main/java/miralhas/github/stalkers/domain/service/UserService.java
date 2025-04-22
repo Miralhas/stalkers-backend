@@ -3,12 +3,10 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
-import miralhas.github.stalkers.domain.event.SendMessageEvent;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -30,7 +28,6 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final ErrorMessages errorMessages;
 	private final UserMapper userMapper;
-	private final ApplicationEventPublisher events;
 
 	public User findUserByEmailOrException(String email) {
 		return userRepository.findUserByEmail(email).orElseThrow(() -> {
@@ -53,8 +50,6 @@ public class UserService {
 		user.setRoles(Set.of(userRole));
 		if (Objects.nonNull(user.getPassword())) user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user = userRepository.save(user);
-		events.publishEvent(new SendMessageEvent(
-				userMapper.toResponse(user), "rk.password.reset", "stalkers"));
 		return user;
 	}
 

@@ -13,7 +13,7 @@ public class Controller {
 	@GetMapping("/")
 	@ResponseStatus(HttpStatus.OK)
 	public String home() {
-		return "hello";
+		return "Stalkers API";
 	}
 
 	@GetMapping("/secured")
