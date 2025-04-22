@@ -4,16 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.AuthenticationDTO;
 import miralhas.github.stalkers.api.dto.UserDTO;
-import miralhas.github.stalkers.api.dto.input.CreateUserInput;
-import miralhas.github.stalkers.api.dto.input.RefreshTokenInput;
-import miralhas.github.stalkers.api.dto.input.SigninInput;
+import miralhas.github.stalkers.api.dto.input.*;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.model.auth.User;
-import miralhas.github.stalkers.domain.service.AuthenticationService;
-import miralhas.github.stalkers.domain.service.RefreshTokenService;
-import miralhas.github.stalkers.domain.service.TokenService;
-import miralhas.github.stalkers.domain.service.UserService;
+import miralhas.github.stalkers.domain.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +24,7 @@ public class AuthenticationController {
 	private final AuthenticationService authenticationService;
 	private final RefreshTokenService refreshTokenService;
 	private final TokenService tokenService;
+	private final PasswordResetService passwordResetService;
 
 	@PostMapping("/signup")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -44,13 +40,29 @@ public class AuthenticationController {
 		return authenticationService.authenticate(signinInput);
 	}
 
+	@PutMapping("/forgotPassword")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void createPasswordResetToken(@RequestBody @Valid ForgotPasswordInput forgotPasswordInput) {
+		passwordResetService.createOrUpdateToken(forgotPasswordInput.email());
+	}
+
+
+	@PutMapping("/resetPassword/{token}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void resetPassword(
+			@PathVariable String token,
+			@RequestBody @Valid ChangePasswordInput changePasswordInput
+	) {
+		passwordResetService.resetPassword(token, changePasswordInput);
+	}
+
 	@PostMapping("/refresh-token")
 	@ResponseStatus(HttpStatus.OK)
 	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {
 		var refreshToken = refreshTokenService.validateRefreshToken(refreshTokenInput.refreshToken());
 		var user = userService.findUserByEmailOrException(refreshToken.getUser().getEmail());
 		var newAccessToken = tokenService.generateToken(user);
-		var newRefreshToken = refreshTokenService.update(refreshToken,user);
+		var newRefreshToken = refreshTokenService.update(refreshToken, user);
 		return new AuthenticationDTO(
 				newAccessToken.getTokenValue(),
 				newRefreshToken.getId().toString(),
