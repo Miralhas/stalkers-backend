@@ -77,10 +77,17 @@ public class SecurityConfig {
 				)
 				.authorizeHttpRequests(authz -> {
 					authz.requestMatchers("/secured").authenticated();
-					authz.requestMatchers(HttpMethod.POST,
-							"/api/auth/refresh-token", "/api/auth/signup", "/api/auth/signin").permitAll();
-					authz.requestMatchers(HttpMethod.PUT,
-							"/api/auth/forgotPassword", "/api/auth/resetPassword/*").permitAll();
+					authz.requestMatchers(
+							HttpMethod.POST,
+							"/api/auth/refresh-token",
+							"/api/auth/signup",
+							"/api/auth/signin"
+					).permitAll();
+					authz.requestMatchers(
+							HttpMethod.PUT,
+							"/api/auth/forgotPassword",
+							"/api/auth/resetPassword/*"
+					).permitAll();
 					authz.requestMatchers(HttpMethod.GET, "/**").permitAll();
 					authz.anyRequest().authenticated();
 				})

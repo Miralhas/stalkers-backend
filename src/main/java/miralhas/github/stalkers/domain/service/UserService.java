@@ -7,27 +7,32 @@ import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService {
+@CacheConfig(cacheNames = "users")
+public class UserService  {
 
 	private final RoleService roleService;
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 	private final ErrorMessages errorMessages;
 	private final UserMapper userMapper;
+
+	@Cacheable
+	public List<User> findAll() {
+		return userRepository.findAll();
+	}
 
 	public User findUserByEmailOrException(String email) {
 		return userRepository.findUserByEmail(email).orElseThrow(() -> {
@@ -44,6 +49,7 @@ public class UserService {
 	}
 
 	@Transactional
+	@CacheEvict(allEntries = true)
 	public User create(User user) {
 		checkIfUsernameOrEmailAreAvailiable(user);
 		var userRole = roleService.getUserRole();
@@ -54,12 +60,12 @@ public class UserService {
 	}
 
 	@Transactional
-	public User update(UpdateUserInput updateUserInput, JwtAuthenticationToken authToken) {
-		var user = findUserByEmailOrException(authToken.getName());
+	@CacheEvict(allEntries = true)
+	public User update(UpdateUserInput updateUserInput, User user) {
 		checkIfCanUpdateUsername(updateUserInput.username(), user);
 		userMapper.update(updateUserInput, user);
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		return user;
+		if (Objects.nonNull(updateUserInput.password())) user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userRepository.save(user);
 	}
 
 	private void checkIfCanUpdateUsername(String username, User user) {

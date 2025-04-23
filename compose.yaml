@@ -45,7 +45,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=prod
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SMTP_PASSWORD=${SMTP}
 #      - LOCAL_IMAGE_DIRECTORY=/app/images
@@ -54,9 +54,20 @@ services:
     networks:
       - stalkers-network
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - stalkers-network
+    volumes:
+      - redis-data:/data
+
 volumes:
-  mysql-data:
 #  api-images:
+  mysql-data:
+  redis-data:
+    driver: local
 networks:
   stalkers-network:
     name: stalkers-network

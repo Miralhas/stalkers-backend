@@ -12,21 +12,21 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class SecurityUser implements UserDetails {
 
-    private final User user;
+	private final User user;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getAuthorities();
-    }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return user.getAuthorities();
+	}
 
-    @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
+	@Override
+	public String getPassword() {
+		return user.getPassword();
+	}
 
-    @Override
-    public String getUsername() {
-        return user.getEmail();
-    }
+	@Override
+	public String getUsername() {
+		return user.getEmail();
+	}
 
 }
