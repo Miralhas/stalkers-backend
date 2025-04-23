@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.AuthenticationDTO;
 import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.*;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
+import miralhas.github.stalkers.api.swagger.AuthenticationControllerSwagger;
 import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.service.*;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class AuthenticationController {
+public class AuthenticationController implements AuthenticationControllerSwagger {
 
 	private final TokenPropertiesConfig tokenPropertiesConfig;
 
@@ -26,6 +27,7 @@ public class AuthenticationController {
 	private final TokenService tokenService;
 	private final PasswordResetService passwordResetService;
 
+	@Override
 	@PostMapping("/signup")
 	@ResponseStatus(HttpStatus.CREATED)
 	public UserDTO signUp(@RequestBody @Valid CreateUserInput createUserInput) {
@@ -34,19 +36,22 @@ public class AuthenticationController {
 		return userMapper.toResponse(user);
 	}
 
+	@Override
 	@PostMapping("/signin")
 	@ResponseStatus(HttpStatus.OK)
-	public AuthenticationDTO login(@RequestBody @Valid SigninInput signinInput) {
+	public AuthenticationDTO signIn(@RequestBody @Valid SigninInput signinInput) {
 		return authenticationService.authenticate(signinInput);
 	}
 
 	@PutMapping("/forgotPassword")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@Override
 	public void createPasswordResetToken(@RequestBody @Valid ForgotPasswordInput forgotPasswordInput) {
 		passwordResetService.createOrUpdateToken(forgotPasswordInput.email());
 	}
 
 
+	@Override
 	@PutMapping("/resetPassword/{token}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void resetPassword(
@@ -56,6 +61,7 @@ public class AuthenticationController {
 		passwordResetService.resetPassword(token, changePasswordInput);
 	}
 
+	@Override
 	@PostMapping("/refresh-token")
 	@ResponseStatus(HttpStatus.OK)
 	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {

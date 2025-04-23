@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
+import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
 import miralhas.github.stalkers.domain.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -15,13 +16,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerSwagger {
 
 	private final UserMapper userMapper;
 	private final UserService userService;
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
+	@Override
 	public List<UserDTO> getAllUsers() {
 		var users = userService.findAll();
 		return userMapper.toCollectionResponse(users);
@@ -29,6 +31,7 @@ public class UserController {
 
 	@PatchMapping
 	@ResponseStatus(HttpStatus.OK)
+	@Override
 	public UserDTO updateUser(@RequestBody @Valid UpdateUserInput updateUserInput, JwtAuthenticationToken token) {
 		var user = userService.findUserByEmailOrException(token.getName());
 		user = userService.update(updateUserInput, user);
