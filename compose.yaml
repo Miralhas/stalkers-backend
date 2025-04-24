@@ -48,9 +48,9 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SMTP_PASSWORD=${SMTP}
-#      - LOCAL_IMAGE_DIRECTORY=/app/images
-#    volumes:
-#      - api-images:/app/images
+      - LOCAL_IMAGE_DIRECTORY=/app/images
+    volumes:
+      - api-images:/app/images
     networks:
       - stalkers-network
 
@@ -64,7 +64,7 @@ services:
       - redis-data:/data
 
 volumes:
-#  api-images:
+  api-images:
   mysql-data:
   redis-data:
     driver: local

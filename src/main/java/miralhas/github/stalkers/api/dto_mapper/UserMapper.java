@@ -5,7 +5,10 @@ import miralhas.github.stalkers.api.dto.input.CreateUserInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.domain.model.auth.Role;
 import miralhas.github.stalkers.domain.model.auth.User;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 import java.util.List;
 
