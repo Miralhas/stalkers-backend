@@ -83,7 +83,10 @@ public class UserService  {
 	@Transactional
 	public Image saveUserImage(User user, Image image, InputStream inputStream) {
 		validateAuthorization.validate(user);
-		image = imageService.save(image, inputStream);
+
+		image = user.hasImage() ? imageService.replace(image, user.getImageFileName(), inputStream)
+				: imageService.save(image, inputStream);
+
 		user.setImage(image);
 		userRepository.saveAndFlush(user);
 		return imageService.getImageJsonOrException(image.getId());

@@ -70,6 +70,10 @@ public class User implements Serializable {
 		return this.image != null;
 	}
 
+	public String getImageFileName() {
+		return hasImage() ? image.getFileName() : "";
+	}
+
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;

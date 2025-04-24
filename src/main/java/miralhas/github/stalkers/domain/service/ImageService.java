@@ -49,11 +49,24 @@ public class ImageService {
 	@Transactional
 	public Image save(Image image, InputStream fileInputStream) {
 		String newImageName = imageStorageService.generateFileName(image.getFileName());
-		String existingFileName = null;
 		image.setFileName(newImageName);
-		var existingImage = imageRepository.findImageByFileName(image.getFileName());
+		image = imageRepository.save(image);
+		imageRepository.flush();
+		var newImage = NewImage.builder()
+				.fileName(image.getFileName())
+				.inputStream(fileInputStream)
+				.build();
+		imageStorageService.save(newImage);
+		return image;
+	}
+
+	@Transactional
+	public Image replace(Image image, String existingImageFileName, InputStream fileInputStream) {
+		String newImageName = imageStorageService.generateFileName(image.getFileName());
+		image.setFileName(newImageName);
+		var existingImage = imageRepository.findImageByFileName(existingImageFileName);
 		if (existingImage.isPresent()) {
-			existingFileName = existingImage.get().getFileName();
+			existingImageFileName = existingImage.get().getFileName();
 			imageRepository.delete(existingImage.get());
 			imageRepository.flush();
 		}
@@ -63,7 +76,7 @@ public class ImageService {
 				.fileName(image.getFileName())
 				.inputStream(fileInputStream)
 				.build();
-		imageStorageService.replace(newImage, existingFileName);
+		imageStorageService.replace(newImage, existingImageFileName);
 		return image;
 	}
 
