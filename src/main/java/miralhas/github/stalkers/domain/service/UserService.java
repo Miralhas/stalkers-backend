@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
+import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.*;
 
 @Service
@@ -28,6 +31,8 @@ public class UserService  {
 	private final UserRepository userRepository;
 	private final ErrorMessages errorMessages;
 	private final UserMapper userMapper;
+	private final ImageService imageService;
+	private final ValidateAuthorization validateAuthorization;
 
 	@Cacheable
 	public List<User> findAll() {
@@ -36,7 +41,14 @@ public class UserService  {
 
 	public User findUserByEmailOrException(String email) {
 		return userRepository.findUserByEmail(email).orElseThrow(() -> {
-			var message = errorMessages.get("user.notFound", email);
+			var message = errorMessages.get("user.email.notFound", email);
+			return new UsernameNotFoundException(message);
+		});
+	}
+
+	public User findUserByIdOrException(Long id) {
+		return userRepository.findById(id).orElseThrow(() -> {
+			var message = errorMessages.get("user.id.notFound", id);
 			return new UsernameNotFoundException(message);
 		});
 	}
@@ -66,6 +78,23 @@ public class UserService  {
 		userMapper.update(updateUserInput, user);
 		if (Objects.nonNull(updateUserInput.password())) user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userRepository.save(user);
+	}
+
+	@Transactional
+	public Image saveUserImage(User user, Image image, InputStream inputStream) {
+		validateAuthorization.validate(user);
+		image = imageService.save(image, inputStream);
+		user.setImage(image);
+		userRepository.saveAndFlush(user);
+		return imageService.getImageJsonOrException(image.getId());
+	}
+
+	@Transactional
+	public void deleteUserImage(User user) {
+		validateAuthorization.validate(user);
+		imageService.delete(user.getImage());
+		user.setImage(null);
+		userRepository.save(user);
 	}
 
 	private void checkIfCanUpdateUsername(String username, User user) {
