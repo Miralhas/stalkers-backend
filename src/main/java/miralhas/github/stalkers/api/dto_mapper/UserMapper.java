@@ -2,10 +2,12 @@ package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.CreateUserInput;
+import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.domain.model.auth.Role;
 import miralhas.github.stalkers.domain.model.auth.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.util.List;
@@ -26,6 +28,9 @@ public interface UserMapper {
 	UserDTO toResponse(User user);
 
 	List<UserDTO> toCollectionResponse(List<User> users);
+
+	@Mapping(target = "id", ignore = true)
+	void update(UpdateUserInput userRequest, @MappingTarget User userEntity);
 
 	@Named("mapRoles")
 	default String mapRoles(Role role) {

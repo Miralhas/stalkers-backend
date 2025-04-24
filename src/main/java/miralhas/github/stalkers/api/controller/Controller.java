@@ -1,22 +1,14 @@
 package miralhas.github.stalkers.api.controller;
 
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-//@RequestMapping()
+@Tag(name = "Home")
+@RequiredArgsConstructor
 public class Controller {
-
-	@GetMapping("/")
-	@ResponseStatus(HttpStatus.OK)
-	public String home(@RequestParam(required = false) Integer number) {
-		System.out.println("got here");
-		System.out.println(number);
-		return "hello";
-	}
 
 	@GetMapping("/secured")
 	public String secured() {

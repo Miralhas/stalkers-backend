@@ -1,14 +1,13 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.exception.RefreshTokenExpiredException;
 import miralhas.github.stalkers.domain.exception.RefreshTokenNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.RefreshToken;
-import miralhas.github.stalkers.domain.model.auth.RefreshTokenRepository;
 import miralhas.github.stalkers.domain.model.auth.User;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+import miralhas.github.stalkers.domain.repository.RefreshTokenRepository;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +19,12 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class RefreshTokenService {
 
-	@Value("${refresh.token.expiration.time}")
-	private Long refreshTokenExpirationTime;
-
+	private final TokenPropertiesConfig tokenPropertiesConfig;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private final MessageSource messageSource;
+	private final ErrorMessages errorMessages;
 
 	public RefreshToken getRefreshTokenOrExcepiton(UUID id) {
-		var message = messageSource.getMessage("refreshToken.notFound", new Object[]{id},
-				LocaleContextHolder.getLocale()
-		);
+		var message = errorMessages.get("refreshToken.notFound", id);
 		return refreshTokenRepository.findById(id)
 				.orElseThrow(() -> new RefreshTokenNotFoundException(message));
 	}
@@ -40,10 +35,8 @@ public class RefreshTokenService {
 		if (refreshToken.isInvalid()) {
 			refreshTokenRepository.deleteAllUserRefreshTokens(refreshToken.getUser());
 			refreshTokenRepository.flush();
-			var message = messageSource.getMessage(
-					"refreshToken.expired",
-					new Object[]{refreshToken.getId(), refreshToken.getExpiresAt()},
-					LocaleContextHolder.getLocale()
+			var message = errorMessages.get(
+					"refreshToken.expired", refreshToken.getId(), refreshToken.getExpiresAt()
 			);
 			throw new RefreshTokenExpiredException(message);
 		}
@@ -54,7 +47,7 @@ public class RefreshTokenService {
 	public RefreshToken save(User user) {
 		var refreshToken = RefreshToken.builder()
 				.user(user)
-				.expiresAt(OffsetDateTime.now().plusSeconds(refreshTokenExpirationTime))
+				.expiresAt(OffsetDateTime.now().plusSeconds(tokenPropertiesConfig.refreshToken().expirationTime()))
 				.build();
 		return refreshTokenRepository.save(refreshToken);
 	}

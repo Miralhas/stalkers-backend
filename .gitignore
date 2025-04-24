@@ -32,5 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 
+!**/src/main/resources/private.pem
+!**/src/main/resources/public.pem
+
 src/main/resources/private.pem
 src/main/resources/public.pem
+
+private.pem
+public.pem

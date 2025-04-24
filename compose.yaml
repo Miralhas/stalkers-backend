@@ -1,0 +1,73 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    hostname: stalkers-messages
+    networks:
+      - stalkers-network
+
+  mysqldb:
+    image: mysql:8.0.33
+    command: --skip-performance-schema --skip-mysqlx
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=stalkers
+      - MYSQL_ROOT_PASSWORD=admin
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - stalkers-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 10
+      interval: 3s
+      timeout: 30s
+
+  stalkers-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stalkers-api
+    image: stalkers-api:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SMTP_PASSWORD=${SMTP}
+      - LOCAL_IMAGE_DIRECTORY=/app/images
+    volumes:
+      - api-images:/app/images
+    networks:
+      - stalkers-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - stalkers-network
+    volumes:
+      - redis-data:/data
+
+volumes:
+  api-images:
+  mysql-data:
+  redis-data:
+    driver: local
+networks:
+  stalkers-network:
+    name: stalkers-network

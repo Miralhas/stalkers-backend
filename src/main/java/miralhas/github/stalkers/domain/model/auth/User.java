@@ -1,23 +1,32 @@
 package miralhas.github.stalkers.domain.model.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import miralhas.github.stalkers.domain.model.Image;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@With
 @Getter
 @Setter
 @Entity
+@Builder
 @ToString
-public class User {
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,23 +40,38 @@ public class User {
 
 	private String password;
 
+	@Builder.Default
 	@Column(nullable = false, name = "is_oauth2_authenticated")
 	private Boolean isOAuth2Authenticated = false;
 
 	@CreationTimestamp
 	private OffsetDateTime createdAt;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	@ToString.Exclude
 	private Set<Role> roles;
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Image image;
+
+	@JsonIgnore
 	public List<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream().map(r -> r.getName().getAuthority()).toList();
 	}
 
+	@JsonIgnore
 	public boolean isAdmin() {
 		return roles.stream().anyMatch(r -> r.getName().equals(Role.Value.ADMIN));
+	}
+
+	@JsonIgnore
+	public boolean hasImage() {
+		return this.image != null;
+	}
+
+	public String getImageFileName() {
+		return hasImage() ? image.getFileName() : "";
 	}
 
 	@Override
