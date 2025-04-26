@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.exception.NovelAlreadyExistsException;
 import miralhas.github.stalkers.domain.exception.NovelNotFoundException;
+import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
@@ -14,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -27,6 +29,7 @@ public class NovelService {
 	private final NovelMapper novelMapper;
 	private final ChapterMapper chapterMapper;
 	private final ChapterService chapterService;
+	private final ImageService imageService;
 
 	@Cacheable(cacheNames = "novels.list")
 	public List<Novel> findAll() {
@@ -34,19 +37,19 @@ public class NovelService {
 	}
 
 	@Cacheable(cacheNames = "novels.detail")
-	public Novel findByIdentifierOrExceptionCacheable(String chapterIdentifier) {
-		return null;
-	}
-
-	public Novel findByIdOrException(Long id) {
-		return novelRepository.findById(id).orElseThrow(() -> new NovelNotFoundException(
-				errorMessages.get("novel.notFound.id", id)
-		));
+	public Novel findBySlugOrExceptionCacheable(String slug) {
+		return findBySlugOrException(slug);
 	}
 
 	public Novel findBySlugOrException(String slug) {
 		return novelRepository.findBySlug(slug).orElseThrow(() -> new NovelNotFoundException(
 				errorMessages.get("novel.notFound.slug", slug)
+		));
+	}
+
+	public Novel findByIdOrException(Long id) {
+		return novelRepository.findById(id).orElseThrow(() -> new NovelNotFoundException(
+				errorMessages.get("novel.notFound.id", id)
 		));
 	}
 
@@ -62,6 +65,23 @@ public class NovelService {
 		chapterService.saveBulk(novel, chapters);
 
 		return novel;
+	}
+
+	@Transactional
+	public Image saveImage(Novel novel, Image image, InputStream inputStream) {
+		image = novel.hasImage() ? imageService.replace(image, novel.getImageFileName(), inputStream)
+				: imageService.save(image, inputStream);
+
+		novel.setImage(image);
+		novelRepository.saveAndFlush(novel);
+		return imageService.getImageJsonOrException(image.getId());
+	}
+
+	@Transactional
+	public void deleteImage(Novel novel) {
+		imageService.delete(novel.getImage());
+		novel.setImage(null);
+		novelRepository.save(novel);
 	}
 
 	private void validateSlug(String slug) {

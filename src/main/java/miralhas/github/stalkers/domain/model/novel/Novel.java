@@ -64,6 +64,14 @@ public class Novel implements Serializable {
 		this.slug = SLG.slugify(title);
 	}
 
+	public boolean hasImage() {
+		return this.image != null;
+	}
+
+	public String getImageFileName() {
+		return this.image.getFileName();
+	}
+
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
