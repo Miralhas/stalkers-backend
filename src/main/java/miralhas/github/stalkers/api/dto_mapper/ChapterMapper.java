@@ -1,18 +1,34 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.ChapterDTO;
+import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import java.util.List;
+
+import static org.mapstruct.NullValueCheckStrategy.ALWAYS;
+import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(
-		unmappedTargetPolicy = ReportingPolicy.IGNORE,
-		componentModel = MappingConstants.ComponentModel.SPRING
+		componentModel = "spring",
+		nullValuePropertyMappingStrategy = IGNORE,
+		nullValueCheckStrategy = ALWAYS
 )
 public interface ChapterMapper {
-	Chapter fromInput(ChapterDTO chapterDTO);
+	Chapter fromInput(ChapterInput chapterInput);
+	List<Chapter> fromInputCollection(List<ChapterInput> chapterInputList);
 
 	ChapterDTO toResponse(Chapter chapter);
 
-	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-	Chapter partialUpdate(ChapterDTO chapterDTO, @MappingTarget Chapter chapter);
+	ChapterSummaryDTO toSummaryResponse(Chapter chapter);
+
+	List<ChapterSummaryDTO> toSummaryCollectionResponse(List<Chapter> chapters);
+
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "slug", ignore = true)
+	Chapter update(ChapterInput chapterInput, @MappingTarget Chapter chapter);
 }

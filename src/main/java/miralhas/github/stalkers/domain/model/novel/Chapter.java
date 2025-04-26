@@ -3,11 +3,14 @@ package miralhas.github.stalkers.domain.model.novel;
 
 import jakarta.persistence.*;
 import lombok.*;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
+
+import static miralhas.github.stalkers.StalkersApplication.SLG;
 
 @With
 @Getter
@@ -28,11 +31,22 @@ public class Chapter implements Serializable {
 	@Column(nullable = false)
 	private String title;
 
+	@Column(nullable = false)
+	private Long number;
+
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String body;
 
 	@Column(nullable = false, unique = true)
 	private String slug;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Novel novel;
+
+	public void generateSlug(String novelTitle) {
+		var titleInitials = CommonsUtils.getInitialsFromSlug(SLG.slugify(novelTitle));
+		this.slug = SLG.slugify("%s chapter %d".formatted(titleInitials, this.number));
+	}
 
 	@Override
 	public final boolean equals(Object o) {

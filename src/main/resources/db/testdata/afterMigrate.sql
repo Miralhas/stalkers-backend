@@ -5,6 +5,9 @@ delete from password_reset_token;
 delete from role;
 delete from user_roles;
 delete from user;
+# delete from chapter;
+# delete from novel_tags;
+# delete from novel;
 
 set foreign_key_checks = 1;
 
@@ -12,6 +15,9 @@ alter table refresh_token auto_increment = 1;
 alter table password_reset_token auto_increment = 1;
 alter table role auto_increment = 1;
 alter table user auto_increment = 1;
+# alter table chapter auto_increment = 1;
+# alter table novel_tags auto_increment = 1;
+# alter table novel auto_increment = 1;
 
 insert into role(name) values('ADMIN'), ('USER');
 

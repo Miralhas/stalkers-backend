@@ -9,9 +9,10 @@ import org.hibernate.proxy.HibernateProxy;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import static miralhas.github.stalkers.StalkersApplication.SLG;
 
 @With
 @Getter
@@ -31,10 +32,6 @@ public class Novel implements Serializable {
 
 	@Column(nullable = false, unique = true)
 	private String slug;
-
-	@Column(nullable = false)
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Chapter> chapters;
 
 	@Column(nullable = false)
 	private String title;
@@ -63,8 +60,8 @@ public class Novel implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
 
-	public long novelChaptersCount() {
-		return this.chapters.size();
+	public void generateSlug() {
+		this.slug = SLG.slugify(title);
 	}
 
 	@Override
