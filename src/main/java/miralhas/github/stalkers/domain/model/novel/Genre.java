@@ -1,6 +1,5 @@
 package miralhas.github.stalkers.domain.model.novel;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -16,10 +15,14 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tags implements Serializable {
+public class Genre implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
+
+	public Genre(String name) {
+		this.name = name;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +31,9 @@ public class Tags implements Serializable {
 	@Column(nullable = false, unique = true)
 	private String name;
 
+	@Column(nullable = true, columnDefinition = "TEXT")
+	private String description;
+
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
@@ -35,8 +41,8 @@ public class Tags implements Serializable {
 		Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
 		Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
 		if (thisEffectiveClass != oEffectiveClass) return false;
-		Tags tags = (Tags) o;
-		return getId() != null && Objects.equals(getId(), tags.getId());
+		Genre genre = (Genre) o;
+		return getId() != null && Objects.equals(getId(), genre.getId());
 	}
 
 	@Override

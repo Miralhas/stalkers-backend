@@ -9,6 +9,7 @@ import miralhas.github.stalkers.domain.exception.NovelNotFoundException;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
+import miralhas.github.stalkers.domain.service.interfaces.GenreService;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,8 @@ public class NovelService {
 	private final ChapterMapper chapterMapper;
 	private final ChapterService chapterService;
 	private final ImageService imageService;
+	private final TagsService tagsService;
+	private final GenreService genreService;
 
 	@Cacheable(cacheNames = "novels.list")
 	public List<Novel> findAll() {
@@ -57,9 +61,10 @@ public class NovelService {
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
 	public Novel save(NovelInput novelInput) {
 		var novel = novelMapper.fromInput(novelInput);
-		var chapters = chapterMapper.fromInputCollection(novelInput.chapters());
 		novel.generateSlug();
-		validateSlug(novel.getSlug());
+		performValidations(novel);
+
+		var chapters = chapterMapper.fromInputCollection(novelInput.chapters());
 
 		novel = novelRepository.save(novel);
 		chapterService.saveBulk(novel, chapters);
@@ -84,11 +89,33 @@ public class NovelService {
 		novelRepository.save(novel);
 	}
 
+	private void performValidations(Novel novel) {
+		validateSlug(novel.getSlug());
+		validateGenres(novel);
+		validateTags(novel);
+	}
+
 	private void validateSlug(String slug) {
 		var exists = novelRepository.checkIfSlugAlreadyExists(slug);
 		if (exists) throw new NovelAlreadyExistsException(
 				errorMessages.get("novel.alreadyExists.slug", slug)
 		);
+	}
+
+	private void validateTags(Novel novel) {
+		var tags = novel.getTags()
+				.stream()
+				.map(t -> tagsService.findTagByNameOrException(t.getName()))
+				.collect(Collectors.toSet());
+		novel.setTags(tags);
+	}
+
+	private void validateGenres(Novel novel) {
+		var genres = novel.getGenres()
+				.stream()
+				.map(t -> genreService.findGenreByNameOrException(t.getName()))
+				.collect(Collectors.toSet());
+		novel.setGenres(genres);
 	}
 
 }

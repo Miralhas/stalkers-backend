@@ -44,18 +44,28 @@ public class Novel implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.ON_GOING;
 
-	@Column(nullable = true)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 
 	@ManyToMany(
-			fetch = FetchType.LAZY,
-			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+			fetch = FetchType.EAGER,
+			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
 	)
 	@JoinTable(
 			name = "novel_tags",
 			joinColumns = @JoinColumn(name = "novel_id"), inverseJoinColumns = @JoinColumn(name = "tag_id")
 	)
-	private Set<Tags> tags = new HashSet<>();
+	private Set<Tag> tags = new HashSet<>();
+
+	@ManyToMany(
+			fetch = FetchType.EAGER,
+			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+	)
+	@JoinTable(
+			name = "novel_genres",
+			joinColumns = @JoinColumn(name = "novel_id"), inverseJoinColumns = @JoinColumn(name = "genre_id")
+	)
+	private Set<Genre> genres = new HashSet<>();
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
@@ -69,7 +79,8 @@ public class Novel implements Serializable {
 	}
 
 	public String getImageFileName() {
-		return this.image.getFileName();
+		if (hasImage()) return this.image.getFileName();
+		return null;
 	}
 
 	@Override

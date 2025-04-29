@@ -2,12 +2,16 @@ package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
+import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(
 		unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -18,9 +22,13 @@ public abstract class NovelMapper {
 	@Autowired
 	protected NovelRepository novelRepository;
 
+	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
+	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel fromInput(NovelInput novelInput);
 
 	@Mapping(target = "chaptersCount", expression = "java(chaptersCount(novel))")
+	@Mapping(target = "tags", qualifiedByName = "tagsMapper")
+	@Mapping(target = "genres", qualifiedByName = "genresMapper")
 	public abstract NovelDTO toResponse(Novel novel);
 
 	public abstract List<NovelDTO> toCollectionResponse(List<Novel> novels);
@@ -31,6 +39,26 @@ public abstract class NovelMapper {
 	@Named("chaptersCount")
 	long chaptersCount(Novel novel) {
 		return novelRepository.countNovelChapters(novel.getId());
+	}
+
+	@Named("tagsMapper")
+	String tagsMapper(Tag tag) {
+		return tag.getName();
+	}
+
+	@Named("genresMapper")
+	String genresMapper(Genre genre) {
+		return genre.getName();
+	}
+
+	@Named("tagsInputMapper")
+	Set<Tag> tagsInputToEntityMapper(List<String> tags) {
+		return tags.stream().map(Tag::new).collect(Collectors.toSet());
+	}
+
+	@Named("genresInputMapper")
+	Set<Genre> genresInputToEntityMapper(List<String> genres) {
+		return genres.stream().map(Genre::new).collect(Collectors.toSet());
 	}
 
 }

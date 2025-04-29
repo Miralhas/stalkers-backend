@@ -1,5 +1,7 @@
 package miralhas.github.stalkers.api.dto;
 
+import java.util.List;
+
 public record NovelDTO(
 		Long id,
 		String slug,
@@ -7,6 +9,8 @@ public record NovelDTO(
 		String author,
 		String status,
 		String description,
-		long chaptersCount
+		long chaptersCount,
+		List<String> genres,
+		List<String> tags
 ) {
 }

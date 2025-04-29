@@ -37,8 +37,9 @@ public class NovelController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Novel createNovel(@RequestBody @Valid NovelInput novelInput) {
-		return novelService.save(novelInput);
+	public NovelDTO createNovel(@RequestBody @Valid NovelInput novelInput) {
+		Novel novel = novelService.save(novelInput);
+		return novelMapper.toResponse(novel);
 	}
 
 	@ResponseStatus(HttpStatus.OK)
