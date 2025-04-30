@@ -48,11 +48,11 @@ public class ChapterController {
 	public ChapterDTO update(
 			@PathVariable String novelSlug,
 			@PathVariable String chapterSlug,
-			@RequestBody @Valid ChapterInput ChapterInput
+			@RequestBody @Valid ChapterInput chapterInput
 	) {
 		var novel = novelService.findBySlugOrException(novelSlug);
 		var chapter = chapterService.findChapterBySlug(chapterSlug);
-		chapter = chapterService.update(chapter, ChapterInput, novel);
+		chapter = chapterService.update(chapter, chapterInput, novel);
 		return chapterMapper.toResponse(chapter);
 	}
 
