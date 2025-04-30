@@ -17,9 +17,6 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
 	)
 	Boolean checkIfSlugAlreadyExists(String slug);
 
-	@Query(nativeQuery = true, value = "SELECT n.* FROM novel n WHERE n.id = :identifier OR n.slug = :identifier")
-	Optional<Novel> findByIdentifier(String identifier);
-
 	@Query(nativeQuery = true, value = "SELECT COUNT(*) FROM chapter c WHERE c.novel_id = :novelId ORDER BY c.id")
 	Long countNovelChapters(Long novelId);
 
