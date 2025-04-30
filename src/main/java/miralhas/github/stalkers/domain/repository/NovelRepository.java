@@ -28,13 +28,13 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
 			"from Novel n LEFT JOIN Chapter c on c.novel.id = n.id " +
 			"WHERE n.id = :id ORDER BY c.id ASC LIMIT 1"
 	)
-	ChapterSummaryDTO findNovelFirstChapterByNovelSlug(Long id);
+	ChapterSummaryDTO findNovelFirstChapterByNovelId(Long id);
 
 	@Query(value = "select " +
 			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(c.id, c.title, c.slug, c.number) " +
 			"from Novel n LEFT JOIN Chapter c on c.novel.id = n.id " +
 			"WHERE n.id = :id ORDER BY c.id DESC LIMIT 1"
 	)
-	ChapterSummaryDTO findNovelLastChapterByNovelSlug(Long id);
+	ChapterSummaryDTO findNovelLastChapterByNovelId(Long id);
 
 }

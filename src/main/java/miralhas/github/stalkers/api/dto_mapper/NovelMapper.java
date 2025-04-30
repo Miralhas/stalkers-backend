@@ -52,12 +52,12 @@ public abstract class NovelMapper {
 
 	@Named("getFirstChapter")
 	ChapterSummaryDTO getFirstChapter(Novel novel) {
-		return novelRepository.findNovelFirstChapterByNovelSlug(novel.getId());
+		return novelRepository.findNovelFirstChapterByNovelId(novel.getId());
 	}
 
 	@Named("getLastChapter")
 	ChapterSummaryDTO getLastChapter(Novel novel) {
-		return novelRepository.findNovelLastChapterByNovelSlug(novel.getId());
+		return novelRepository.findNovelLastChapterByNovelId(novel.getId());
 	}
 
 	@Named("tagsMapper")

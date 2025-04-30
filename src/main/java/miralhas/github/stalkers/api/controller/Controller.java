@@ -26,8 +26,7 @@ public class Controller {
 	}
 
 	@GetMapping("/test")
-//	@PreAuthorize("hasRole('ADMIN')")
-	public Map<String, String> test(WebRequest webRequest, HttpServletRequest request, JwtAuthenticationToken token) {
+	public Map<String, String> test() {
 		var usr = SecurityContextHolder.getContext().getAuthentication();
 		return Map.of("message", "Stalkers API");
 	}
