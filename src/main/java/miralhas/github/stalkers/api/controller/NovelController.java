@@ -16,6 +16,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class NovelController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.CREATED)
 	public NovelDTO createNovel(@RequestBody @Valid NovelInput novelInput) {
 		Novel novel = novelService.save(novelInput);
@@ -59,6 +61,7 @@ public class NovelController {
 	}
 
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@PutMapping(value = "/{novelSlug}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ImageDTO saveImage(@PathVariable String novelSlug, @Valid ImageInput imageInput) throws IOException {
 		var image = imageMapper.fromInput(imageInput);
@@ -68,6 +71,7 @@ public class NovelController {
 	}
 
 	@DeleteMapping("/{novelSlug}/image")
+	@PreAuthorize("hasRole('ADMIN')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteImage(@PathVariable String novelSlug) {
 		var novel = novelService.findBySlugOrException(novelSlug);

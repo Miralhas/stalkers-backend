@@ -1,4 +1,4 @@
-# set foreign_key_checks = 0;
+set foreign_key_checks = 0;
 #
 # delete from refresh_token;
 # delete from password_reset_token;
@@ -7,12 +7,13 @@
 # delete from user;
 # delete from tag;
 # delete from genre;
-# delete from chapter;
-# delete from novel_genres;
-# delete from novel_tags;
-# delete from novel;
+delete from chapter;
+delete from novel_genres;
+delete from novel_tags;
+delete from novel;
+delete from image;
 #
-# set foreign_key_checks = 1;
+set foreign_key_checks = 1;
 #
 # alter table refresh_token auto_increment = 1;
 # alter table password_reset_token auto_increment = 1;
@@ -20,10 +21,11 @@
 # alter table user auto_increment = 1;
 # alter table tag auto_increment = 1;
 # alter table genre auto_increment = 1;
-# alter table chapter auto_increment = 1;
-# alter table novel_genres auto_increment = 1;
-# alter table novel_tags auto_increment = 1;
-# alter table novel auto_increment = 1;
+alter table chapter auto_increment = 1;
+alter table novel_genres auto_increment = 1;
+alter table novel_tags auto_increment = 1;
+alter table novel auto_increment = 1;
+alter table image auto_increment = 1;
 #
 # insert into role(name) values('ADMIN'), ('USER');
 #

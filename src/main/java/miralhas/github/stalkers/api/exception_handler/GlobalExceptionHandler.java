@@ -67,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ProblemDetail handleAccessDeniedException(AccessDeniedException ex, WebRequest webRequest) {
-		var detail = ex.getMessage();
+		var detail = errorMessages.get("forbidden");
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
 		problemDetail.setTitle("Forbidden");
 		problemDetail.setType(URI.create("http://localhost:8080/forbidden-access"));
