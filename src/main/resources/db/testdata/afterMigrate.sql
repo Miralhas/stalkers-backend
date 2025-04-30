@@ -1145,6 +1145,7 @@
 # INSERT INTO `tag` (`id`, `name`, `description`) VALUES (1107, 'Scary', NULL);
 # INSERT INTO `tag` (`id`, `name`, `description`) VALUES (1108, 'Sweet Love', NULL);
 # INSERT INTO `tag` (`id`, `name`, `description`) VALUES (1109, 'Killer', NULL);
+# INSERT INTO `tag` (`id`, `name`, `description`) VALUES (1110, 'Blood Pumping', NULL);
 #
 # INSERT INTO `genre` (`id`, `name`, `description`) VALUES (1, 'Eastern', 'Eastern novel is a subgenre of fantasy novel that has elements of Asian culture as the foundation, such as cultivation, xuanhuan, wuxia, or xianxia. It usually contains the Daoist culture as the elementary core.');
 # INSERT INTO `genre` (`id`, `name`, `description`) VALUES (2, 'Fantasy', 'Fantasy fiction is a genre that involves magic and supernatural elements. The background is set in a fictional universe or unpredictable world and characters use magic to fight against powerful supernaturel enemies such as dragon. Compared with Eastern Fantasy, Fantasy refers to Western fantasy and is inspired by mythology and folklore. Fantasy is also distinguished from science fiction and horror though there is an overlap between the three.');
