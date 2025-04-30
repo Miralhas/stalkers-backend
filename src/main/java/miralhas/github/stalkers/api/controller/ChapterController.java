@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.domain.service.ChapterService;
@@ -43,6 +44,14 @@ public class ChapterController {
 		return chapterMapper.toResponse(chapter);
 	}
 
+	@PostMapping("/save-bulk")
+	@ResponseStatus(HttpStatus.CREATED)
+	public void createBulk(@RequestBody @Valid BulkChaptersInput chapterInputs, @PathVariable String novelSlug) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		var chapters = chapterMapper.fromInputCollection(chapterInputs.chapters());
+		chapterService.saveBulk(novel, chapters);
+	}
+
 	@PutMapping("/{chapterSlug}")
 	@ResponseStatus(HttpStatus.OK)
 	public ChapterDTO update(
@@ -59,7 +68,7 @@ public class ChapterController {
 	@DeleteMapping("/{chapterSlug}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable String novelSlug, @PathVariable String chapterSlug) {
-		chapterService.delete(chapterSlug);
+		chapterService.delete(chapterSlug, novelSlug);
 	}
 
 }

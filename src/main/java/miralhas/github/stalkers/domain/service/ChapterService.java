@@ -48,7 +48,7 @@ public class ChapterService {
 	@Transactional
 	@Caching(
 			evict = {
-					@CacheEvict(cacheNames = "chapters.list", allEntries = true),
+					@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug"),
 					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 			}
 	)
@@ -58,7 +58,12 @@ public class ChapterService {
 	}
 
 	@Transactional
-	@CacheEvict(cacheNames = "chapters.list", allEntries = true)
+	@Caching(
+			evict = {
+					@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug"),
+					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
+			}
+	)
 	public void saveBulk(Novel novel, List<Chapter> chapters) {
 		chapters.forEach(chapter -> setChapterPropertiesAndValidations(chapter, novel));
 		chapterRepository.saveAllAndFlush(chapters);
@@ -66,7 +71,7 @@ public class ChapterService {
 
 	@Transactional
 	@Caching(
-			evict = {@CacheEvict(cacheNames = "chapters.list", allEntries = true)},
+			evict = {@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug")},
 			put = {@CachePut(cacheNames = "chapters.detail", key = "#result.slug")}
 	)
 	public Chapter update(Chapter chapter, ChapterInput chapterInput, Novel novel) {
@@ -83,10 +88,10 @@ public class ChapterService {
 
 	@Transactional
 	@Caching(evict = {
-			@CacheEvict(cacheNames = "chapters.list", allEntries = true),
+			@CacheEvict(cacheNames = "chapters.list", key = "#novelSlug"),
 			@CacheEvict(cacheNames = "chapters.detail", key = "#chapterSlug")
 	})
-	public void delete(String chapterSlug) {
+	public void delete(String chapterSlug, String novelSlug) {
 		chapterRepository.deleteBySlug(chapterSlug);
 	}
 

@@ -46,6 +46,9 @@ public class Novel implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.ON_GOING;
 
+	@Column(nullable = true)
+	private String alias;
+
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 
