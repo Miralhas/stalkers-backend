@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
@@ -41,8 +42,8 @@ public class NovelService {
 	}
 
 	@Cacheable(cacheNames = "novels.detail")
-	public Novel findBySlugOrExceptionCacheable(String slug) {
-		return findBySlugOrException(slug);
+	public NovelDTO findBySlugOrExceptionCacheable(String slug) {
+		return novelMapper.toResponse(findBySlugOrException(slug));
 	}
 
 	public Novel findBySlugOrException(String slug) {
@@ -74,11 +75,16 @@ public class NovelService {
 
 	@Transactional
 	public Image saveImage(Novel novel, Image image, InputStream inputStream) {
-		image = novel.hasImage() ? imageService.replace(image, novel.getImageFileName(), inputStream)
-				: imageService.save(image, inputStream);
+		if (novel.hasImage()) {
+			var novelImage = novel.getImage();
+			novel.setImage(null);
+			novelRepository.saveAndFlush(novel);
+			imageService.delete(novelImage);
+		}
 
+		image = imageService.save(image, inputStream);
 		novel.setImage(image);
-		novelRepository.saveAndFlush(novel);
+		novelRepository.save(novel);
 		return imageService.getImageJsonOrException(image.getId());
 	}
 

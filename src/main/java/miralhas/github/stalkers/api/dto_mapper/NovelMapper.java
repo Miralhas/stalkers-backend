@@ -1,6 +1,8 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
+import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
+import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Novel;
@@ -29,9 +31,16 @@ public abstract class NovelMapper {
 	@Mapping(target = "chaptersCount", expression = "java(chaptersCount(novel))")
 	@Mapping(target = "tags", qualifiedByName = "tagsMapper")
 	@Mapping(target = "genres", qualifiedByName = "genresMapper")
+	@Mapping(target = "firstChapter", expression = "java(getFirstChapter(novel))")
+	@Mapping(target = "lastChapter", expression = "java(getLastChapter(novel))")
 	public abstract NovelDTO toResponse(Novel novel);
 
+	@Mapping(target = "chaptersCount", expression = "java(chaptersCount(novel))")
+	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
+
 	public abstract List<NovelDTO> toCollectionResponse(List<Novel> novels);
+
+	public abstract List<NovelSummaryDTO> toSummaryCollectionResponse(List<Novel> novels);
 
 //	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 //	Novel partialUpdate(NovelDTO novelDTO, @MappingTarget Novel novel);
@@ -39,6 +48,16 @@ public abstract class NovelMapper {
 	@Named("chaptersCount")
 	long chaptersCount(Novel novel) {
 		return novelRepository.countNovelChapters(novel.getId());
+	}
+
+	@Named("getFirstChapter")
+	ChapterSummaryDTO getFirstChapter(Novel novel) {
+		return novelRepository.findNovelFirstChapterByNovelSlug(novel.getId());
+	}
+
+	@Named("getLastChapter")
+	ChapterSummaryDTO getLastChapter(Novel novel) {
+		return novelRepository.findNovelLastChapterByNovelSlug(novel.getId());
 	}
 
 	@Named("tagsMapper")

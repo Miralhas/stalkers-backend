@@ -46,7 +46,12 @@ public class ChapterService {
 	}
 
 	@Transactional
-	@CacheEvict(cacheNames = "chapters.list", allEntries = true)
+	@Caching(
+			evict = {
+					@CacheEvict(cacheNames = "chapters.list", allEntries = true),
+					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
+			}
+	)
 	public Chapter save(Novel novel, Chapter chapter) {
 		setChapterPropertiesAndValidations(chapter, novel);
 		return chapterRepository.save(chapter);
@@ -68,7 +73,7 @@ public class ChapterService {
 		var initialChapterNumber = chapter.getNumber();
 		chapterMapper.update(chapterInput, chapter);
 
-		// caso o title do update seja diferente que o title anterior, fazer verificação
+		// caso o title do update seja diferente que o title anterior, fazer verificação (mudar slug)
 		if (!initialChapterNumber.equals(chapterInput.number())) {
 			setChapterPropertiesAndValidations(chapter, novel);
 		}

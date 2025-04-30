@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ImageDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
+import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
@@ -31,8 +32,14 @@ public class NovelController {
 	private final ImageService imageService;
 
 	@GetMapping
-	public List<NovelDTO> findAll() {
-		return novelMapper.toCollectionResponse(novelService.findAll());
+	public List<NovelSummaryDTO> findAll() {
+		return novelMapper.toSummaryCollectionResponse(novelService.findAll());
+	}
+
+	@GetMapping("/{novelSlug}")
+	@ResponseStatus(HttpStatus.OK)
+	public NovelDTO findBySlug(@PathVariable String novelSlug) {
+		return novelService.findBySlugOrExceptionCacheable(novelSlug);
 	}
 
 	@PostMapping

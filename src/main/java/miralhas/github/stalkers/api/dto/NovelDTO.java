@@ -1,5 +1,7 @@
 package miralhas.github.stalkers.api.dto;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 public record NovelDTO(
@@ -11,6 +13,11 @@ public record NovelDTO(
 		String description,
 		long chaptersCount,
 		List<String> genres,
-		List<String> tags
-) {
+		List<String> tags,
+		ChapterSummaryDTO firstChapter,
+		ChapterSummaryDTO lastChapter
+
+) implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
 }
