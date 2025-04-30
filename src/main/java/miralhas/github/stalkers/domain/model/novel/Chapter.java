@@ -1,20 +1,25 @@
-package miralhas.github.stalkers.domain.model.auth;
+package miralhas.github.stalkers.domain.model.novel;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+import static miralhas.github.stalkers.StalkersApplication.SLG;
+
+@With
 @Getter
 @Setter
 @Entity
-public class Role implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Chapter implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -24,20 +29,23 @@ public class Role implements Serializable {
 	private Long id;
 
 	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private Value name;
+	private String title;
 
-	@Getter
-	public enum Value {
-		USER(new SimpleGrantedAuthority("USER")),
-		ADMIN(new SimpleGrantedAuthority("ADMIN")),
-		ROBOT(new SimpleGrantedAuthority("ROBOT"));
+	@Column(nullable = false)
+	private Long number;
 
-		private final SimpleGrantedAuthority authority;
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String body;
 
-		Value(SimpleGrantedAuthority authority) {
-			this.authority = authority;
-		}
+	@Column(nullable = false, unique = true)
+	private String slug;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Novel novel;
+
+	public void generateSlug(String novelTitle) {
+		var titleInitials = CommonsUtils.getInitialsFromSlug(SLG.slugify(novelTitle));
+		this.slug = SLG.slugify("%s chapter %d".formatted(titleInitials, this.number));
 	}
 
 	@Override
@@ -47,13 +55,12 @@ public class Role implements Serializable {
 		Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
 		Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
 		if (thisEffectiveClass != oEffectiveClass) return false;
-		Role role = (Role) o;
-		return getId() != null && Objects.equals(getId(), role.getId());
+		Chapter chapter = (Chapter) o;
+		return getId() != null && Objects.equals(getId(), chapter.getId());
 	}
 
 	@Override
 	public final int hashCode() {
 		return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
 	}
-
 }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,6 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -43,7 +46,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(
 			HttpSecurity httpSecurity,
 			CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
-			CustomOauth2FailureHandler customOauth2FailureHandler
+			CustomOauth2FailureHandler customOauth2FailureHandler,
+			RobotFilter robotFilter
 	) throws Exception {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
@@ -91,6 +95,7 @@ public class SecurityConfig {
 					authz.requestMatchers(HttpMethod.GET, "/**").permitAll();
 					authz.anyRequest().authenticated();
 				})
+				.addFilterBefore(robotFilter, OAuth2AuthorizationRequestRedirectFilter.class)
 				.build();
 	}
 

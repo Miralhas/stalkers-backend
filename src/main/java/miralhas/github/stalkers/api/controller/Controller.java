@@ -2,8 +2,11 @@ package miralhas.github.stalkers.api.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @Tag(name = "Home")
@@ -13,5 +16,10 @@ public class Controller {
 	@GetMapping("/secured")
 	public String secured() {
 		return "hello, secured";
+	}
+
+	@GetMapping("/test")
+	public Map<String, String> test() {
+		return Map.of("message", "Stalkers API");
 	}
 }

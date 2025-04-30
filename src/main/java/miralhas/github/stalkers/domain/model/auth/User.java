@@ -55,7 +55,6 @@ public class User implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Image image;
 
-	@JsonIgnore
 	public List<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream().map(r -> r.getName().getAuthority()).toList();
 	}
@@ -71,7 +70,8 @@ public class User implements Serializable {
 	}
 
 	public String getImageFileName() {
-		return hasImage() ? image.getFileName() : "";
+		if (hasImage()) return this.image.getFileName();
+		return null;
 	}
 
 	@Override
