@@ -54,6 +54,6 @@ public class RobotFilter extends OncePerRequestFilter {
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		return request.getHeader("X-Robot-Secret") == null;
+		return request.getHeader(robotHeader) == null;
 	}
 }
