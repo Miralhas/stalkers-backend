@@ -49,6 +49,12 @@ public class ChapterService {
 				));
 	}
 
+	// Cache Breakdown:
+	// 2. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
+	// 		in novels.detail contains 2 fields that are related to chapters (firstChapter and lastChapter).
+	// 3. Evict all entries to chapters.list of the novel that is receiving new chapter/s
+	// 		(cache containing all chapter of a single novel)
+
 	@Transactional
 	@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 	public Chapter save(Novel novel, Chapter chapter) {
@@ -67,30 +73,47 @@ public class ChapterService {
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 	}
 
+	// Cache Breakdown:
+	// 1. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
+	// 		in novels.detail contains 2 fields that are related to chapters (firstChapter and lastChapter), so it needs
+	// 		to be updated whenever a chapter of that novel is saved/updated/deleted.
+	// 2. Update cache for the entry that is being updated
+	// 3. Evict all entries to chapters.list of that novel (cache containing all chapter of a single novel)
+
 	@Transactional
 	@Caching(
-			evict = {@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug")},
+			evict = {@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")},
 			put = {@CachePut(cacheNames = "chapters.detail", key = "#result.slug")}
 	)
 	public Chapter update(Chapter chapter, ChapterInput chapterInput, Novel novel) {
 		var initialChapterNumber = chapter.getNumber();
 		chapterMapper.update(chapterInput, chapter);
 
-		// caso o title do update seja diferente que o title anterior, fazer verificação (mudar slug)
+		// if the update is changing the chapter number, then a validation is needed (change slug)
 		if (!initialChapterNumber.equals(chapterInput.number())) {
 			setChapterPropertiesAndValidations(chapter, novel);
 		}
 
-		return chapterRepository.save(chapter);
+		Chapter saved = chapterRepository.save(chapter);
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+		return saved;
 	}
+
+	// Cache Breakdown:
+	// 1. Evict cache for chapters.detail (cache for a single chapter)
+	// 2. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
+	// 		in novels.detail contains 2 fields that are related to chapters (firstChapter and lastChapter), so it needs
+	// 		to be updated whenever a chapter of that novel is saved/updated/deleted.
+	// 3. Evict all entries to chapters.list of that novel (cache containing all chapter of a single novel)
 
 	@Transactional
 	@Caching(evict = {
-			@CacheEvict(cacheNames = "chapters.list", key = "#novelSlug"),
-			@CacheEvict(cacheNames = "chapters.detail", key = "#chapterSlug")
+			@CacheEvict(cacheNames = "chapters.detail", key = "#chapterSlug"),
+			@CacheEvict(cacheNames = "novels.detail", key = "#novelSlug")
 	})
 	public void delete(String chapterSlug, String novelSlug) {
 		chapterRepository.deleteBySlug(chapterSlug);
+		cacheManager.evictNovelChaptersEntry(novelSlug);
 	}
 
 	private void setChapterPropertiesAndValidations(Chapter chapter, Novel novel) {

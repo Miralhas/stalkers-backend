@@ -21,7 +21,7 @@ public class PageDTO<T> {
 		this.setResults(page.getContent());
 		this.setCurrentPage(page.getNumber());
 		this.setTotalItems(page.getTotalElements());
-		this.setNext(page.hasNext() ? page.getNumber()+1 : null);
-		this.setPrevious(page.hasPrevious() ? page.getNumber()-1 : null);
+		this.setNext(page.hasNext() ? page.getNumber() + 1 : null);
+		this.setPrevious(page.hasPrevious() ? page.getNumber() - 1 : null);
 	}
 }
