@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 @EnableCaching
 @SpringBootApplication
@@ -19,6 +20,7 @@ public class StalkersApplication {
 			.locale(Locale.ENGLISH).build();
 
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(StalkersApplication.class, args);
 	}
 }

@@ -9,6 +9,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+import static miralhas.github.stalkers.StalkersApplication.SLG;
+
 @With
 @Getter
 @Setter
@@ -34,6 +36,13 @@ public class Tag implements Serializable {
 
 	@Column(nullable = true, columnDefinition = "TEXT")
 	private String description;
+
+	@Column(nullable = false, unique = true)
+	private String slug;
+
+	public void generateSlug() {
+		this.slug = SLG.slugify("tag " + this.name);
+	}
 
 	@Override
 	public final boolean equals(Object o) {

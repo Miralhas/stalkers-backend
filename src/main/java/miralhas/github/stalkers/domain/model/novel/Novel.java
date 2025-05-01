@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -51,6 +52,14 @@ public class Novel implements Serializable {
 
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
+
+	@CreationTimestamp
+	@Column(nullable = true)
+	private OffsetDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(nullable = true)
+	private OffsetDateTime updatedAt;
 
 	@ManyToMany(
 			fetch = FetchType.EAGER,

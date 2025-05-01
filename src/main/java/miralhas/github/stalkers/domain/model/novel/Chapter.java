@@ -4,10 +4,13 @@ package miralhas.github.stalkers.domain.model.novel;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
@@ -42,6 +45,14 @@ public class Chapter implements Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Novel novel;
+
+	@CreationTimestamp
+	@Column(nullable = true)
+	private OffsetDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(nullable = true)
+	private OffsetDateTime updatedAt;
 
 	public void generateSlug(String novelTitle) {
 		var titleInitials = CommonsUtils.getInitialsFromSlug(SLG.slugify(novelTitle));

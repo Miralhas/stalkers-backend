@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ImageDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
@@ -13,6 +14,10 @@ import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NovelService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +38,13 @@ public class NovelController {
 	private final ImageService imageService;
 
 	@GetMapping
-	public List<NovelSummaryDTO> findAll() {
-		return novelMapper.toSummaryCollectionResponse(novelService.findAll());
+	public PageDTO<NovelSummaryDTO> findAll(
+			@PageableDefault(size = 1, sort = {"title", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		var novelsPage = novelService.findAll(pageable);
+		List<NovelSummaryDTO> novelSummaryDTOS = novelMapper.toSummaryCollectionResponse(novelsPage.getContent());
+		var novelSummaryDTOsPage = new PageImpl<>(novelSummaryDTOS, pageable, novelsPage.getTotalElements());
+		return new PageDTO<>(novelSummaryDTOsPage);
 	}
 
 	@GetMapping("/{novelSlug}")
