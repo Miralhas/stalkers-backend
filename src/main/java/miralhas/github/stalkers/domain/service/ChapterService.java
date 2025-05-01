@@ -9,6 +9,7 @@ import miralhas.github.stalkers.domain.exception.NovelAlreadyExistsException;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.ChapterRepository;
+import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -29,8 +30,9 @@ public class ChapterService {
 	private final ErrorMessages errorMessages;
 	private final ChapterRepository chapterRepository;
 	private final ChapterMapper chapterMapper;
+	private final CacheManagerUtils cacheManager;
 
-	@Cacheable(cacheNames = "chapters.list", unless = "#result.getContent().isEmpty()")
+	@Cacheable(value = "chapters.list", unless = "#result.getContent().isEmpty()", keyGenerator = "novelChaptersKeyGenerator")
 	public Page<ChapterSummaryDTO> findAllByNovelSlug(String novelSlug, Pageable pageable) {
 		return chapterRepository.findAllByNovelSlug(novelSlug, pageable);
 	}
@@ -48,27 +50,21 @@ public class ChapterService {
 	}
 
 	@Transactional
-	@Caching(
-			evict = {
-					@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug"),
-					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
-			}
-	)
+	@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 	public Chapter save(Novel novel, Chapter chapter) {
 		setChapterPropertiesAndValidations(chapter, novel);
-		return chapterRepository.save(chapter);
+		// evict only chapters.list of the novel that is receiving new chapters
+		Chapter saved = chapterRepository.save(chapter);
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+		return saved;
 	}
 
 	@Transactional
-	@Caching(
-			evict = {
-					@CacheEvict(cacheNames = "chapters.list", key = "#novel.slug"),
-					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
-			}
-	)
+	@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 	public void saveBulk(Novel novel, List<Chapter> chapters) {
 		chapters.forEach(chapter -> setChapterPropertiesAndValidations(chapter, novel));
 		chapterRepository.saveAllAndFlush(chapters);
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 	}
 
 	@Transactional

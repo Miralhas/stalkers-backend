@@ -1,5 +1,7 @@
 package miralhas.github.stalkers.config.redis;
 
+import miralhas.github.stalkers.config.cache.NovelChaptersKeyGenerator;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -18,6 +20,11 @@ public class RedisConfig {
 		template.setConnectionFactory(connectionFactory);
 		template.setEnableTransactionSupport(true);
 		return template;
+	}
+
+	@Bean("novelChaptersKeyGenerator")
+	public KeyGenerator keyGenerator() {
+		return new NovelChaptersKeyGenerator();
 	}
 
 }
