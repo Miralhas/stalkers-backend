@@ -2,7 +2,7 @@ package miralhas.github.stalkers.api.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class PageDTO<T> {
 	private int totalPages;
 	private int currentPage;
 
-	public PageDTO(PageImpl<T> page) {
+	public PageDTO(Page<T> page) {
 		this.setTotalPages(page.getTotalPages());
 		this.setResults(page.getContent());
 		this.setCurrentPage(page.getNumber());
