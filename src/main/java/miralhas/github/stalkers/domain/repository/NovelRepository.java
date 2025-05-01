@@ -21,14 +21,16 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
 	Long countNovelChapters(Long novelId);
 
 	@Query(value = "select " +
-			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(c.id, c.title, c.slug, c.number) " +
+			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
 			"from Novel n LEFT JOIN Chapter c on c.novel.id = n.id " +
 			"WHERE n.id = :id ORDER BY c.id ASC LIMIT 1"
 	)
 	ChapterSummaryDTO findNovelFirstChapterByNovelId(Long id);
 
 	@Query(value = "select " +
-			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(c.id, c.title, c.slug, c.number) " +
+			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
 			"from Novel n LEFT JOIN Chapter c on c.novel.id = n.id " +
 			"WHERE n.id = :id ORDER BY c.id DESC LIMIT 1"
 	)

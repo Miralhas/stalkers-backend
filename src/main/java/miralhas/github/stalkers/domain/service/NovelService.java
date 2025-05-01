@@ -14,18 +14,18 @@ import miralhas.github.stalkers.domain.service.interfaces.GenreService;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class NovelService {
-
 
 	private final NovelRepository novelRepository;
 	private final ErrorMessages errorMessages;
@@ -36,9 +36,9 @@ public class NovelService {
 	private final TagsService tagsService;
 	private final GenreService genreService;
 
-	@Cacheable(cacheNames = "novels.list")
-	public List<Novel> findAll() {
-		return novelRepository.findAll();
+	@Cacheable(cacheNames = "novels.list", unless = "#result.getContent().isEmpty()")
+	public Page<Novel> findAll(Pageable pageable) {
+		return novelRepository.findAll(pageable);
 	}
 
 	@Cacheable(cacheNames = "novels.detail")

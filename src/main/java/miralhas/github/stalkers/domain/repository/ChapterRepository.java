@@ -2,11 +2,12 @@ package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
@@ -15,9 +16,10 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	)
 	Boolean checkIfSlugAlreadyExists(String slug);
 
-	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(c.id, c.title, c.slug, c.number) " +
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
 			"FROM Chapter c LEFT JOIN Novel n ON n.id = c.novel.id WHERE n.slug = :slug")
-	List<ChapterSummaryDTO> findAllByNovelSlug(String slug);
+	Page<ChapterSummaryDTO> findAllByNovelSlug(String slug, Pageable pageable);
 
 	@Query(nativeQuery = true, value = "SELECT c.* FROM chapter c WHERE c.slug = :slug")
 	Optional<Chapter> findBySlug(String slug);

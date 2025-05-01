@@ -14,6 +14,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +30,9 @@ public class ChapterService {
 	private final ChapterRepository chapterRepository;
 	private final ChapterMapper chapterMapper;
 
-	@Cacheable(cacheNames = "chapters.list", unless = "#result.isEmpty()")
-	public List<ChapterSummaryDTO> findAllByNovelSlug(String novelSlug) {
-		return chapterRepository.findAllByNovelSlug(novelSlug);
+	@Cacheable(cacheNames = "chapters.list", unless = "#result.getContent().isEmpty()")
+	public Page<ChapterSummaryDTO> findAllByNovelSlug(String novelSlug, Pageable pageable) {
+		return chapterRepository.findAllByNovelSlug(novelSlug, pageable);
 	}
 
 	@Cacheable(cacheNames = "chapters.detail")

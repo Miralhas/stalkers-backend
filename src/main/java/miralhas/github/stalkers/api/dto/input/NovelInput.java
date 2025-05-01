@@ -16,7 +16,6 @@ public record NovelInput(
 		@NotBlank
 		String author,
 
-		@NotBlank
 		@EnumPattern(enumClass = Status.class)
 		String status,
 

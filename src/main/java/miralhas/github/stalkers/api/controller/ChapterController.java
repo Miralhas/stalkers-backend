@@ -4,11 +4,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.NovelService;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +30,14 @@ public class ChapterController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<ChapterSummaryDTO> getAllChaptersByNovelId(@PathVariable String novelSlug) {
-		return chapterService.findAllByNovelSlug(novelSlug);
+	public PageDTO<ChapterSummaryDTO> getAllChaptersByNovelId(
+			@PathVariable String novelSlug,
+			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		var chaptersPage = chapterService.findAllByNovelSlug(novelSlug, pageable);
+		List<ChapterSummaryDTO> chapterSummaryDTOs = chaptersPage.getContent();
+		var chaptersSummaryDTOsPage = new PageImpl<>(chapterSummaryDTOs, pageable, chaptersPage.getTotalElements());
+		return new PageDTO<>(chaptersSummaryDTOsPage);
 	}
 
 	@ResponseStatus(HttpStatus.OK)

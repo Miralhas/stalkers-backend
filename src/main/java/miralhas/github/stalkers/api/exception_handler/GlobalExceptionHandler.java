@@ -11,6 +11,7 @@ import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -63,7 +64,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return problemDetail;
 	}
 
-
+	@ExceptionHandler(PropertyReferenceException.class)
+	public ProblemDetail handlePropertyReferenceException(PropertyReferenceException ex, WebRequest webRequest) {
+		var detail = ex.getMessage();
+		var status = HttpStatus.BAD_REQUEST;
+		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
+		problemDetail.setTitle("Pagination Bad Request");
+		problemDetail.setType(URI.create("https://localhost:8080/errors/pagination-bad-request"));
+		return problemDetail;
+	}
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ProblemDetail handleAccessDeniedException(AccessDeniedException ex, WebRequest webRequest) {
