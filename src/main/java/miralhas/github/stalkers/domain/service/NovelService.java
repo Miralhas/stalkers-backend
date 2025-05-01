@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.NovelDTO;
+import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
@@ -37,8 +38,8 @@ public class NovelService {
 	private final GenreService genreService;
 
 	@Cacheable(cacheNames = "novels.list", unless = "#result.getContent().isEmpty()")
-	public Page<Novel> findAll(Pageable pageable) {
-		return novelRepository.findAll(pageable);
+	public Page<Novel> findAll(Pageable pageable, NovelFilter filter) {
+		return novelRepository.findAll(filter.toSpecification(), pageable);
 	}
 
 	@Cacheable(cacheNames = "novels.detail")
