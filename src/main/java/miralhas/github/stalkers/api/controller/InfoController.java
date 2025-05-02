@@ -1,7 +1,9 @@
 package miralhas.github.stalkers.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.service.InfoService;
@@ -26,9 +28,10 @@ public class InfoController {
 	@GetMapping("/tags")
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<Tag> getAllTags(
-			@PageableDefault(size = 100, sort = {"name", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+			@PageableDefault(size = 100, sort = {"name", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
+			@Valid TagFilter filter
 	) {
-		var tagsPage = infoService.findAllTags(pageable);
+		var tagsPage = infoService.findAllTags(filter, pageable);
 		return new PageDTO<>(tagsPage);
 	}
 

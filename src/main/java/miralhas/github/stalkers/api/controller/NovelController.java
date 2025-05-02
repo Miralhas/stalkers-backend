@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.ImageDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
@@ -39,9 +40,10 @@ public class NovelController {
 
 	@GetMapping
 	public PageDTO<NovelSummaryDTO> findAll(
-			@PageableDefault(size = 1, sort = {"title", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+			@PageableDefault(size = 10, sort = {"title", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
+			@Valid NovelFilter filter
 	) {
-		var novelsPage = novelService.findAll(pageable);
+		var novelsPage = novelService.findAll(pageable, filter);
 		List<NovelSummaryDTO> novelSummaryDTOS = novelMapper.toSummaryCollectionResponse(novelsPage.getContent());
 		var novelSummaryDTOsPage = new PageImpl<>(novelSummaryDTOS, pageable, novelsPage.getTotalElements());
 		return new PageDTO<>(novelSummaryDTOsPage);
