@@ -14,5 +14,6 @@ public class UserLibraryDTO {
 	private Long userId;
 	private OffsetDateTime lastReadAt;
 	private boolean isBookmarked;
+	private boolean isCompleted;
 	private Long totalChapters;
 }

@@ -18,7 +18,7 @@ public class TagsService {
 
 	public Tag findTagByNameOrException(String name){
 		return tagRepository.findByName(name).orElseThrow(() -> new TagNotFoundException(
-				errorMessages.get("tag.NotFound.name", name)
+				errorMessages.get("tag.notFound.name", name)
 		));
 	}
 

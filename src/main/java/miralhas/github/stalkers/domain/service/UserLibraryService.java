@@ -2,8 +2,10 @@ package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.UserLibraryDTO;
+import miralhas.github.stalkers.api.dto.filter.LibraryFilter;
 import miralhas.github.stalkers.api.dto_mapper.UserLibraryMapper;
 import miralhas.github.stalkers.domain.exception.BusinessException;
+import miralhas.github.stalkers.domain.exception.LibraryElementNotFound;
 import miralhas.github.stalkers.domain.model.UserLibrary;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
@@ -33,17 +35,26 @@ public class UserLibraryService {
 	private final NovelRepository novelRepository;
 	private final ChapterRepository chapterRepository;
 
-	public Page<UserLibraryDTO> findUserLibrary(User user, Boolean bookmarked, Pageable pageable) {
-		var userLibrary = bookmarked
-				? userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable)
-				: userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
+	public UserLibrary getLibraryElementOrException(Long libraryElementId) {
+		return userLibraryRepository.findById(libraryElementId).orElseThrow(() -> new LibraryElementNotFound(
+				errorMessages.get("library.notFound.id", libraryElementId)
+		));
+	}
 
+	public Page<UserLibraryDTO> findUserLibrary(User user, LibraryFilter filter, Pageable pageable) {
+		Page<Object[]> userLibrary;
+		if (filter.getBookmarked()) {
+			userLibrary = userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable);
+		} else if (filter.getCompleted()) {
+			userLibrary = userLibraryRepository.findUserLibraryCompletedByUserId(user.getId(), pageable);
+		} else {
+			userLibrary = userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
+		}
 		var userLibraryPageDTO = userLibrary.getContent().stream().map(libraryNovel -> {
 			var userHistoryDTO = userLibraryMapper.toResponse((UserLibrary) libraryNovel[0]);
 			userHistoryDTO.setTotalChapters((Long) libraryNovel[1]);
 			return userHistoryDTO;
 		}).toList();
-
 		return new PageImpl<>(userLibraryPageDTO, pageable, userLibrary.getTotalElements());
 	}
 
@@ -104,6 +115,45 @@ public class UserLibraryService {
 				.build();
 
 		userLibraryRepository.save(novelLibrary);
+	}
+
+	@Transactional
+	public void libraryNovelCompleted(User user, Novel novel) {
+		var libraryNovelOptional = userLibraryRepository
+				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
+
+		if (libraryNovelOptional.isPresent()) {
+			var libraryNovel = libraryNovelOptional.get();
+			libraryNovel.setCompleted(true);
+			userLibraryRepository.save(libraryNovel);
+			return;
+		}
+
+		var novelFirstChapterId = novelRepository.getNovelFirstChapterIdByNovelId(novel.getId());
+		var novelLibrary = UserLibrary.builder()
+				.user(user)
+				.currentChapter(chapterRepository.getReferenceById(novelFirstChapterId))
+				.novel(novel)
+				.isBookmarked(true)
+				.isCompleted(true)
+				.lastReadAt(OffsetDateTime.now())
+				.build();
+
+		userLibraryRepository.save(novelLibrary);
+	}
+
+	@Transactional
+	public void removeBookmark(Long libraryElementId) {
+		var lib = getLibraryElementOrException(libraryElementId);
+		lib.setBookmarked(false);
+		userLibraryRepository.save(lib);
+	}
+
+	@Transactional
+	public void removeComplete(Long libraryElementId) {
+		var lib = getLibraryElementOrException(libraryElementId);
+		lib.setCompleted(false);
+		userLibraryRepository.save(lib);
 	}
 
 

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.UserLibraryDTO;
+import miralhas.github.stalkers.api.dto.filter.LibraryFilter;
 import miralhas.github.stalkers.api.dto.input.UserLibraryInput;
 import miralhas.github.stalkers.domain.service.NovelService;
 import miralhas.github.stalkers.domain.service.UserLibraryService;
@@ -30,12 +31,12 @@ public class UserLibraryController {
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<UserLibraryDTO> findUserLibrary(
-			@RequestParam(name = "bookmarked", defaultValue = "false", required = false) Boolean bookmarked,
 			@PageableDefault(size = 20, sort = {"lastReadAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable,
+			LibraryFilter filter,
 			JwtAuthenticationToken authToken
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
-		Page<UserLibraryDTO> userLibraryDTOPage = userLibraryService.findUserLibrary(user, bookmarked, pageable);
+		Page<UserLibraryDTO> userLibraryDTOPage = userLibraryService.findUserLibrary(user, filter, pageable);
 		return new PageDTO<>(userLibraryDTOPage);
 	}
 
@@ -51,12 +52,35 @@ public class UserLibraryController {
 		return userLibraryService.updateUserLibrary(user, userHistoryInput.novelId(), userHistoryInput.chapterId());
 	}
 
-	@PutMapping("/bookmark/{novelSlug}")
 	@PreAuthorize("hasRole('USER')")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PutMapping("/bookmark/{novelSlug}")
 	public void bookmarkNovel(@PathVariable String novelSlug, JwtAuthenticationToken authToken) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
 		var novel = novelService.findBySlugOrException(novelSlug);
 		userLibraryService.bookmarkNovel(user, novel);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping("/bookmark/{libraryElementId}")
+	public void removeBookmark(@PathVariable Long libraryElementId) {
+		userLibraryService.removeBookmark(libraryElementId);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PutMapping("/complete/{novelSlug}")
+	public void completeNovel(@PathVariable String novelSlug, JwtAuthenticationToken authToken) {
+		var user = userService.findUserByEmailOrException(authToken.getName());
+		var novel = novelService.findBySlugOrException(novelSlug);
+		userLibraryService.libraryNovelCompleted(user, novel);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping("/complete/{libraryElementId}")
+	public void removeComplete(@PathVariable Long libraryElementId) {
+		userLibraryService.removeComplete(libraryElementId);
 	}
 }
