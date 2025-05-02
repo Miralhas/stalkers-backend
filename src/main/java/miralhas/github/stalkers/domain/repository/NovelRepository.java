@@ -37,4 +37,7 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	)
 	ChapterSummaryDTO findNovelLastChapterByNovelId(Long id);
 
+	@Query(value = "select c.id from Chapter c where c.novel.id = :novelId ORDER BY c.id ASC LIMIT 1")
+	Long getNovelFirstChapterIdByNovelId(Long novelId);
+
 }

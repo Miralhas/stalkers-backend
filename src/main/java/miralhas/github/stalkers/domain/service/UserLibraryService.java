@@ -8,12 +8,17 @@ import miralhas.github.stalkers.domain.model.UserLibrary;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.repository.ChapterRepository;
+import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.repository.UserLibraryRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +30,28 @@ public class UserLibraryService {
 	private final NovelService novelService;
 	private final ChapterService chapterService;
 	private final ErrorMessages errorMessages;
+	private final NovelRepository novelRepository;
+	private final ChapterRepository chapterRepository;
 
-	public List<UserLibraryDTO> findUserLibrary(User user) {
-		List<Object[]> userLibrary = userLibraryRepository.findUserLibraryByUserId(user.getId());
-		return userLibrary.stream().map(libraryNovel -> {
+	public Page<UserLibraryDTO> findUserLibrary(User user, Boolean bookmarked, Pageable pageable) {
+		var userLibrary = bookmarked
+				? userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable)
+				: userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
+
+		var userLibraryPageDTO = userLibrary.getContent().stream().map(libraryNovel -> {
 			var userHistoryDTO = userLibraryMapper.toResponse((UserLibrary) libraryNovel[0]);
 			userHistoryDTO.setTotalChapters((Long) libraryNovel[1]);
 			return userHistoryDTO;
 		}).toList();
+
+		return new PageImpl<>(userLibraryPageDTO, pageable, userLibrary.getTotalElements());
 	}
 
 	@Transactional
 	public UserLibraryDTO updateUserLibrary(User user, Long novelId, Long chapterId) {
 		var novel = novelService.findByIdOrException(novelId);
 		var chapter = chapterService.findByIdOrException(chapterId);
-		validateLibrary(novel, chapter);
+		validateIfChapterIsFromNovel(novel, chapter);
 
 		var optionalNovelHistory = userLibraryRepository
 				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
@@ -50,6 +62,7 @@ public class UserLibraryService {
 		if (optionalNovelHistory.isPresent()) {
 			var novelHistory = optionalNovelHistory.get();
 			novelHistory.setCurrentChapter(chapter);
+			novelHistory.setLastReadAt(OffsetDateTime.now());
 			userLibrary = userLibraryRepository.save(novelHistory);
 			var userHistoryDTO = userLibraryMapper.toResponse(userLibrary);
 			userHistoryDTO.setTotalChapters(null);
@@ -60,6 +73,7 @@ public class UserLibraryService {
 				.user(user)
 				.currentChapter(chapter)
 				.novel(novel)
+				.lastReadAt(OffsetDateTime.now())
 				.build();
 
 		var userHistoryDTO = userLibraryMapper.toResponse(userLibraryRepository.save(userLibrary));
@@ -68,7 +82,32 @@ public class UserLibraryService {
 	}
 
 
-	private void validateLibrary(Novel novel, Chapter chapter) {
+	@Transactional
+	public void bookmarkNovel(User user, Novel novel) {
+		var libraryNovelOptional = userLibraryRepository
+				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
+
+		if (libraryNovelOptional.isPresent()) {
+			var libraryNovel = libraryNovelOptional.get();
+			libraryNovel.setBookmarked(true);
+			userLibraryRepository.save(libraryNovel);
+			return;
+		}
+
+		var novelFirstChapterId = novelRepository.getNovelFirstChapterIdByNovelId(novel.getId());
+		var novelLibrary = UserLibrary.builder()
+				.user(user)
+				.currentChapter(chapterRepository.getReferenceById(novelFirstChapterId))
+				.novel(novel)
+				.isBookmarked(true)
+				.lastReadAt(OffsetDateTime.now())
+				.build();
+
+		userLibraryRepository.save(novelLibrary);
+	}
+
+
+	private void validateIfChapterIsFromNovel(Novel novel, Chapter chapter) {
 		if (novel.equals(chapter.getNovel())) return;
 		throw new BusinessException(
 				errorMessages.get("library.invalidChapter", chapter.getSlug(), novel.getSlug())

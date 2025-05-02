@@ -62,7 +62,7 @@ public class Novel implements Serializable {
 	private OffsetDateTime updatedAt;
 
 	@ManyToMany(
-			fetch = FetchType.EAGER,
+			fetch = FetchType.LAZY,
 			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
 	)
 	@JoinTable(

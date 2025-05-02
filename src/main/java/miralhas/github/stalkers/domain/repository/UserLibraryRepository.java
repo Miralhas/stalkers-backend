@@ -1,11 +1,12 @@
 package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.domain.model.UserLibrary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserLibraryRepository extends JpaRepository<UserLibrary, Long> {
@@ -19,10 +20,20 @@ public interface UserLibraryRepository extends JpaRepository<UserLibrary, Long> 
 			"JOIN FETCH ul.user " +
 			"JOIN FETCH ul.novel " +
 			"JOIN FETCH ul.currentChapter " +
-			"WHERE ul.user.id = :userId " +
-			"ORDER BY ul.lastReadAt DESC"
+			"WHERE ul.user.id = :userId "
 	)
-	List<Object[]> findUserLibraryByUserId(Long userId);
+	Page<Object[]> findUserLibraryByUserId(Long userId, Pageable pageable);
+
+
+	@Query("select ul, " +
+			"(SELECT COUNT(c) FROM Chapter c WHERE c.novel.id = ul.novel.id) AS totalChapters " +
+			"from UserLibrary ul " +
+			"JOIN FETCH ul.user " +
+			"JOIN FETCH ul.novel " +
+			"JOIN FETCH ul.currentChapter " +
+			"WHERE ul.user.id = :userId and ul.isBookmarked = true "
+	)
+	Page<Object[]> findUserLibraryBookmarkByUserId(Long userId, Pageable pageable);
 
 
 	@Modifying

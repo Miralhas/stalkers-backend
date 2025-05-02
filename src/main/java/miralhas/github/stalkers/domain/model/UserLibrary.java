@@ -44,7 +44,7 @@ public class UserLibrary implements Serializable {
 	@JoinColumn(name = "current_chapter_id", nullable = false)
 	private Chapter currentChapter;
 
-	@UpdateTimestamp
+//	@UpdateTimestamp
 	@Column(name = "last_read_at", nullable = false)
 	private OffsetDateTime lastReadAt;
 
