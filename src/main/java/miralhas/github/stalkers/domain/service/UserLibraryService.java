@@ -156,7 +156,6 @@ public class UserLibraryService {
 	public void removeComplete(Long libraryElementId) {
 		var lib = getLibraryElementOrException(libraryElementId);
 		lib.setCompleted(false);
-		userLibraryRepository.save(lib);
 		lib = userLibraryRepository.save(lib);
 		cacheManagerUtils.evictUserLibraryEntry(lib.getUser().getEmail());
 	}
