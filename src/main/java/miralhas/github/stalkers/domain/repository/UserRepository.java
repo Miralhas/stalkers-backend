@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-	@Query("from User u where u.email = :email")
+	@Query("from User u LEFT JOIN FETCH u.roles where u.email = :email")
 	Optional<User> findUserByEmail(String email);
 
-	@Query("from User u where u.username = :username")
+	@Query("from User u LEFT JOIN FETCH u.roles where u.username = :username")
 	Optional<User> findUserByUsername(String username);
 
 	@Override

@@ -47,7 +47,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_RABBITMQ_HOST=rabbitmq
-      - SMTP_PASSWORD=${SMTP}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - LOCAL_IMAGE_DIRECTORY=/app/images
     volumes:
       - api-images:/app/images

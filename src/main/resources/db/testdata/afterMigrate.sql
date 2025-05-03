@@ -12,6 +12,7 @@
 # delete from novel_tags;
 # delete from novel;
 # delete from image;
+# delete from user_library;
 #
 # set foreign_key_checks = 1;
 #
@@ -19,6 +20,7 @@
 # alter table password_reset_token auto_increment = 1;
 # alter table role auto_increment = 1;
 # alter table user auto_increment = 1;
+# alter table user_roles auto_increment = 1;
 # alter table tag auto_increment = 1;
 # alter table genre auto_increment = 1;
 # alter table chapter auto_increment = 1;
@@ -26,6 +28,7 @@
 # alter table novel_tags auto_increment = 1;
 # alter table novel auto_increment = 1;
 # alter table image auto_increment = 1;
+# alter table user_library auto_increment = 1;
 #
 # insert into role(name) values('ADMIN'), ('USER');
 #
