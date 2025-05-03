@@ -5,7 +5,10 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.notification.enums.Type;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
@@ -14,7 +17,10 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @DiscriminatorValue("NEW_CHAPTER")
-public class NewChapterNotification extends Notification {
+public class NewChapterNotification extends Notification implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
 
 	@Builder
 	public NewChapterNotification(
@@ -27,7 +33,7 @@ public class NewChapterNotification extends Notification {
 			String description,
 			Set<User> recipients
 	) {
-		super(isRead, createdAt, title, description, recipients);
+		super(isRead, createdAt, title, description, recipients, Type.NEW_CHAPTER);
 		this.newChapterSlug = newChapterSlug;
 		this.novelSlug = novelSlug;
 		this.newChapterReleaseDate = newChapterReleaseDate;

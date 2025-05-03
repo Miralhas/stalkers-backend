@@ -1,0 +1,34 @@
+package miralhas.github.stalkers.domain.service;
+
+import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
+import miralhas.github.stalkers.domain.event.SendMessageEvent;
+import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
+import miralhas.github.stalkers.domain.model.novel.Chapter;
+import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.repository.NewChapterNotificationRepository;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class NotificationService {
+
+	private final NewChapterNotificationRepository newChapterRepository;
+	private final ApplicationEventPublisher events;
+
+	@Transactional
+	public NewChapterNotification saveNewChapterNotification(NewChapterNotification notification) {
+		return newChapterRepository.save(notification);
+	}
+
+	public void sendNewChapterNotification(Novel novel, Chapter chapter) {
+		var newChapterNotificationInput = new NewChapterNotificationInput(chapter, novel);
+		events.publishEvent(new SendMessageEvent(
+				newChapterNotificationInput, "rk.notification.new-chapter", "stalkers")
+		);
+	}
+
+}

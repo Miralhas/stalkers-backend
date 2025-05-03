@@ -1,8 +1,11 @@
 package miralhas.github.stalkers.domain.model.notification;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.notification.enums.Type;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -22,12 +25,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class Notification implements Serializable {
 
-	public Notification(boolean isRead, OffsetDateTime createdAt, String title, String description, Set<User> recipients) {
+	public Notification(
+			boolean isRead, OffsetDateTime createdAt, String title, String description, Set<User> recipients, Type type
+	) {
 		this.isRead = isRead;
 		this.createdAt = createdAt;
 		this.title = title;
 		this.description = description;
 		this.recipients = recipients;
+		this.type = type;
 	}
 
 	@Serial
@@ -49,6 +55,10 @@ public class Notification implements Serializable {
 
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
+
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Type type;
 
 	@ManyToMany(
 			fetch = FetchType.LAZY,

@@ -2,8 +2,8 @@
 #
 # delete from refresh_token;
 # delete from password_reset_token;
-# delete from role;
 # delete from user_roles;
+# delete from role;
 # delete from user;
 # delete from tag;
 # delete from genre;
