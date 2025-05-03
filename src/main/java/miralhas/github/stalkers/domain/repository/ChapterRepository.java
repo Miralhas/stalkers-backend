@@ -16,9 +16,11 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	)
 	Boolean checkIfSlugAlreadyExists(String slug);
 
-	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+	@Query(
+			value = "SELECT new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
 			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
-			"FROM Chapter c LEFT JOIN Novel n ON n.id = c.novel.id WHERE n.slug = :slug")
+			"FROM Chapter c WHERE c.novel.slug = :slug"
+	)
 	Page<ChapterSummaryDTO> findAllByNovelSlug(String slug, Pageable pageable);
 
 	@Query(nativeQuery = true, value = "SELECT c.* FROM chapter c WHERE c.slug = :slug")
