@@ -41,7 +41,7 @@ public class UserLibrary implements Serializable {
 	private Novel novel;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "current_chapter_id", nullable = false)
+	@JoinColumn(name = "current_chapter_id", nullable = true)
 	private Chapter currentChapter;
 
 //	@UpdateTimestamp

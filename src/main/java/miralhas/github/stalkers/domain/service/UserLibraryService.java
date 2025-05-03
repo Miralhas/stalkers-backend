@@ -10,10 +10,10 @@ import miralhas.github.stalkers.domain.model.UserLibrary;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
-import miralhas.github.stalkers.domain.repository.ChapterRepository;
-import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.repository.UserLibraryRepository;
+import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +32,7 @@ public class UserLibraryService {
 	private final NovelService novelService;
 	private final ChapterService chapterService;
 	private final ErrorMessages errorMessages;
-	private final NovelRepository novelRepository;
-	private final ChapterRepository chapterRepository;
+	private final CacheManagerUtils cacheManagerUtils;
 
 	public UserLibrary getLibraryElementOrException(Long libraryElementId) {
 		return userLibraryRepository.findById(libraryElementId).orElseThrow(() -> new LibraryElementNotFound(
@@ -41,6 +40,11 @@ public class UserLibraryService {
 		));
 	}
 
+	@Cacheable(
+			cacheNames = "libraries.list",
+			key = "{#user.getEmail(), #filter, #pageable}",
+			unless = "#result.getContent().isEmpty()"
+	)
 	public Page<UserLibraryDTO> findUserLibrary(User user, LibraryFilter filter, Pageable pageable) {
 		Page<Object[]> userLibrary;
 		if (filter.getBookmarked()) {
@@ -59,7 +63,7 @@ public class UserLibraryService {
 	}
 
 	@Transactional
-	public UserLibraryDTO updateUserLibrary(User user, Long novelId, Long chapterId) {
+	public void updateUserLibrary(User user, Long novelId, Long chapterId) {
 		var novel = novelService.findByIdOrException(novelId);
 		var chapter = chapterService.findByIdOrException(chapterId);
 		validateIfChapterIsFromNovel(novel, chapter);
@@ -69,15 +73,15 @@ public class UserLibraryService {
 
 		UserLibrary userLibrary;
 
+		cacheManagerUtils.evictUserLibraryEntry(user.getEmail());
+
 		// user já tem essa novel na biblioteca.
 		if (optionalNovelHistory.isPresent()) {
 			var novelHistory = optionalNovelHistory.get();
 			novelHistory.setCurrentChapter(chapter);
 			novelHistory.setLastReadAt(OffsetDateTime.now());
-			userLibrary = userLibraryRepository.save(novelHistory);
-			var userHistoryDTO = userLibraryMapper.toResponse(userLibrary);
-			userHistoryDTO.setTotalChapters(null);
-			return userHistoryDTO;
+			userLibraryRepository.save(novelHistory);
+			return;
 		}
 
 		userLibrary = UserLibrary.builder()
@@ -87,16 +91,15 @@ public class UserLibraryService {
 				.lastReadAt(OffsetDateTime.now())
 				.build();
 
-		var userHistoryDTO = userLibraryMapper.toResponse(userLibraryRepository.save(userLibrary));
-		userHistoryDTO.setTotalChapters(null);
-		return userHistoryDTO;
+		userLibraryRepository.save(userLibrary);
 	}
-
 
 	@Transactional
 	public void bookmarkNovel(User user, Novel novel) {
 		var libraryNovelOptional = userLibraryRepository
 				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
+
+		cacheManagerUtils.evictUserLibraryEntry(user.getEmail());
 
 		if (libraryNovelOptional.isPresent()) {
 			var libraryNovel = libraryNovelOptional.get();
@@ -105,10 +108,8 @@ public class UserLibraryService {
 			return;
 		}
 
-		var novelFirstChapterId = novelRepository.getNovelFirstChapterIdByNovelId(novel.getId());
 		var novelLibrary = UserLibrary.builder()
 				.user(user)
-				.currentChapter(chapterRepository.getReferenceById(novelFirstChapterId))
 				.novel(novel)
 				.isBookmarked(true)
 				.lastReadAt(OffsetDateTime.now())
@@ -122,6 +123,8 @@ public class UserLibraryService {
 		var libraryNovelOptional = userLibraryRepository
 				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
 
+		cacheManagerUtils.evictUserLibraryEntry(user.getEmail());
+
 		if (libraryNovelOptional.isPresent()) {
 			var libraryNovel = libraryNovelOptional.get();
 			libraryNovel.setCompleted(true);
@@ -129,10 +132,9 @@ public class UserLibraryService {
 			return;
 		}
 
-		var novelFirstChapterId = novelRepository.getNovelFirstChapterIdByNovelId(novel.getId());
 		var novelLibrary = UserLibrary.builder()
 				.user(user)
-				.currentChapter(chapterRepository.getReferenceById(novelFirstChapterId))
+				.currentChapter(null)
 				.novel(novel)
 				.isBookmarked(true)
 				.isCompleted(true)
@@ -146,7 +148,8 @@ public class UserLibraryService {
 	public void removeBookmark(Long libraryElementId) {
 		var lib = getLibraryElementOrException(libraryElementId);
 		lib.setBookmarked(false);
-		userLibraryRepository.save(lib);
+		lib = userLibraryRepository.save(lib);
+		cacheManagerUtils.evictUserLibraryEntry(lib.getUser().getEmail());
 	}
 
 	@Transactional
@@ -154,8 +157,9 @@ public class UserLibraryService {
 		var lib = getLibraryElementOrException(libraryElementId);
 		lib.setCompleted(false);
 		userLibraryRepository.save(lib);
+		lib = userLibraryRepository.save(lib);
+		cacheManagerUtils.evictUserLibraryEntry(lib.getUser().getEmail());
 	}
-
 
 	private void validateIfChapterIsFromNovel(Novel novel, Chapter chapter) {
 		if (novel.equals(chapter.getNovel())) return;

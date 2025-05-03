@@ -43,13 +43,13 @@ public class UserLibraryController {
 
 	@PutMapping
 	@PreAuthorize("hasRole('USER')")
-	@ResponseStatus(HttpStatus.OK)
-	public UserLibraryDTO updateUserLibrary(
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void updateUserLibrary(
 			@RequestBody @Valid UserLibraryInput userHistoryInput,
 			JwtAuthenticationToken authToken
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
-		return userLibraryService.updateUserLibrary(user, userHistoryInput.novelId(), userHistoryInput.chapterId());
+		userLibraryService.updateUserLibrary(user, userHistoryInput.novelId(), userHistoryInput.chapterId());
 	}
 
 	@PreAuthorize("hasRole('USER')")

@@ -3,11 +3,17 @@ package miralhas.github.stalkers.api.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class UserLibraryDTO {
+public class UserLibraryDTO implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 	private Long libraryElementId;
 	private String chapterSlug;
 	private String novelSlug;
