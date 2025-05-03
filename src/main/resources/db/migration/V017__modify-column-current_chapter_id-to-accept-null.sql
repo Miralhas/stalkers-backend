@@ -1,0 +1,1 @@
+ALTER TABLE user_library MODIFY COLUMN current_chapter_id BIGINT NULL;

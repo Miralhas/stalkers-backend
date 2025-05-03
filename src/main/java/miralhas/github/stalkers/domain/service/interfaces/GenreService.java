@@ -18,7 +18,7 @@ public class GenreService {
 
 	public Genre findGenreByNameOrException(String name){
 		return genreRepository.findByName(name).orElseThrow(() -> new GenreNotFoundException(
-				errorMessages.get("genre.NotFound.name", name)
+				errorMessages.get("genre.notFound.name", name)
 		));
 	}
 }

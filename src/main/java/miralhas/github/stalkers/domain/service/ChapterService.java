@@ -49,6 +49,12 @@ public class ChapterService {
 				));
 	}
 
+	public Chapter findByIdOrException(Long id) {
+		return chapterRepository.findById(id).orElseThrow(() -> new ChapterNotFoundException(
+				errorMessages.get("chapter.notFound.id", id)
+		));
+	}
+
 	// Cache Breakdown:
 	// 2. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
 	// 		in novels.detail contains 2 fields that are related to chapters (firstChapter and lastChapter).

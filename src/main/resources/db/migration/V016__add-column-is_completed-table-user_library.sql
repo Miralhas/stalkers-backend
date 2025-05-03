@@ -1,0 +1,1 @@
+ALTER TABLE user_library ADD COLUMN `is_completed` BIT(1) NOT NULL;
