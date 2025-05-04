@@ -25,8 +25,8 @@ public class InfoService {
 
 	@Cacheable(cacheNames = "tags.list")
 	public Page<Tag> findAllTags(TagFilter filter, Pageable pageable) {
-		if (StringUtils.hasText(filter.startsWith())) {
-			return tagRepository.findAllTagsThatStartsWith(filter.startsWith(), pageable);
+		if (StringUtils.hasText(filter.firstLetter())) {
+			return tagRepository.findAllTagsWithTheFirstLetter(filter.firstLetter(), pageable);
 		}
 		return tagRepository.findAll(pageable);
 	}
