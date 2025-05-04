@@ -28,7 +28,7 @@ public class NotificationListener {
 			key = "rk.notification.new-chapter"
 	))
 	public void onNewChapterUploaded(NewChapterNotificationInput input) {
-		var recipients = novelRepository.findAllBookmarkedUsesOfANovel(input.novel().getId());
+		var recipients = novelRepository.findAllBookmarkedUsersOfANovel(input.novel().getId());
 		if (ObjectUtils.isEmpty(recipients)) return; // no one to send the notification to.
 
 		var novel = input.novel();

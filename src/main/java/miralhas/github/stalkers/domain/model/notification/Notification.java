@@ -22,7 +22,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "notifcation_type")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "notification_type")
 @NoArgsConstructor
 public class Notification implements Serializable {
 

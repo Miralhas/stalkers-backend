@@ -42,6 +42,6 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	@Query("select ul.user " +
 			"from UserLibrary ul " +
 			"where ul.novel.id = :novelId and ul.isBookmarked = true")
-	Set<User> findAllBookmarkedUsesOfANovel(Long novelId);
+	Set<User> findAllBookmarkedUsersOfANovel(Long novelId);
 
 }
