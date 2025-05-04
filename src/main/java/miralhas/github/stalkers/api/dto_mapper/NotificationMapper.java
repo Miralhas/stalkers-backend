@@ -13,7 +13,7 @@ public class NotificationMapper {
 		if (n instanceof NewChapterNotification newChapterNotification) {
 			return mapNewChapterNotification(newChapterNotification);
 		} else {
-			throw new InternalServerError();
+			throw new InternalServerError("Unsupported Notification type: " + n.getClass().getName());
 		}
 	}
 

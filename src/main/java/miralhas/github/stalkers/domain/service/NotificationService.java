@@ -3,7 +3,9 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.NotificationDTO;
 import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
+import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NotificationMapper;
+import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.event.SendMessageEvent;
 import miralhas.github.stalkers.domain.exception.NotificationNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.User;
@@ -32,6 +34,8 @@ public class NotificationService {
 	private final ErrorMessages errorMessages;
 	private final UserRepository userRepository;
 	private final NotificationMapper notificationMapper;
+	private final NovelMapper novelMapper;
+	private final ChapterMapper chapterMapper;
 
 	public Notification findNotificationByIdOrException(Long id) {
 		return notificationRepository.findById(id).orElseThrow(() -> new NotificationNotFoundException(
@@ -51,7 +55,9 @@ public class NotificationService {
 	}
 
 	public void sendNewChapterNotification(Novel novel, Chapter chapter) {
-		var newChapterNotificationInput = new NewChapterNotificationInput(chapter, novel);
+		var novelSummaryDTO = novelMapper.toSummaryResponse(novel);
+		var chapterSummaryDTO = chapterMapper.toSummaryResponse(chapter);
+		var newChapterNotificationInput = new NewChapterNotificationInput(chapterSummaryDTO, novelSummaryDTO);
 		events.publishEvent(new SendMessageEvent(
 				newChapterNotificationInput, "rk.notification.new-chapter", "stalkers")
 		);

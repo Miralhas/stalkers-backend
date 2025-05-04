@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 @Log4j2
 @Component
@@ -28,26 +29,27 @@ public class NotificationListener {
 			key = "rk.notification.new-chapter"
 	))
 	public void onNewChapterUploaded(NewChapterNotificationInput input) {
-		var recipients = novelRepository.findAllBookmarkedUsersOfANovel(input.novel().getId());
+		var recipients = novelRepository.findAllBookmarkedUsersOfANovel(input.novel().id());
 		if (ObjectUtils.isEmpty(recipients)) return; // no one to send the notification to.
 
 		var novel = input.novel();
 		var chapter = input.chapter();
 		var recipientsEmail = recipients.stream().map(User::getEmail).toList();
+		var capitalizedNovelTitle = StringUtils.capitalize(novel.title());
 
 		log.info("Sending new '{}' chapter notification to users: {}",
-				novel.getSlug(), recipientsEmail);
+				novel.slug(), recipientsEmail);
 
 		var notification = NewChapterNotification.builder()
-				.title("New Chapter Released - %s".formatted(novel.capitalizedTitle()))
+				.title("New Chapter Released - %s".formatted(capitalizedNovelTitle))
 				.description("Chapter %d is now live. Catch up on the latest chapters of %s".formatted(
-						chapter.getNumber(),
-						novel.capitalizedTitle()
+						chapter.number(),
+						capitalizedNovelTitle
 				))
 				.recipients(recipients)
-				.novelSlug(novel.getSlug())
-				.newChapterSlug(chapter.getSlug())
-				.newChapterReleaseDate(chapter.getCreatedAt())
+				.novelSlug(novel.slug())
+				.newChapterSlug(chapter.slug())
+				.newChapterReleaseDate(chapter.createdAt())
 				.build();
 
 		notification = notificationService.saveNewChapterNotification(notification);
