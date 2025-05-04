@@ -3,13 +3,17 @@ package miralhas.github.stalkers.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ImageDTO;
+import miralhas.github.stalkers.api.dto.NotificationDTO;
 import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
+import miralhas.github.stalkers.api.dto_mapper.NotificationMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
+import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
+import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -31,6 +35,9 @@ public class UserController implements UserControllerSwagger {
 	private final UserService userService;
 	private final ImageMapper imageMapper;
 	private final ImageService imageService;
+	private final UserRepository userRepository;
+	private final NotificationMapper notificationMapper;
+	private final NotificationService notificationService;
 
 	@Override
 	@GetMapping
@@ -80,4 +87,13 @@ public class UserController implements UserControllerSwagger {
 		var user = userService.findUserByIdOrException(id);
 		userService.deleteUserImage(user);
 	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping("/notifications")
+	public List<NotificationDTO> getUserNotifications(JwtAuthenticationToken token) {
+		var user = userService.findUserByEmailOrException(token.getName());
+		return notificationService.getUserNotifications(user);
+	}
+
 }

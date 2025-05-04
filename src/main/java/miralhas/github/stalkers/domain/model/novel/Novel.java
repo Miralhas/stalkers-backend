@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
+import static org.springframework.util.StringUtils.capitalize;
 
 @With
 @Getter
@@ -86,6 +87,10 @@ public class Novel implements Serializable {
 
 	public void generateSlug() {
 		this.slug = SLG.slugify(title);
+	}
+
+	public String capitalizedTitle() {
+		return capitalize(this.title);
 	}
 
 	public boolean hasImage() {

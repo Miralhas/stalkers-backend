@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.notification.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,14 +10,17 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-	@Query("from User u where u.email = :email")
+	@Query("from User u LEFT JOIN FETCH u.roles where u.email = :email")
 	Optional<User> findUserByEmail(String email);
 
-	@Query("from User u where u.username = :username")
+	@Query("from User u LEFT JOIN FETCH u.roles where u.username = :username")
 	Optional<User> findUserByUsername(String username);
 
 	@Override
 	@Query("from User u LEFT JOIN FETCH u.roles")
 	List<User> findAll();
+
+	@Query("select n from Notification n LEFT JOIN n.recipients u WHERE u.id = :userId ORDER BY n.createdAt DESC")
+	List<Notification> findUserNotifications(Long userId);
 
 }

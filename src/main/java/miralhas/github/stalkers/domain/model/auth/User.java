@@ -20,7 +20,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Serializable {
@@ -56,10 +55,9 @@ public class User implements Serializable {
 			joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id")
 	)
-	@ToString.Exclude
 	private Set<Role> roles;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
 
 	public List<? extends GrantedAuthority> getAuthorities() {

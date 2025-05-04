@@ -17,6 +17,9 @@ public class RabbitMQConfig {
 	}
 
 	private List<String> getAllowedListPatterns() {
-		return List.of("miralhas.github.stalkers.api.dto.*", "java.*");
+		return List.of(
+				"miralhas.github.stalkers.api.dto.*",
+				"java.*"
+		);
 	}
 }

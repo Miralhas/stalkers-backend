@@ -31,6 +31,7 @@ public class ChapterService {
 	private final ChapterRepository chapterRepository;
 	private final ChapterMapper chapterMapper;
 	private final CacheManagerUtils cacheManager;
+	private final NotificationService notificationService;
 
 	@Cacheable(value = "chapters.list", unless = "#result.getContent().isEmpty()", keyGenerator = "novelChaptersKeyGenerator")
 	public Page<ChapterSummaryDTO> findAllByNovelSlug(String novelSlug, Pageable pageable) {
@@ -68,6 +69,7 @@ public class ChapterService {
 		// evict only chapters.list of the novel that is receiving new chapters
 		Chapter saved = chapterRepository.save(chapter);
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+		notificationService.sendNewChapterNotification(novel, saved);
 		return saved;
 	}
 
@@ -75,8 +77,9 @@ public class ChapterService {
 	@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 	public void saveBulk(Novel novel, List<Chapter> chapters) {
 		chapters.forEach(chapter -> setChapterPropertiesAndValidations(chapter, novel));
-		chapterRepository.saveAllAndFlush(chapters);
+		chapters = chapterRepository.saveAllAndFlush(chapters);
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+		notificationService.sendNewChapterNotification(novel, chapters.getFirst());
 	}
 
 	// Cache Breakdown:

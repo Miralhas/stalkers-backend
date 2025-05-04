@@ -44,4 +44,15 @@ public interface UserLibraryRepository extends JpaRepository<UserLibrary, Long> 
 	)
 	Page<Object[]> findUserLibraryCompletedByUserId(Long userId, Pageable pageable);
 
+	@Query(
+			nativeQuery = true,
+			value = "SELECT IF(EXISTS(" +
+					"SELECT 1 FROM user_library ul " +
+					"LEFT JOIN novel n ON n.id = ul.novel_id " +
+					"WHERE n.slug = :novelSlug " +
+					"AND ul.user_id = :userId " +
+					"AND ul.is_bookmarked = TRUE), 'true', 'false')"
+	)
+	boolean isNovelBookmarkedByUser(String novelSlug, Long userId);
+
 }

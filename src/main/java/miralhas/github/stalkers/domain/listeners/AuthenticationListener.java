@@ -3,7 +3,6 @@ package miralhas.github.stalkers.domain.listeners;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import miralhas.github.stalkers.api.dto.PasswordResetDTO;
-import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.domain.service.interfaces.SendEmailService;
 import miralhas.github.stalkers.domain.service.interfaces.SendEmailService.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -36,14 +35,5 @@ public class AuthenticationListener {
 				.build();
 
 		sendEmailService.send(message);
-	}
-
-	@RabbitListener(bindings = @QueueBinding(
-			exchange = @Exchange(value = "stalkers", type = "topic"),
-			value = @Queue("queue.user.created"),
-			key = "rk.user.created"
-	))
-	public void userCreatedListener(UserDTO user) {
-
 	}
 }
