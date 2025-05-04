@@ -41,7 +41,7 @@ public class UserLibraryService {
 	}
 
 	@Cacheable(
-			cacheNames = "libraries.list",
+			cacheNames = "user.library.list",
 			key = "{#user.getEmail(), #filter, #pageable}",
 			unless = "#result.getContent().isEmpty()"
 	)

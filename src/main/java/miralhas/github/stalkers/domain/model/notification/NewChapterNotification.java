@@ -27,13 +27,12 @@ public class NewChapterNotification extends Notification implements Serializable
 			String newChapterSlug,
 			String novelSlug,
 			OffsetDateTime newChapterReleaseDate,
-			boolean isRead,
 			OffsetDateTime createdAt,
 			String title,
 			String description,
 			Set<User> recipients
 	) {
-		super(isRead, createdAt, title, description, recipients, Type.NEW_CHAPTER);
+		super(createdAt, title, description, recipients, Type.NEW_CHAPTER);
 		this.newChapterSlug = newChapterSlug;
 		this.novelSlug = novelSlug;
 		this.newChapterReleaseDate = newChapterReleaseDate;
@@ -47,4 +46,5 @@ public class NewChapterNotification extends Notification implements Serializable
 
 	@Column(nullable = true)
 	private OffsetDateTime newChapterReleaseDate;
+
 }

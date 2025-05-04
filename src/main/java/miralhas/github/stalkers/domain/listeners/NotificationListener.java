@@ -44,7 +44,6 @@ public class NotificationListener {
 						chapter.getNumber(),
 						novel.capitalizedTitle()
 				))
-				.isRead(false)
 				.recipients(recipients)
 				.novelSlug(novel.getSlug())
 				.newChapterSlug(chapter.getSlug())

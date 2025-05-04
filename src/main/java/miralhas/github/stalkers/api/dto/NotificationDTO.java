@@ -11,7 +11,6 @@ public record NotificationDTO(
 		String description,
 		String novelSlug,
 		String chapterSlug,
-		OffsetDateTime newChapterReleaseDate,
-		boolean isRead
+		OffsetDateTime newChapterReleaseDate
 ) {
 }

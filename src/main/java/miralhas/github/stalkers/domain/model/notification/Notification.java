@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.notification.enums.Type;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,9 +27,8 @@ import java.util.Set;
 public class Notification implements Serializable {
 
 	public Notification(
-			boolean isRead, OffsetDateTime createdAt, String title, String description, Set<User> recipients, Type type
+			OffsetDateTime createdAt, String title, String description, Set<User> recipients, Type type
 	) {
-		this.isRead = isRead;
 		this.createdAt = createdAt;
 		this.title = title;
 		this.description = description;
@@ -43,9 +43,6 @@ public class Notification implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private boolean isRead;
-
 	@CreationTimestamp
 	@Column(nullable = true)
 	private OffsetDateTime createdAt;
@@ -59,6 +56,7 @@ public class Notification implements Serializable {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Type type;
+
 
 	@ManyToMany(
 			fetch = FetchType.LAZY,

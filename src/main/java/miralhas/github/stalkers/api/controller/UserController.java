@@ -13,6 +13,7 @@ import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
+import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class UserController implements UserControllerSwagger {
 	private final ImageService imageService;
 	private final UserRepository userRepository;
 	private final NotificationMapper notificationMapper;
+	private final NotificationService notificationService;
 
 	@Override
 	@GetMapping
@@ -86,7 +88,8 @@ public class UserController implements UserControllerSwagger {
 		userService.deleteUserImage(user);
 	}
 
-//	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/notifications")
 	public List<NotificationDTO> getUserNotifications(JwtAuthenticationToken token) {
 		var user = userService.findUserByEmailOrException(token.getName());
@@ -94,4 +97,5 @@ public class UserController implements UserControllerSwagger {
 				.map(notificationMapper::toResponse)
 				.toList();
 	}
+
 }

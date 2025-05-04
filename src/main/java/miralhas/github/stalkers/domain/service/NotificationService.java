@@ -3,10 +3,15 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
 import miralhas.github.stalkers.domain.event.SendMessageEvent;
+import miralhas.github.stalkers.domain.exception.NotificationNotFoundException;
+import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
+import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.NewChapterNotificationRepository;
+import miralhas.github.stalkers.domain.repository.NotificationRepository;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +23,14 @@ public class NotificationService {
 
 	private final NewChapterNotificationRepository newChapterRepository;
 	private final ApplicationEventPublisher events;
+	private final NotificationRepository notificationRepository;
+	private final ErrorMessages errorMessages;
+
+	public Notification findNotificationByIdOrException(Long id) {
+		return notificationRepository.findById(id).orElseThrow(() -> new NotificationNotFoundException(
+				errorMessages.get("notification.notFound.id", id)
+		));
+	}
 
 	@Transactional
 	public NewChapterNotification saveNewChapterNotification(NewChapterNotification notification) {
@@ -29,6 +42,13 @@ public class NotificationService {
 		events.publishEvent(new SendMessageEvent(
 				newChapterNotificationInput, "rk.notification.new-chapter", "stalkers")
 		);
+	}
+
+	@Transactional
+	public void removeUserFromRecipients(User user, Long notificationId) {
+		var notification = findNotificationByIdOrException(notificationId);
+		notification.getRecipients().remove(user);
+		notificationRepository.save(notification);
 	}
 
 }

@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.UserLibraryDTO;
 import miralhas.github.stalkers.api.dto.filter.LibraryFilter;
 import miralhas.github.stalkers.api.dto.input.UserLibraryInput;
+import miralhas.github.stalkers.domain.repository.UserLibraryRepository;
 import miralhas.github.stalkers.domain.service.NovelService;
 import miralhas.github.stalkers.domain.service.UserLibraryService;
 import miralhas.github.stalkers.domain.service.UserService;
@@ -18,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/library")
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class UserLibraryController {
 	private final UserService userService;
 	private final UserLibraryService userLibraryService;
 	private final NovelService novelService;
+	private final UserLibraryRepository userLibraryRepository;
 
 	@GetMapping
 	@PreAuthorize("hasRole('USER')")
@@ -82,5 +86,14 @@ public class UserLibraryController {
 	@DeleteMapping("/complete/{libraryElementId}")
 	public void removeComplete(@PathVariable Long libraryElementId) {
 		userLibraryService.removeComplete(libraryElementId);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/bookmark/is-novel-bookmarked/{novelSlug}")
+	public Map<String, Boolean> isNovelBookmarkedByUser(@PathVariable String novelSlug, JwtAuthenticationToken authToken) {
+		var user = userService.findUserByEmailOrException(authToken.getName());
+		var isBookmarked = userLibraryRepository.isNovelBookmarkedByUser(novelSlug, user.getId());
+		return Map.of("isBookmarked", isBookmarked);
 	}
 }
