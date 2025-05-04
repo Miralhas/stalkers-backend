@@ -49,11 +49,11 @@ public class UserLibraryController {
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void updateUserLibrary(
-			@RequestBody @Valid UserLibraryInput userHistoryInput,
+			@RequestBody @Valid UserLibraryInput userLibraryInput,
 			JwtAuthenticationToken authToken
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
-		userLibraryService.updateUserLibrary(user, userHistoryInput.novelId(), userHistoryInput.chapterId());
+		userLibraryService.updateUserLibrary(user, userLibraryInput.novelId(), userLibraryInput.chapterId());
 	}
 
 	@PreAuthorize("hasRole('USER')")
