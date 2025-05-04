@@ -93,9 +93,7 @@ public class UserController implements UserControllerSwagger {
 	@GetMapping("/notifications")
 	public List<NotificationDTO> getUserNotifications(JwtAuthenticationToken token) {
 		var user = userService.findUserByEmailOrException(token.getName());
-		return userRepository.findUserNotifications(user.getId()).stream()
-				.map(notificationMapper::toResponse)
-				.toList();
+		return notificationService.getUserNotifications(user);
 	}
 
 }
