@@ -8,6 +8,7 @@ import java.util.List;
 @UtilityClass
 public class CommonsUtils {
 
+	public static final int WORDS_ARRAY_SIZE = 50;
 	public static final List<String> WORDS_ARRAY = List.of(
 			"Formula",
 			"Evening",
@@ -113,7 +114,6 @@ public class CommonsUtils {
 			"Phantom",
 			"Pitcher"
 	);
-	public static final int WORDS_ARRAY_SIZE = 50;
 
 	public String randomUsernameGenerator() {
 		var random = new SecureRandom();
