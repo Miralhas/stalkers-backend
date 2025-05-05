@@ -10,13 +10,13 @@ public record NovelDTO(
 		String title,
 		String author,
 		String status,
+		Boolean isHidden,
 		String description,
 		long chaptersCount,
 		List<String> genres,
 		List<String> tags,
 		ChapterSummaryDTO firstChapter,
 		ChapterSummaryDTO lastChapter
-
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;

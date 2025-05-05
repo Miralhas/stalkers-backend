@@ -64,7 +64,7 @@ public class Novel implements Serializable {
 
 	@Builder.Default
 	@Column(nullable = false)
-	private Boolean isHidden = Boolean.TRUE;
+	private Boolean isHidden = Boolean.FALSE;
 
 	@ManyToMany(
 			fetch = FetchType.LAZY,
