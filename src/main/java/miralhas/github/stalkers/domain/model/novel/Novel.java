@@ -3,6 +3,7 @@ package miralhas.github.stalkers.domain.model.novel;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
+import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -86,24 +87,28 @@ public class Novel implements Serializable {
 	)
 	private Set<Genre> genres = new HashSet<>();
 
+	@OneToMany(mappedBy = "novel", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<NovelReview> reviews;
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
+
+	public void addReview(NovelReview review) {
+		this.reviews.add(review);
+		review.setNovel(this);
+	}
+
+	public void removeReview(NovelReview review) {
+		this.reviews.remove(review);
+		review.setNovel(null);
+	}
 
 	public void generateSlug() {
 		this.slug = SLG.slugify(title);
 	}
 
-	public String capitalizedTitle() {
-		return capitalize(this.title);
-	}
-
 	public boolean hasImage() {
 		return this.image != null;
-	}
-
-	public String getImageFileName() {
-		if (hasImage()) return this.image.getFileName();
-		return null;
 	}
 
 	@Override
