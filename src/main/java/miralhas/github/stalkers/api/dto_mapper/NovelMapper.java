@@ -4,12 +4,14 @@ import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
+import miralhas.github.stalkers.api.dto.input.UpdateNovelInput;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -42,8 +44,10 @@ public abstract class NovelMapper {
 
 	public abstract List<NovelSummaryDTO> toSummaryCollectionResponse(List<Novel> novels);
 
-//	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-//	Novel partialUpdate(NovelDTO novelDTO, @MappingTarget Novel novel);
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
+	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
+	public abstract Novel update(UpdateNovelInput input, @MappingTarget Novel novel);
 
 	@Named("chaptersCount")
 	long chaptersCount(Novel novel) {
@@ -72,11 +76,13 @@ public abstract class NovelMapper {
 
 	@Named("tagsInputMapper")
 	Set<Tag> tagsInputToEntityMapper(List<String> tags) {
+		if (ObjectUtils.isEmpty(tags)) return null;
 		return tags.stream().map(Tag::new).collect(Collectors.toSet());
 	}
 
 	@Named("genresInputMapper")
 	Set<Genre> genresInputToEntityMapper(List<String> genres) {
+		if (ObjectUtils.isEmpty(genres)) return null;
 		return genres.stream().map(Genre::new).collect(Collectors.toSet());
 	}
 

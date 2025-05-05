@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RobotFilter extends OncePerRequestFilter {
 
+	private final ErrorMessages errorMessages;
 	@Value("${robot.secret}")
 	private String robotSecret;
 
@@ -38,7 +40,7 @@ public class RobotFilter extends OncePerRequestFilter {
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setContentType("application/json");
 			ObjectMapper mapper = new ObjectMapper();
-			mapper.writeValue(response.getWriter(), Map.of("message", "Access denied!"));
+			mapper.writeValue(response.getWriter(), Map.of("message", errorMessages.get("forbidden.notRobot")));
 			return;
 		}
 

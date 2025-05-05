@@ -14,9 +14,11 @@ public class CacheManagerUtils {
 	private final CacheManager cacheManager;
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	public void evictSingleEntry(String cacheName, Object key) {
-		var cache = cacheManager.getCache(cacheName);
-		if (cache != null) cache.evict(key);
+	public void evictSingleEntry(String cacheName) {
+		Set<String> keys = redisTemplate.keys(cacheName);
+		if (!keys.isEmpty()) {
+			redisTemplate.delete(keys);
+		}
 	}
 
 	public void evitAllEntries(String cacheName) {

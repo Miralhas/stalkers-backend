@@ -43,6 +43,16 @@ public class NovelSpec {
 		};
 	}
 
+	// By default, the query will show only novels that have the 'isHidden' flag set to false.
+	// When requesting the query, if the query param 'showAll' is set to true, then it will be shown all novels, be it
+	// the flag false or not.
+	public static Specification<Novel> showEveryNovel(Boolean flag) {
+		return (root, query, builder) -> {
+			if (flag == null || flag) return null;
+			return builder.equal(root.get("isHidden"), false);
+		};
+	}
+
 	public static Specification<Novel> tagsNameEqual(List<String> tags) {
 		return (root, query, builder) -> {
 			if (!ObjectUtils.isEmpty(tags) && Objects.nonNull(query)) {
