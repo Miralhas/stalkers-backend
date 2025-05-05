@@ -5,6 +5,7 @@ import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
@@ -43,5 +44,9 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"from UserLibrary ul " +
 			"where ul.novel.id = :novelId and ul.isBookmarked = true")
 	Set<User> findAllBookmarkedUsersOfANovel(Long novelId);
+
+	@Modifying
+	@Query("delete from Novel n where n.slug = :slug ")
+	void deleteBySlug(String slug);
 
 }

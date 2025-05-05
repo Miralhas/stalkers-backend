@@ -10,6 +10,7 @@ public record NovelSummaryDTO(
 		String author,
 		String status,
 		String description,
+		String isHidden,
 		long chaptersCount
 ) implements Serializable {
 	@Serial

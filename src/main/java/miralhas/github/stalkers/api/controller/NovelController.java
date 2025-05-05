@@ -9,13 +9,13 @@ import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
+import miralhas.github.stalkers.api.dto.input.UpdateNovelInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NovelService;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,7 +26,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,19 +39,33 @@ public class NovelController {
 
 	@GetMapping
 	public PageDTO<NovelSummaryDTO> findAll(
-			@PageableDefault(size = 10, sort = {"title", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
+			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
 			@Valid NovelFilter filter
 	) {
 		var novelsPage = novelService.findAll(pageable, filter);
-		List<NovelSummaryDTO> novelSummaryDTOS = novelMapper.toSummaryCollectionResponse(novelsPage.getContent());
-		var novelSummaryDTOsPage = new PageImpl<>(novelSummaryDTOS, pageable, novelsPage.getTotalElements());
-		return new PageDTO<>(novelSummaryDTOsPage);
+		return new PageDTO<>(novelsPage);
 	}
 
 	@GetMapping("/{novelSlug}")
 	@ResponseStatus(HttpStatus.OK)
 	public NovelDTO findBySlug(@PathVariable String novelSlug) {
 		return novelService.findBySlugOrExceptionCacheable(novelSlug);
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("/{novelSlug}")
+	public NovelDTO updateNovel(@PathVariable String novelSlug, @RequestBody @Valid UpdateNovelInput input) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		novel = novelService.update(input, novel);
+		return novelMapper.toResponse(novel);
+	}
+
+	@DeleteMapping("/{novelSlug}")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteNovel(@PathVariable String novelSlug) {
+		novelService.delete(novelSlug);
 	}
 
 	@PostMapping

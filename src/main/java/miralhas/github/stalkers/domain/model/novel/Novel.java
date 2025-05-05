@@ -62,6 +62,10 @@ public class Novel implements Serializable {
 	@Column(nullable = true)
 	private OffsetDateTime updatedAt;
 
+	@Builder.Default
+	@Column(nullable = false)
+	private Boolean isHidden = Boolean.TRUE;
+
 	@ManyToMany(
 			fetch = FetchType.LAZY,
 			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
