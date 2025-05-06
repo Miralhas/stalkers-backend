@@ -1,10 +1,10 @@
 package miralhas.github.stalkers.domain.model.comment;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import miralhas.github.stalkers.domain.model.auth.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -23,6 +23,8 @@ import java.util.Set;
 @Table(name = "comments")
 @DiscriminatorValue("COMMENT")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@AllArgsConstructor
+@NoArgsConstructor
 @DiscriminatorColumn(name = "comment_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Comment implements Serializable {
 
@@ -37,11 +39,9 @@ public abstract class Comment implements Serializable {
 	private String message;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@ToString.Exclude
 	private Comment parentComment;
 
-	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
-	@ToString.Exclude
+	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
 	private Set<Comment> childComments = new HashSet<>();
 
 	@CreationTimestamp
@@ -50,12 +50,20 @@ public abstract class Comment implements Serializable {
 	@UpdateTimestamp
 	private OffsetDateTime updatedAt;
 
+	@Column(nullable = false)
+	private Boolean isSpoiler = Boolean.FALSE;
+
+	@JoinColumn(nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
-	@ToString.Exclude
 	private User commenter;
 
 	public boolean hasParent() {
 		return this.parentComment != null;
+	}
+
+	public Long getParentId() {
+		if (!hasParent()) return null;
+		return this.getParentComment().getId();
 	}
 
 	@Override

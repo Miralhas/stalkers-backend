@@ -4,17 +4,24 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.CommentDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
+import miralhas.github.stalkers.api.dto.input.CommentInput;
+import miralhas.github.stalkers.api.dto.input.UpdateCommentInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
+import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
+import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.NovelService;
+import miralhas.github.stalkers.domain.service.ReviewService;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +34,8 @@ public class ChapterController {
 	private final ChapterService chapterService;
 	private final ChapterMapper chapterMapper;
 	private final NovelService novelService;
+	private final ReviewService reviewService;
+	private final CommentMapper commentMapper;
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
@@ -81,5 +90,48 @@ public class ChapterController {
 	public void delete(@PathVariable String novelSlug, @PathVariable String chapterSlug) {
 		chapterService.delete(chapterSlug, novelSlug);
 	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/{chapterSlug}/reviews")
+	public List<CommentDTO> chapterReviews(@PathVariable String novelSlug, @PathVariable String chapterSlug) {
+		return reviewService.findChapterReviewsBySlug(chapterSlug)
+				.stream().map(commentMapper::toResponse).toList();
+	}
+
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping("/{chapterSlug}/reviews")
+	public CommentDTO addReview(
+			@PathVariable String novelSlug,
+			@PathVariable String chapterSlug,
+			@RequestBody @Valid CommentInput input
+	) {
+		Comment review = reviewService.addChapterReview(input, chapterSlug);
+		return commentMapper.toResponse(review);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.OK)
+	@PutMapping("/{chapterSlug}/reviews/{reviewId}")
+	public CommentDTO updateReview(
+			@RequestBody @Valid UpdateCommentInput input,
+			@PathVariable String novelSlug,
+			@PathVariable String chapterSlug,
+			@PathVariable Long reviewId
+	) {
+		Comment updatedComment = reviewService.update(input, reviewId);
+		return commentMapper.toResponse(updatedComment);
+	}
+
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasRole('USER')")
+	@DeleteMapping("/{chapterSlug}/reviews/{reviewId}")
+	public void deleteReview(
+			@PathVariable String novelSlug,
+			@PathVariable String chapterSlug,
+			@PathVariable Long reviewId
+	) {
+		reviewService.deleteReview(reviewId);
+	}
+
 
 }

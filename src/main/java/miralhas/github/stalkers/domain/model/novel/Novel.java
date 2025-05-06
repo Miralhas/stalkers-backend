@@ -1,5 +1,6 @@
 package miralhas.github.stalkers.domain.model.novel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
@@ -17,7 +18,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
-import static org.springframework.util.StringUtils.capitalize;
 
 @With
 @Getter
@@ -87,6 +87,7 @@ public class Novel implements Serializable {
 	)
 	private Set<Genre> genres = new HashSet<>();
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "novel", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<NovelReview> reviews;
 

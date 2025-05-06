@@ -13,7 +13,10 @@ import java.util.Set;
 
 public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecificationExecutor<Novel> {
 
-	@Query("from Novel n where n.slug = :slug")
+	@Query("from Novel n " +
+			"LEFT JOIN FETCH n.tags " +
+			"LEFT JOIN FETCH n.genres " +
+			"where n.slug = :slug")
 	Optional<Novel> findBySlug(String slug);
 
 	@Query(nativeQuery = true,

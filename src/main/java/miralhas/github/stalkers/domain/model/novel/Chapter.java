@@ -4,7 +4,6 @@ package miralhas.github.stalkers.domain.model.novel;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.comment.ChapterReview;
-import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -62,12 +61,12 @@ public class Chapter implements Serializable {
 
 	public void addReview(ChapterReview review) {
 		this.reviews.add(review);
-		review.setNovel(this);
+		review.setChapter(this);
 	}
 
 	public void removeReview(ChapterReview review) {
 		this.reviews.remove(review);
-		review.setNovel(null);
+		review.setChapter(null);
 	}
 
 	public void generateSlug(String novelTitle) {

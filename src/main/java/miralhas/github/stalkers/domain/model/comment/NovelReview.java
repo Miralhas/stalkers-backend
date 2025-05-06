@@ -1,8 +1,10 @@
 package miralhas.github.stalkers.domain.model.comment;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.With;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 
 import java.io.Serial;
@@ -11,6 +13,8 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
+@With
+@AllArgsConstructor
 @DiscriminatorValue("NOVEL_REVIEW")
 public class NovelReview extends Comment implements Serializable {
 
