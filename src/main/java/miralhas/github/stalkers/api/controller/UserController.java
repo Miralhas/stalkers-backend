@@ -8,10 +8,8 @@ import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
-import miralhas.github.stalkers.api.dto_mapper.NotificationMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
-import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
@@ -35,8 +33,6 @@ public class UserController implements UserControllerSwagger {
 	private final UserService userService;
 	private final ImageMapper imageMapper;
 	private final ImageService imageService;
-	private final UserRepository userRepository;
-	private final NotificationMapper notificationMapper;
 	private final NotificationService notificationService;
 
 	@Override

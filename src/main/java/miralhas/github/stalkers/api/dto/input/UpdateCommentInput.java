@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpdateCommentInput(
 		@NotBlank
-		String message
+		String message,
+
+		Boolean isSpoiler
 ) {
 }
