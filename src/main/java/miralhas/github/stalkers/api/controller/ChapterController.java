@@ -93,9 +93,12 @@ public class ChapterController {
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("/{chapterSlug}/reviews")
-	public List<CommentDTO> chapterReviews(@PathVariable String novelSlug, @PathVariable String chapterSlug) {
-		return reviewService.findChapterReviewsBySlug(chapterSlug)
-				.stream().map(commentMapper::toResponse).toList();
+	public PageDTO<CommentDTO> chapterReviews(
+			@PathVariable String novelSlug,
+			@PathVariable String chapterSlug,
+			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		return reviewService.findChapterReviewsBySlug(chapterSlug, pageable);
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)

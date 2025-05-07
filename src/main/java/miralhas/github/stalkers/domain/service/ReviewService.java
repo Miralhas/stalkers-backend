@@ -1,6 +1,8 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.CommentDTO;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
 import miralhas.github.stalkers.api.dto.input.UpdateCommentInput;
 import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
@@ -13,9 +15,11 @@ import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.*;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -44,18 +48,18 @@ public class ReviewService {
 		));
 	}
 
-	public Comment findCommentProjectionByIdOrThrowException(Long id) {
-		return commentRepository.findById(id).orElseThrow(() -> new CommentNotFoundException(
-				errorMessages.get("comment.notFound.id", id)
-		));
+	public PageDTO<CommentDTO> findNovelReviewsBySlug(String slug, Pageable pageable) {
+		var novelReviewsPage = novelReviewRepository.findRootReviewsByNovelSlug(slug, pageable);
+		var commentsDTO = novelReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
+		var pageImpl = new PageImpl<>(commentsDTO, pageable, novelReviewsPage.getTotalElements());
+		return new PageDTO<>(pageImpl);
 	}
 
-	public List<NovelReview> findNovelReviewsBySlug(String slug) {
-		return novelReviewRepository.findRootReviewsByNovelSlug(slug);
-	}
-
-	public List<ChapterReview> findChapterReviewsBySlug(String slug) {
-		return chapterReviewRepository.findRootReviewsByChapterSlug(slug);
+	public PageDTO<CommentDTO> findChapterReviewsBySlug(String slug, Pageable pageable) {
+		var chapterReviewsPage = chapterReviewRepository.findRootReviewsByChapterSlug(slug, pageable);
+		var commentsDTO = chapterReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
+		var pageImpl = new PageImpl<>(commentsDTO, pageable, chapterReviewsPage.getTotalElements());
+		return new PageDTO<>(pageImpl);
 	}
 
 	@Transactional

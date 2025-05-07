@@ -24,7 +24,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -106,9 +105,11 @@ public class NovelController {
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("/{novelSlug}/reviews")
-	public List<CommentDTO> novelReviews(@PathVariable String novelSlug) {
-		return reviewService.findNovelReviewsBySlug(novelSlug)
-				.stream().map(commentMapper::toResponse).toList();
+	public PageDTO<CommentDTO> novelReviews(
+			@PathVariable String novelSlug,
+			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		return reviewService.findNovelReviewsBySlug(novelSlug, pageable);
 	}
 
 	@PreAuthorize("hasRole('USER')")

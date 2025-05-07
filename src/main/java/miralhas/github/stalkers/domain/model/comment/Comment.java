@@ -13,7 +13,8 @@ import org.hibernate.proxy.HibernateProxy;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public abstract class Comment implements Serializable {
 	private Comment parentComment;
 
 	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-	private Set<Comment> childComments = new HashSet<>();
+	private List<Comment> childComments = new ArrayList<>();
 
 	@CreationTimestamp
 	private OffsetDateTime createdAt;
@@ -56,6 +57,9 @@ public abstract class Comment implements Serializable {
 	@JoinColumn(nullable = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User commenter;
+
+	@OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+	private Set<Upvote> upvotes;
 
 	public boolean hasParent() {
 		return this.parentComment != null;
