@@ -96,7 +96,7 @@ public class ChapterController {
 	public PageDTO<CommentDTO> chapterReviews(
 			@PathVariable String novelSlug,
 			@PathVariable String chapterSlug,
-			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+			@PageableDefault(size = 5, sort = {"voteCount", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return reviewService.findChapterReviewsBySlug(chapterSlug, pageable);
 	}

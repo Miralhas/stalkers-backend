@@ -10,7 +10,8 @@ public record CommentDTO(
 		OffsetDateTime createdAt,
 		OffsetDateTime updatedAt,
 		boolean isSpoiler,
-		List<String> upvoters,
+		List<String> voters,
+		long voteCount,
 		String message,
 		List<CommentDTO> childComments
 ) {

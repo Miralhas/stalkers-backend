@@ -107,7 +107,7 @@ public class NovelController {
 	@GetMapping("/{novelSlug}/reviews")
 	public PageDTO<CommentDTO> novelReviews(
 			@PathVariable String novelSlug,
-			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+			@PageableDefault(size = 10, sort = {"voteCount", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return reviewService.findNovelReviewsBySlug(novelSlug, pageable);
 	}

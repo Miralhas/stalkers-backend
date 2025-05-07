@@ -11,7 +11,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	@Query("SELECT c FROM Comment c " +
 			"LEFT JOIN FETCH c.parentComment " +
 			"LEFT JOIN FETCH c.childComments " +
-			"LEFT JOIN FETCH c.upvotes " +
+			"LEFT JOIN FETCH c.votes " +
 			"WHERE c.parentComment.id = :parentId"
 	)
 	List<Comment> findByParentCommentId(Long parentId);
@@ -19,7 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 	@Query("SELECT c FROM Comment c " +
 			"LEFT JOIN FETCH c.parentComment " +
 			"LEFT JOIN FETCH c.childComments " +
-			"LEFT JOIN FETCH c.upvotes " +
+			"LEFT JOIN FETCH c.votes " +
 			"WHERE c.id = :commentId"
 	)
 	Optional<Comment> findById(Long commentId);

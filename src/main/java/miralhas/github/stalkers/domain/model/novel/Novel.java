@@ -7,6 +7,7 @@ import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -93,6 +94,9 @@ public class Novel implements Serializable {
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
+
+	@Formula("(SELECT COUNT(*) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
+	private long chaptersCount;
 
 	public void addReview(NovelReview review) {
 		this.reviews.add(review);

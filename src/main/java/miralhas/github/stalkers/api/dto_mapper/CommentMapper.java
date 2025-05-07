@@ -6,7 +6,7 @@ import miralhas.github.stalkers.api.dto.input.UpdateCommentInput;
 import miralhas.github.stalkers.domain.model.comment.ChapterReview;
 import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
-import miralhas.github.stalkers.domain.model.comment.Upvote;
+import miralhas.github.stalkers.domain.model.comment.Vote;
 import org.mapstruct.*;
 import org.springframework.util.ObjectUtils;
 
@@ -33,7 +33,7 @@ public interface CommentMapper {
 
 	@Mapping(target = "parentId", source = "parentComment.id")
 	@Mapping(target = "childComments", source = "childComments", qualifiedByName = "childCommentsMapper")
-	@Mapping(target = "upvoters", source = "upvotes", qualifiedByName = "upvotersMap")
+	@Mapping(target = "voters", source = "votes", qualifiedByName = "votersMap")
 	CommentDTO toResponse(Comment comment);
 
 	Comment update(UpdateCommentInput input, @MappingTarget Comment comment);
@@ -45,10 +45,10 @@ public interface CommentMapper {
 		return novelReview;
 	}
 
-	@Named("upvotersMap")
-	default List<String> upvotersMap(Set<Upvote> upvotes) {
-		if (ObjectUtils.isEmpty(upvotes)) return List.of();
-		return upvotes.stream().map(u -> u.getUser().getEmail()).toList();
+	@Named("votersMap")
+	default List<String> upvotersMap(Set<Vote> votes) {
+		if (ObjectUtils.isEmpty(votes)) return List.of();
+		return votes.stream().map(u -> u.getUser().getEmail()).toList();
 	}
 
 	@Named("childCommentsMapper")

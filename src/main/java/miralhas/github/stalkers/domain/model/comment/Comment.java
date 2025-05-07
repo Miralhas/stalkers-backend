@@ -6,9 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.comment.enums.Type;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -59,7 +62,10 @@ public abstract class Comment implements Serializable {
 	private User commenter;
 
 	@OneToMany(mappedBy = "comment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-	private Set<Upvote> upvotes;
+	private Set<Vote> votes;
+
+	@Formula("(SELECT COALESCE(SUM(v.count), 0) FROM vote v WHERE v.comment_id = id)")
+	private long voteCount;
 
 	public boolean hasParent() {
 		return this.parentComment != null;
@@ -68,6 +74,11 @@ public abstract class Comment implements Serializable {
 	public Long getParentId() {
 		if (!hasParent()) return null;
 		return this.getParentComment().getId();
+	}
+
+	public long getUpvoteCount() {
+		if (ObjectUtils.isEmpty(this.votes)) return 0L;
+		return this.votes.stream().filter(v -> v.getType().equals(Type.UPVOTE)).count();
 	}
 
 	@Override

@@ -30,14 +30,12 @@ public abstract class NovelMapper {
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel fromInput(NovelInput novelInput);
 
-	@Mapping(target = "chaptersCount", expression = "java(chaptersCount(novel))")
 	@Mapping(target = "tags", qualifiedByName = "tagsMapper")
 	@Mapping(target = "genres", qualifiedByName = "genresMapper")
 	@Mapping(target = "firstChapter", expression = "java(getFirstChapter(novel))")
 	@Mapping(target = "lastChapter", expression = "java(getLastChapter(novel))")
 	public abstract NovelDTO toResponse(Novel novel);
 
-	@Mapping(target = "chaptersCount", expression = "java(chaptersCount(novel))")
 	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
 
 	public abstract List<NovelDTO> toCollectionResponse(List<Novel> novels);
@@ -48,11 +46,6 @@ public abstract class NovelMapper {
 	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel update(UpdateNovelInput input, @MappingTarget Novel novel);
-
-	@Named("chaptersCount")
-	long chaptersCount(Novel novel) {
-		return novelRepository.countNovelChapters(novel.getId());
-	}
 
 	@Named("getFirstChapter")
 	ChapterSummaryDTO getFirstChapter(Novel novel) {
