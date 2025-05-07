@@ -2,17 +2,18 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ImageDTO;
-import miralhas.github.stalkers.api.dto.NotificationDTO;
-import miralhas.github.stalkers.api.dto.UserDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
+import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
+import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
+import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,6 +35,9 @@ public class UserController implements UserControllerSwagger {
 	private final ImageMapper imageMapper;
 	private final ImageService imageService;
 	private final NotificationService notificationService;
+	private final ValidateAuthorization validateAuthorization;
+	private final UserRepository userRepository;
+	private final CommentMapper commentMapper;
 
 	@Override
 	@GetMapping
@@ -91,5 +95,22 @@ public class UserController implements UserControllerSwagger {
 		var user = userService.findUserByEmailOrException(token.getName());
 		return notificationService.getUserNotifications(user);
 	}
+
+	@GetMapping("/comments")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public List<UserCommentDTO> getUserChapterComments() {
+		var currentUser = validateAuthorization.getCurrentUser();
+		return userRepository.findAllUserChapterComments(currentUser.getId());
+	}
+
+	@GetMapping("/reviews")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public List<UserCommentDTO> getUserNovelReviews() {
+		var currentUser = validateAuthorization.getCurrentUser();
+		return userRepository.findAllUserNovelComments(currentUser.getId());
+	}
+
 
 }

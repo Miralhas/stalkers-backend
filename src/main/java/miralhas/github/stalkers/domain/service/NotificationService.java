@@ -9,6 +9,7 @@ import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.event.SendMessageEvent;
 import miralhas.github.stalkers.domain.exception.NotificationNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
 import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
@@ -63,11 +64,20 @@ public class NotificationService {
 		);
 	}
 
+	// will send a notification to the parent of the comment, informing him of a new reply.
+	public void sendCommentReplyNotification(Comment comment) {
+		if (comment.hasParent()) {
+			var parent = comment.getParentComment();
+			System.out.println("sending notification...");
+		}
+	}
+
 	@Transactional
 	public void removeUserFromRecipients(User user, Long notificationId) {
 		var notification = findNotificationByIdOrException(notificationId);
 		notification.getRecipients().remove(user);
 		notificationRepository.save(notification);
 	}
+
 
 }
