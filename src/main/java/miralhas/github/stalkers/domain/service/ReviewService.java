@@ -13,13 +13,15 @@ import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.*;
+import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
-import org.springframework.data.domain.*;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -37,6 +39,7 @@ public class ReviewService {
 	private final ChapterService chapterService;
 	private final ValidateAuthorization validateAuthorization;
 	private final ChapterRepository chapterRepository;
+	private final CacheManagerUtils cacheManagerUtils;
 
 	public List<Comment> findCommentsByParentId(Long id) {
 		return commentRepository.findByParentCommentId(id);
@@ -48,6 +51,7 @@ public class ReviewService {
 		));
 	}
 
+	@Cacheable(cacheNames = "reviews.list", unless = "#result.getResults().isEmpty()")
 	public PageDTO<CommentDTO> findNovelReviewsBySlug(String slug, Pageable pageable) {
 		var novelReviewsPage = novelReviewRepository.findRootReviewsByNovelSlug(slug, pageable);
 		var commentsDTO = novelReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
@@ -55,6 +59,7 @@ public class ReviewService {
 		return new PageDTO<>(pageImpl);
 	}
 
+	@Cacheable(cacheNames = "reviews.list", unless = "#result.getResults().isEmpty()")
 	public PageDTO<CommentDTO> findChapterReviewsBySlug(String slug, Pageable pageable) {
 		var chapterReviewsPage = chapterReviewRepository.findRootReviewsByChapterSlug(slug, pageable);
 		var commentsDTO = chapterReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
@@ -76,6 +81,7 @@ public class ReviewService {
 		}
 		novelReview.setCommenter(user);
 		novelReview = commentRepository.save(novelReview);
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
 		return novelReview;
 	}
 
@@ -94,6 +100,7 @@ public class ReviewService {
 
 		chapterReview.setCommenter(validateAuthorization.getCurrentUser());
 		chapterReviewRepository.save(chapterReview);
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
 		return chapterReview;
 	}
 
@@ -102,12 +109,16 @@ public class ReviewService {
 		var comment = findCommentByIdOrThrowException(commentId);
 		validateAuthorization.validate(comment.getCommenter());
 		comment = commentMapper.update(input, comment);
-		return commentRepository.save(comment);
+		comment = commentRepository.save(comment);
+		invalidateCommentCacheEntry(comment);
+		return comment;
 	}
 
 	@Transactional
 	public void deleteReview(Long reviewId) {
 		var comment = findCommentByIdOrThrowException(reviewId);
+		validateAuthorization.validate(comment.getCommenter());
+		invalidateCommentCacheEntry(comment);
 		if (comment instanceof NovelReview novelReview) {
 			Novel novel = novelReview.getNovel();
 			if (novel != null) {
@@ -121,6 +132,7 @@ public class ReviewService {
 				chapterRepository.save(chapter);
 			}
 		}
+
 		deleteCommentAndChildren(comment.getId());
 	}
 
@@ -133,11 +145,11 @@ public class ReviewService {
 		commentRepository.deleteById(commentId);
 	}
 
-//
-//	public Comment findCommentByIdOrThrowException(Long commentId) {
-//		return commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(
-//				errorMessages.get("comment.notFound.id", commentId)
-//		));
-//	}
-
+	private void invalidateCommentCacheEntry(Comment comment) {
+		if (comment instanceof NovelReview novelReview) {
+			cacheManagerUtils.evictNovelReviewsEntry(novelReview.getNovel().getSlug());
+		} else if (comment instanceof ChapterReview chapterReview) {
+			cacheManagerUtils.evictNovelReviewsEntry(chapterReview.getChapter().getSlug());
+		}
+	}
 }

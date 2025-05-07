@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ChapterReviewRepository extends JpaRepository<ChapterReview, Long> {
 	@Query("SELECT cr from ChapterReview cr " +
-			"LEFT JOIN FETCH cr.childComments " +
+			"LEFT JOIN FETCH cr.childComments ch " +
 			"LEFT JOIN FETCH cr.parentComment " +
 			"LEFT JOIN FETCH cr.votes up " +
 			"LEFT JOIN FETCH cr.commenter co " +
