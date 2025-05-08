@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-	@Query("from Notification n LEFT JOIN FETCH n.recipients where n.id = :id")
+	@Query("from Notification n LEFT JOIN FETCH n.recipientAssociations nr where n.id = :id")
 	Optional<Notification> findById(Long id);
 
 }

@@ -90,7 +90,7 @@ public class NotificationService {
 	@Transactional
 	public void removeUserFromRecipients(User user, Long notificationId) {
 		var notification = findNotificationByIdOrException(notificationId);
-		notification.getRecipients().remove(user);
+		notification.removeRecipient(user);
 		notificationRepository.save(notification);
 	}
 

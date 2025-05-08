@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Type {
+public enum NotificationType {
 	NEW_CHAPTER("NEW_CHAPTER"),
 	UPVOTE("UPVOTE"),
 	NEW_REPLY("NEW_REPLY");
