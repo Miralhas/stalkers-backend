@@ -33,6 +33,13 @@ public class CacheManagerUtils {
 		}
 	}
 
+	public void evictNovelReviewsEntry(String slug) {
+		Set<String> keys = redisTemplate.keys("reviews.list::*"+slug+"*");
+		if (!keys.isEmpty()) {
+			redisTemplate.delete(keys);
+		}
+	}
+
 	public void evictUserLibraryEntry(String userEmail) {
 		Set<String> keys = redisTemplate.keys("libraries.list::*"+userEmail+"*");
 		if (!keys.isEmpty()) {

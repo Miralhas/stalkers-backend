@@ -1,10 +1,13 @@
 package miralhas.github.stalkers.domain.model.novel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
+import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -16,7 +19,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
-import static org.springframework.util.StringUtils.capitalize;
 
 @With
 @Getter
@@ -86,24 +88,32 @@ public class Novel implements Serializable {
 	)
 	private Set<Genre> genres = new HashSet<>();
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "novel", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	private Set<NovelReview> reviews;
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
+
+	@Formula("(SELECT COUNT(*) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
+	private long chaptersCount;
+
+	public void addReview(NovelReview review) {
+		this.reviews.add(review);
+		review.setNovel(this);
+	}
+
+	public void removeReview(NovelReview review) {
+		this.reviews.remove(review);
+		review.setNovel(null);
+	}
 
 	public void generateSlug() {
 		this.slug = SLG.slugify(title);
 	}
 
-	public String capitalizedTitle() {
-		return capitalize(this.title);
-	}
-
 	public boolean hasImage() {
 		return this.image != null;
-	}
-
-	public String getImageFileName() {
-		if (hasImage()) return this.image.getFileName();
-		return null;
 	}
 
 	@Override

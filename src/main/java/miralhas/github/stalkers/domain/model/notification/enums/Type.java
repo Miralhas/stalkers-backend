@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Type {
 	NEW_CHAPTER("NEW_CHAPTER"),
 	UPVOTE("UPVOTE"),
-	REPLY("REPLY");
+	NEW_REPLY("NEW_REPLY");
 
 	private final String name;
 }

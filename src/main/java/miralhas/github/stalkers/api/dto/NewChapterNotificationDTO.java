@@ -1,10 +1,11 @@
 package miralhas.github.stalkers.api.dto;
 
+import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
 import miralhas.github.stalkers.domain.model.notification.enums.Type;
 
 import java.time.OffsetDateTime;
 
-public record NotificationDTO(
+public record NewChapterNotificationDTO(
 		Long id,
 		Type type,
 		String title,
@@ -12,5 +13,5 @@ public record NotificationDTO(
 		String novelSlug,
 		String chapterSlug,
 		OffsetDateTime newChapterReleaseDate
-) {
+) implements NotificationDTO {
 }

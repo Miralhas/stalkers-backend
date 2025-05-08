@@ -4,11 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
-public class PageDTO<T> {
+public class PageDTO<T> implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 	private List<T> results;
 	private long totalItems;
 	private Integer next;
