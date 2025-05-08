@@ -5,9 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import miralhas.github.stalkers.api.dto.UserCommentDTO;
 import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
 import miralhas.github.stalkers.api.dto.input.NewReplyNotificationInput;
-import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
-import miralhas.github.stalkers.domain.model.notification.NewReplyNotification;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.NotificationService;
@@ -20,8 +18,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-
-import java.util.Set;
 
 @Log4j2
 @Component
@@ -40,31 +36,30 @@ public class NotificationListener {
 			key = "rk.notification.new-chapter"
 	))
 	public void onNewChapterUploaded(NewChapterNotificationInput input) {
-		var recipients = novelRepository.findAllBookmarkedUsersOfANovel(input.novel().id());
-		if (ObjectUtils.isEmpty(recipients)) return; // no one to send the notification to.
+		var recipientIds = novelRepository.findAllBookmarkedUsersIdOfANovel(input.novel().id());
+		if (ObjectUtils.isEmpty(recipientIds)) return; // no one to send the notification to.
 
 		var novel = input.novel();
 		var chapter = input.chapter();
-		var recipientsEmail = recipients.stream().map(User::getEmail).toList();
 		var capitalizedNovelTitle = StringUtils.capitalize(novel.title());
 
 		log.info("Sending new '{}' chapter notification to users: {}",
-				novel.slug(), recipientsEmail);
+				novel.slug(), recipientIds);
 
-		var notification = NewChapterNotification.builder()
-				.title("New Chapter Released - %s".formatted(capitalizedNovelTitle))
-				.description("Chapter %d is now live. Catch up on the latest chapters of %s".formatted(
-						chapter.number(),
-						capitalizedNovelTitle
-				))
-				.recipients(recipients)
-				.novelSlug(novel.slug())
-				.newChapterSlug(chapter.slug())
-				.newChapterReleaseDate(chapter.createdAt())
-				.build();
+		var notification = new NewChapterNotification();
+		notification.setType();
+		notification.setTitle("New Chapter Released - %s".formatted(capitalizedNovelTitle));
+		notification.setDescription("Chapter %d is now live. Catch up on the latest chapters of %s".formatted(
+				chapter.number(),
+				capitalizedNovelTitle
+		));
+		notification.setNovelSlug(novel.slug());
+		notification.setNewChapterSlug(chapter.slug());
+		notification.setNewChapterReleaseDate(chapter.createdAt());
+//		notification.addRecipients(recipients);
 
-		notification = notificationService.saveNewChapterNotification(notification);
-		log.info("Notification of id '{}' saved successfully!", notification.getId());
+		var saved = notificationService.saveNotification(notification, recipientIds);
+		log.info("Notification of id '{}' saved successfully!", saved.getId());
 	}
 
 	@RabbitListener(bindings = @QueueBinding(
@@ -73,29 +68,29 @@ public class NotificationListener {
 			key = "rk.notification.new-reply"
 	))
 	public void onNewReplyMade(NewReplyNotificationInput newReply) {
-		var parentComment = newReply.parentComment();
-		var childComment = newReply.childComment();
-
-		var commentOwner = userService.findUserByEmailOrException(parentComment.commenter());
-		var userReplying = userService.findUserByEmailOrException(childComment.commenter());
-
-		String uri = getURI(parentComment);
-
-		log.info("Sending new reply notification to user: {}", parentComment.commenter());
-
-		var notification = NewReplyNotification.builder()
-				.userReplying(userReplying.getEmail())
-				.recipients(Set.of(commentOwner))
-				.title("Someone replied to your comment")
-				.description("You’ve got a new reply on your comment. Join the conversation!")
-				.parentCommentContent(newReply.parentComment().message())
-				.replyCommentContent(newReply.childComment().message())
-				.uri(uri)
-				.build();
-
-
-		notification = notificationService.saveNewReplyNotification(notification);
-		log.info("Notifcation of id '{}' was sent successfully!", notification.getId());
+//		var parentComment = newReply.parentComment();
+//		var childComment = newReply.childComment();
+//
+//		var commentOwner = userService.findUserByEmailOrException(parentComment.commenter());
+//		var userReplying = userService.findUserByEmailOrException(childComment.commenter());
+//
+//		String uri = getURI(parentComment);
+//
+//		log.info("Sending new reply notification to user: {}", parentComment.commenter());
+//
+//		var notification = NewReplyNotification.builder()
+//				.userReplying(userReplying.getEmail())
+//				.recipients(Set.of(commentOwner))
+//				.title("Someone replied to your comment")
+//				.description("You’ve got a new reply on your comment. Join the conversation!")
+//				.parentCommentContent(newReply.parentComment().message())
+//				.replyCommentContent(newReply.childComment().message())
+//				.uri(uri)
+//				.build();
+//
+//
+//		notification = notificationService.saveNewReplyNotification(notification);
+//		log.info("Notifcation of id '{}' was sent successfully!", notification.getId());
 	}
 
 	private String getURI(UserCommentDTO parentComment) {

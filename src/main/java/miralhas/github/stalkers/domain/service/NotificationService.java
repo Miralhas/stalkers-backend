@@ -1,5 +1,7 @@
 package miralhas.github.stalkers.domain.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
 import miralhas.github.stalkers.api.dto.input.NewReplyNotificationInput;
@@ -12,7 +14,6 @@ import miralhas.github.stalkers.domain.event.SendMessageEvent;
 import miralhas.github.stalkers.domain.exception.NotificationNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.comment.Comment;
-import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
 import miralhas.github.stalkers.domain.model.notification.NewReplyNotification;
 import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +46,9 @@ public class NotificationService {
 	private final CommentMapper commentMapper;
 	private final NewReplyNotificationRepository newReplyNotificationRepository;
 
+	@PersistenceContext
+	private final EntityManager entityManager;
+
 	public Notification findNotificationByIdOrException(Long id) {
 		return notificationRepository.findById(id).orElseThrow(() -> new NotificationNotFoundException(
 				errorMessages.get("notification.notFound.id", id)
@@ -57,7 +62,10 @@ public class NotificationService {
 	}
 
 	@Transactional
-	public NewChapterNotification saveNewChapterNotification(NewChapterNotification notification) {
+	public Notification saveNotification(Notification notification, Set<Long> recipientIds) {
+		var recipients = userRepository.findAllById(recipientIds);
+		recipients = recipients.stream().map(entityManager::merge).toList();
+		recipients.forEach(notification::addRecipient);
 		return newChapterRepository.save(notification);
 	}
 

@@ -22,4 +22,5 @@ public class UserLibraryDTO implements Serializable {
 	private boolean isBookmarked;
 	private boolean isCompleted;
 	private Long totalChapters;
+	private Long chapterNumber;
 }
