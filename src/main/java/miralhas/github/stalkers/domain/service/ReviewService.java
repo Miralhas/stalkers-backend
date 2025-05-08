@@ -40,6 +40,7 @@ public class ReviewService {
 	private final ValidateAuthorization validateAuthorization;
 	private final ChapterRepository chapterRepository;
 	private final CacheManagerUtils cacheManagerUtils;
+	private final NotificationService notificationService;
 
 	public List<Comment> findCommentsByParentId(Long id) {
 		return commentRepository.findByParentCommentId(id);
@@ -82,6 +83,7 @@ public class ReviewService {
 		novelReview.setCommenter(user);
 		novelReview = commentRepository.save(novelReview);
 		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
+		notificationService.sendCommentReplyNotification(novelReview);
 		return novelReview;
 	}
 

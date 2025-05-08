@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
+import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
 import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;

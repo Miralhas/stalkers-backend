@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Setter
 @With
 @AllArgsConstructor
-@DiscriminatorValue("NOVEL_REVIEW")
+@DiscriminatorValue(Comment.NOVEL_REVIEW)
 public class NovelReview extends Comment implements Serializable {
 
 	@Serial

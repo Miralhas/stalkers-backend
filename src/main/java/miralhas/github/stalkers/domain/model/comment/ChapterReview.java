@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-@DiscriminatorValue("CHAPTER_REVIEW")
+@DiscriminatorValue(Comment.CHAPTER_REVIEW)
 public class ChapterReview extends Comment implements Serializable {
 
 	@Serial
@@ -24,4 +24,5 @@ public class ChapterReview extends Comment implements Serializable {
 	@JoinColumn(name = "chapter_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Chapter chapter;
+
 }

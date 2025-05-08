@@ -1,8 +1,10 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.CommentDTO;
+import miralhas.github.stalkers.api.dto.UserCommentDTO;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
 import miralhas.github.stalkers.api.dto.input.UpdateCommentInput;
+import miralhas.github.stalkers.domain.exception.InternalServerError;
 import miralhas.github.stalkers.domain.model.comment.ChapterReview;
 import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
@@ -36,6 +38,11 @@ public interface CommentMapper {
 	@Mapping(target = "voters", source = "votes", qualifiedByName = "votersMap")
 	CommentDTO toResponse(Comment comment);
 
+	@Mapping(target = "type", expression = "java(typeMapper(comment))")
+	@Mapping(target = "slug", expression = "java(slugMapper(comment))")
+	@Mapping(target = "commenter", source = "commenter.email")
+	UserCommentDTO toUserCommentDTO(Comment comment);
+
 	Comment update(UpdateCommentInput input, @MappingTarget Comment comment);
 
 	@Named("longToParentComment")
@@ -49,6 +56,26 @@ public interface CommentMapper {
 	default List<String> upvotersMap(Set<Vote> votes) {
 		if (ObjectUtils.isEmpty(votes)) return List.of();
 		return votes.stream().map(u -> u.getUser().getEmail()).toList();
+	}
+
+	default String typeMapper(Comment comment) {
+		if (comment instanceof NovelReview novelReview) {
+			return Comment.NOVEL_REVIEW;
+		} else if (comment instanceof ChapterReview chapterReview) {
+			return Comment.CHAPTER_REVIEW;
+		}
+		throw new InternalServerError("Unsupported Comment type: " + comment.getClass().getName());
+	}
+
+	default String slugMapper(Comment comment) {
+		if (comment instanceof NovelReview novelReview) {
+			var isRoot = novelReview.getNovel() != null;
+			return isRoot ? novelReview.getNovel().getSlug() : null;
+		} else if (comment instanceof ChapterReview chapterReview) {
+			var isRoot = chapterReview.getChapter() != null;
+			return isRoot ? chapterReview.getChapter().getSlug() : null;
+		}
+		throw new InternalServerError("Unsupported Comment type: " + comment.getClass().getName());
 	}
 
 	@Named("childCommentsMapper")

@@ -34,6 +34,8 @@ public abstract class Comment implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
+	public static final String NOVEL_REVIEW = "NOVEL_REVIEW";
+	public static final String CHAPTER_REVIEW = "CHAPTER_REVIEW";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
