@@ -41,7 +41,7 @@ public class CacheManagerUtils {
 	}
 
 	public void evictUserLibraryEntry(String userEmail) {
-		Set<String> keys = redisTemplate.keys("libraries.list::*"+userEmail+"*");
+		Set<String> keys = redisTemplate.keys("user.library.list::*"+userEmail+"*");
 		if (!keys.isEmpty()) {
 			redisTemplate.delete(keys);
 		}
