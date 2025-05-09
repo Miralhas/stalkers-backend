@@ -1,0 +1,1 @@
+ALTER TABLE notification_recipients ADD COLUMN `is_read` BIT(1) NULL DEFAULT NULL;

@@ -4,6 +4,7 @@ import miralhas.github.stalkers.api.dto.UserLibraryDTO;
 import miralhas.github.stalkers.domain.model.UserLibrary;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import static org.mapstruct.NullValueCheckStrategy.ALWAYS;
 import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
@@ -20,6 +21,7 @@ public interface UserLibraryMapper {
 	@Mapping(target = "userId", source = "user.id")
 	@Mapping(target = "totalChapters", ignore = true)
 	@Mapping(target = "libraryElementId", source = "id")
+	@Mapping(target = "chapterNumber", source = "currentChapter.number", defaultValue = "0L")
 	UserLibraryDTO toResponse(UserLibrary userLibrary);
 
 }

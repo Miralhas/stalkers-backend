@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
 import miralhas.github.stalkers.domain.model.auth.User;
-import miralhas.github.stalkers.domain.model.notification.enums.Type;
+import miralhas.github.stalkers.domain.model.notification.enums.NotificationType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -16,6 +15,7 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -25,16 +25,6 @@ import java.util.Set;
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "notification_type")
 @NoArgsConstructor
 public class Notification implements Serializable {
-
-	public Notification(
-			OffsetDateTime createdAt, String title, String description, Set<User> recipients, Type type
-	) {
-		this.createdAt = createdAt;
-		this.title = title;
-		this.description = description;
-		this.recipients = recipients;
-		this.type = type;
-	}
 
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -55,19 +45,37 @@ public class Notification implements Serializable {
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Type type;
+	private NotificationType type;
+
+	@OneToMany(
+			mappedBy = "notification",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true
+	)
+	private Set<NotificationRecipient> recipientAssociations = new HashSet<>();
 
 
-	@ManyToMany(
-			fetch = FetchType.LAZY,
-			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
-	)
-	@JoinTable(
-			name = "notification_recipients",
-			joinColumns = @JoinColumn(name = "notification_id"),
-			inverseJoinColumns = @JoinColumn(name = "recipient_id")
-	)
-	private Set<User> recipients = new HashSet<>();
+	public void addRecipient(User user) {
+		NotificationRecipient association = new NotificationRecipient(this, user);
+		recipientAssociations.add(association);
+	}
+
+	public void addRecipients(Set<User> users) {
+		var recipients = users.stream().map(u -> new NotificationRecipient(this, u))
+				.collect(Collectors.toSet());
+		recipientAssociations.addAll(recipients);
+	}
+
+	public void removeRecipient(User user) {
+		recipientAssociations.removeIf(association -> association.getRecipient().equals(user));
+	}
+
+	// Convenience getter to maintain backward compatibility
+	public Set<User> getRecipients() {
+		return recipientAssociations.stream()
+				.map(NotificationRecipient::getRecipient)
+				.collect(Collectors.toSet());
+	}
 
 	@Override
 	public final boolean equals(Object o) {

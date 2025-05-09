@@ -1,7 +1,6 @@
 package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -43,10 +42,10 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	)
 	ChapterSummaryDTO findNovelLastChapterByNovelId(Long id);
 
-	@Query("select ul.user " +
+	@Query("select ul.user.id " +
 			"from UserLibrary ul " +
 			"where ul.novel.id = :novelId and ul.isBookmarked = true")
-	Set<User> findAllBookmarkedUsersOfANovel(Long novelId);
+	Set<Long> findAllBookmarkedUsersIdOfANovel(Long novelId);
 
 	@Modifying
 	@Query("delete from Novel n where n.slug = :slug ")

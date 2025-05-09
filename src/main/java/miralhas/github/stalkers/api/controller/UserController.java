@@ -10,6 +10,7 @@ import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
+import miralhas.github.stalkers.domain.repository.NotificationRepository;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NotificationService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,6 +41,7 @@ public class UserController implements UserControllerSwagger {
 	private final ValidateAuthorization validateAuthorization;
 	private final UserRepository userRepository;
 	private final CommentMapper commentMapper;
+	private final NotificationRepository notificationRepository;
 
 	@Override
 	@GetMapping
@@ -95,6 +98,15 @@ public class UserController implements UserControllerSwagger {
 	public List<NotificationDTO> getUserNotifications(JwtAuthenticationToken token) {
 		var user = userService.findUserByEmailOrException(token.getName());
 		return notificationService.getUserNotifications(user);
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping("/notifications/unread-count")
+	public Map<String, Long> getUserUnreadNotificationsCount(JwtAuthenticationToken token) {
+		var user = userService.findUserByEmailOrException(token.getName());
+		Long count = notificationRepository.findUserUnreadNotificationsCount(user.getId());
+		return Map.of("count", count);
 	}
 
 	@GetMapping("/comments")

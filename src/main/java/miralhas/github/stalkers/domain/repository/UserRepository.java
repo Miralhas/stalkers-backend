@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("from User u LEFT JOIN FETCH u.roles")
 	List<User> findAll();
 
-	@Query("select n from Notification n LEFT JOIN n.recipients u WHERE u.id = :userId ORDER BY n.createdAt DESC")
+	@Query("select n from Notification n LEFT JOIN n.recipientAssociations nr WHERE nr.recipient.id = :userId ORDER BY n.createdAt DESC")
 	List<Notification> findUserNotifications(Long userId);
 
 	@Query("select new miralhas.github.stalkers.api.dto.UserCommentDTO(" +
