@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import miralhas.github.stalkers.domain.model.notification.enums.NotificationType;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -31,4 +32,8 @@ public class NewReplyNotification extends Notification implements Serializable {
 
 	@Column(nullable = true)
 	private String uri;
+
+	public void setType() {
+		super.setType(NotificationType.NEW_REPLY);
+	}
 }

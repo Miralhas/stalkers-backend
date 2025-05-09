@@ -1,7 +1,6 @@
 package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

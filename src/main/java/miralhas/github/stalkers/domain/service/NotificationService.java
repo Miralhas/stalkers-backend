@@ -14,7 +14,6 @@ import miralhas.github.stalkers.domain.event.SendMessageEvent;
 import miralhas.github.stalkers.domain.exception.NotificationNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.comment.Comment;
-import miralhas.github.stalkers.domain.model.notification.NewReplyNotification;
 import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
@@ -67,11 +66,6 @@ public class NotificationService {
 		recipients = recipients.stream().map(entityManager::merge).toList();
 		recipients.forEach(notification::addRecipient);
 		return newChapterRepository.save(notification);
-	}
-
-	@Transactional
-	public NewReplyNotification saveNewReplyNotification(NewReplyNotification notification) {
-		return newReplyNotificationRepository.save(notification);
 	}
 
 	public void sendNewChapterNotification(Novel novel, Chapter chapter) {

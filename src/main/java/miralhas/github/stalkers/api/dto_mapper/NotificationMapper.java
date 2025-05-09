@@ -26,6 +26,7 @@ public class NotificationMapper {
 		return new NewChapterNotificationDTO(
 				n.getId(),
 				n.getType(),
+				n.getCreatedAt(),
 				n.getTitle(),
 				n.getDescription(),
 				n.getNovelSlug(),
@@ -38,6 +39,7 @@ public class NotificationMapper {
 		return new NewReplyNotificationDTO(
 				n.getId(),
 				n.getType(),
+				n.getCreatedAt(),
 				n.getTitle(),
 				n.getDescription(),
 				n.getUserReplying(),

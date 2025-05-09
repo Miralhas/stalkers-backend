@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 public record NewChapterNotificationDTO(
 		Long id,
 		NotificationType type,
+		OffsetDateTime createdAt,
 		String title,
 		String description,
 		String novelSlug,

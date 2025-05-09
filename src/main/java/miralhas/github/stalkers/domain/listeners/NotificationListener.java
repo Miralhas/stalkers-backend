@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.UserCommentDTO;
 import miralhas.github.stalkers.api.dto.input.NewChapterNotificationInput;
 import miralhas.github.stalkers.api.dto.input.NewReplyNotificationInput;
 import miralhas.github.stalkers.domain.model.notification.NewChapterNotification;
+import miralhas.github.stalkers.domain.model.notification.NewReplyNotification;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.NotificationService;
@@ -18,6 +19,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.Set;
 
 @Log4j2
 @Component
@@ -67,29 +70,28 @@ public class NotificationListener {
 			key = "rk.notification.new-reply"
 	))
 	public void onNewReplyMade(NewReplyNotificationInput newReply) {
-//		var parentComment = newReply.parentComment();
-//		var childComment = newReply.childComment();
-//
-//		var commentOwner = userService.findUserByEmailOrException(parentComment.commenter());
-//		var userReplying = userService.findUserByEmailOrException(childComment.commenter());
-//
-//		String uri = getURI(parentComment);
-//
-//		log.info("Sending new reply notification to user: {}", parentComment.commenter());
-//
-//		var notification = NewReplyNotification.builder()
-//				.userReplying(userReplying.getEmail())
-//				.recipients(Set.of(commentOwner))
-//				.title("Someone replied to your comment")
-//				.description("You’ve got a new reply on your comment. Join the conversation!")
-//				.parentCommentContent(newReply.parentComment().message())
-//				.replyCommentContent(newReply.childComment().message())
-//				.uri(uri)
-//				.build();
-//
-//
-//		notification = notificationService.saveNewReplyNotification(notification);
-//		log.info("Notifcation of id '{}' was sent successfully!", notification.getId());
+		var parentComment = newReply.parentComment();
+		var childComment = newReply.childComment();
+
+		var commentOwner = userService.findUserByEmailOrException(parentComment.commenter());
+		var userReplying = userService.findUserByEmailOrException(childComment.commenter());
+
+		String uri = getURI(parentComment);
+
+		log.info("Sending new reply notification to user: {}", parentComment.commenter());
+
+		var notification = new NewReplyNotification();
+		notification.setType();
+		notification.setUserReplying(userReplying.getEmail());
+		notification.setTitle("Someone replied to your comment");
+		notification.setDescription("You’ve got a new reply on your comment. Join the conversation!");
+		notification.setParentCommentContent(newReply.parentComment().message());
+		notification.setReplyCommentContent(newReply.childComment().message());
+		notification.setUri(uri);
+
+
+		var saved = notificationService.saveNotification(notification, Set.of(commentOwner.getId()));
+		log.info("Notifcation of id '{}' was sent successfully!", saved.getId());
 	}
 
 	private String getURI(UserCommentDTO parentComment) {
