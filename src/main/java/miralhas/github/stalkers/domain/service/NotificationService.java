@@ -17,7 +17,10 @@ import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
-import miralhas.github.stalkers.domain.repository.*;
+import miralhas.github.stalkers.domain.repository.NewChapterNotificationRepository;
+import miralhas.github.stalkers.domain.repository.NotificationRecipientRepository;
+import miralhas.github.stalkers.domain.repository.NotificationRepository;
+import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,7 +44,6 @@ public class NotificationService {
 	private final NovelMapper novelMapper;
 	private final ChapterMapper chapterMapper;
 	private final CommentMapper commentMapper;
-	private final NewReplyNotificationRepository newReplyNotificationRepository;
 	private final NotificationRecipientRepository notificationRecipientRepository;
 
 	@PersistenceContext

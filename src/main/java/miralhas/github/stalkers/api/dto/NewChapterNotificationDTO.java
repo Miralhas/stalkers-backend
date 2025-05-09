@@ -12,7 +12,6 @@ public record NewChapterNotificationDTO(
 		String title,
 		String description,
 		String novelSlug,
-		String chapterSlug,
-		OffsetDateTime newChapterReleaseDate
+		String chapterSlug
 ) implements NotificationDTO {
 }

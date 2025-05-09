@@ -30,8 +30,7 @@ public class NotificationMapper {
 				n.getTitle(),
 				n.getDescription(),
 				n.getNovelSlug(),
-				n.getNewChapterSlug(),
-				n.getNewChapterReleaseDate()
+				n.getNewChapterSlug()
 		);
 	}
 

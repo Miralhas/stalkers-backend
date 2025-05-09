@@ -26,9 +26,6 @@ public class NewChapterNotification extends Notification implements Serializable
 	@Column(nullable = true)
 	private String novelSlug;
 
-	@Column(nullable = true)
-	private OffsetDateTime newChapterReleaseDate;
-
 	public void setType() {
 		super.setType(NotificationType.NEW_CHAPTER);
 	}

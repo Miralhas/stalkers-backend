@@ -54,7 +54,7 @@ public class RabbitMQConfig {
 			if (t.getCause() instanceof AmqpRejectAndDontRequeueException) {
 				log.error("Message rejected and will not be requeued: {}", t.getCause().getMessage());
 			} else {
-				log.error("Unhandled exception in message listener: {}", t.getMessage(), t);
+				log.error("Unhandled exception in message listener [{}]: {}", t.getClass().getName(), t.getMessage(), t);
 				throw new AmqpRejectAndDontRequeueException("Error handler converted exception to fatal", t);
 			}
 		}
