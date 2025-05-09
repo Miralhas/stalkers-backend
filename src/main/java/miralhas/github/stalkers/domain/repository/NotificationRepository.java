@@ -15,7 +15,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 			nativeQuery = true,
 			value = "SELECT COUNT(*) FROM notification n " +
 					"LEFT JOIN notification_recipients nr ON n.id = notification_id " +
-					"WHERE nr.recipient_id = 2 AND nr.is_read = false;"
+					"WHERE nr.recipient_id = :userId AND nr.is_read = false;"
 	)
 	Long findUserUnreadNotificationsCount(Long userId);
 
