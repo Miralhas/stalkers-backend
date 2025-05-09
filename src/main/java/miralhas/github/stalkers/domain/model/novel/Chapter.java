@@ -30,7 +30,8 @@ public class Chapter implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqGen")
+	@SequenceGenerator(name = "seqGen", sequenceName = "chap_seq", initialValue = 1)
 	private Long id;
 
 	@Column(nullable = false)

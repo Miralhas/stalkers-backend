@@ -91,7 +91,7 @@ public class NotificationListener {
 
 
 		var saved = notificationService.saveNotification(notification, Set.of(commentOwner.getId()));
-		log.info("Notifcation of id '{}' was sent successfully!", saved.getId());
+		log.info("Notification of id '{}' was sent successfully!", saved.getId());
 	}
 
 	private String getURI(UserCommentDTO parentComment) {
