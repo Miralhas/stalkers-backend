@@ -140,10 +140,10 @@ public class NotificationListener {
 		String description = "Your comment on ";
 		var suffix = descriptionSuffix(comment.getVoteCount());
 		if (comment instanceof NovelReview novelReview) {
-			description = description.concat(novelReview.getNovel().capitalizedTitle());
+			description = description.concat(novelReview.getNovelTitle());
 		} else if (comment instanceof ChapterReview chapterReview) {
-			description = description.concat(chapterReview.getChapter().getNovel().capitalizedTitle())
-					.concat(", %s".formatted(chapterReview.getChapter().getTitle()));
+			description = description.concat(chapterReview.getNovelTitle())
+					.concat(", %s".formatted(chapterReview.getChapterTitle()));
 		}
 		return description.concat(" %s".formatted(suffix));
 	}

@@ -28,4 +28,8 @@ public class NovelReview extends Comment implements Serializable {
 	@JoinColumn(name = "novel_id")
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Novel novel;
+
+	public String getNovelTitle() {
+		return this.novel.capitalizedTitle();
+	}
 }

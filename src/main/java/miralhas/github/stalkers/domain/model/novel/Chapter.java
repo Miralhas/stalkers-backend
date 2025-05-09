@@ -75,6 +75,10 @@ public class Chapter implements Serializable {
 		this.slug = SLG.slugify("%s chapter %d".formatted(titleInitials, this.number));
 	}
 
+	public String capitalizedTitle() {
+		return CommonsUtils.capitalize(this.title);
+	}
+
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;

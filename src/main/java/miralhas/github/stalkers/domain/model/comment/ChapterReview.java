@@ -25,4 +25,12 @@ public class ChapterReview extends Comment implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Chapter chapter;
 
+	public String getNovelTitle() {
+		return this.chapter.getNovel().capitalizedTitle();
+	}
+
+	public String getChapterTitle() {
+		return this.chapter.capitalizedTitle();
+	}
+
 }
