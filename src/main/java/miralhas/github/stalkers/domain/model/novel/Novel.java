@@ -6,6 +6,7 @@ import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,9 +15,11 @@ import org.hibernate.proxy.HibernateProxy;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
 
@@ -106,6 +109,12 @@ public class Novel implements Serializable {
 	public void removeReview(NovelReview review) {
 		this.reviews.remove(review);
 		review.setNovel(null);
+	}
+
+	public String capitalizedTitle() {
+		return Arrays.stream(this.title.split("\\s+"))
+				.map(StringUtils::capitalize)
+				.collect(Collectors.joining(" "));
 	}
 
 	public void generateSlug() {

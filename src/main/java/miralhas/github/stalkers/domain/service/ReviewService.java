@@ -103,6 +103,7 @@ public class ReviewService {
 		chapterReview.setCommenter(validateAuthorization.getCurrentUser());
 		chapterReviewRepository.save(chapterReview);
 		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		notificationService.sendCommentReplyNotification(chapterReview);
 		return chapterReview;
 	}
 

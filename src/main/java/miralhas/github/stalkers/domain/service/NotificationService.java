@@ -91,6 +91,13 @@ public class NotificationService {
 		}
 	}
 
+	public void sendUpvoteNotification(Comment comment) {
+		var userCommentDTO = commentMapper.toUserCommentDTO(comment);
+		events.publishEvent(new SendMessageEvent(
+				userCommentDTO, "rk.notification.upvote", "stalkers")
+		);
+	}
+
 	@Transactional
 	public void readAllUserUnreadNotifications() {
 		var user = validateAuthorization.getCurrentUser();

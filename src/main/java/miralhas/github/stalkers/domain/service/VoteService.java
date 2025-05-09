@@ -20,18 +20,20 @@ public class VoteService {
 	private final ValidateAuthorization validateAuthorization;
 	private final VoteRepository voteRepository;
 	private final ErrorMessages errorMessages;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public void createVote(Comment comment, Type voteType) {
 		var currentUser = validateAuthorization.getCurrentUser();
 		validateVote(comment, currentUser);
-		var upvote = Vote.builder()
+		var vote = Vote.builder()
 				.comment(comment)
 				.user(currentUser)
 				.type(voteType)
 				.count(voteType.getCount())
 				.build();
-		voteRepository.save(upvote);
+		voteRepository.save(vote);
+		notificationService.sendUpvoteNotification(comment);
 	}
 
 	@Transactional

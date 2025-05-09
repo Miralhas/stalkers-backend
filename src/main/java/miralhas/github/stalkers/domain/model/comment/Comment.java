@@ -78,11 +78,6 @@ public abstract class Comment implements Serializable {
 		return this.getParentComment().getId();
 	}
 
-	public long getUpvoteCount() {
-		if (ObjectUtils.isEmpty(this.votes)) return 0L;
-		return this.votes.stream().filter(v -> v.getType().equals(Type.UPVOTE)).count();
-	}
-
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;

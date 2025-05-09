@@ -23,7 +23,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	)
 	Page<ChapterSummaryDTO> findAllByNovelSlug(String slug, Pageable pageable);
 
-	@Query(nativeQuery = true, value = "SELECT c.* FROM chapter c WHERE c.slug = :slug")
+	@Query("SELECT c FROM Chapter c LEFT JOIN FETCH c.novel WHERE c.slug = :slug")
 	Optional<Chapter> findBySlug(String slug);
 
 	@Modifying
