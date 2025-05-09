@@ -77,7 +77,7 @@ public class ChapterService {
 	@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
 	public void saveBulk(Novel novel, List<Chapter> chapters) {
 		chapters.forEach(chapter -> setChapterPropertiesAndValidations(chapter, novel));
-		chapters = chapterRepository.saveAll(chapters);
+		chapters = chapterRepository.saveAllAndFlush(chapters);
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 		notificationService.sendNewChapterNotification(novel, chapters.getFirst());
 	}
