@@ -161,7 +161,7 @@ public class NotificationListener {
 	}
 
 	private String descriptionSuffix(Long voteCount) {
-		if (voteCount == 1) {
+		if (voteCount == FIRST_UPVOTE) {
 			return "just received its first upvote!";
 		}
 		return "reached %d upvotes!".formatted(voteCount);
