@@ -14,14 +14,14 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@DiscriminatorValue("UPVOTE")
+@DiscriminatorValue("NEW_VOTE")
 public class UpvoteNotification extends Notification implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
 
 	public void setType() {
-		super.setType(NotificationType.UPVOTE);
+		super.setType(NotificationType.NEW_VOTE);
 	}
 
 }
