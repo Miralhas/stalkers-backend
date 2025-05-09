@@ -18,11 +18,9 @@ import miralhas.github.stalkers.domain.model.notification.NewReplyNotification;
 import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
-import miralhas.github.stalkers.domain.repository.NewChapterNotificationRepository;
-import miralhas.github.stalkers.domain.repository.NewReplyNotificationRepository;
-import miralhas.github.stalkers.domain.repository.NotificationRepository;
-import miralhas.github.stalkers.domain.repository.UserRepository;
+import miralhas.github.stalkers.domain.repository.*;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +43,11 @@ public class NotificationService {
 	private final ChapterMapper chapterMapper;
 	private final CommentMapper commentMapper;
 	private final NewReplyNotificationRepository newReplyNotificationRepository;
+	private final NotificationRecipientRepository notificationRecipientRepository;
 
 	@PersistenceContext
 	private final EntityManager entityManager;
+	private final ValidateAuthorization validateAuthorization;
 
 	public Notification findNotificationByIdOrException(Long id) {
 		return notificationRepository.findById(id).orElseThrow(() -> new NotificationNotFoundException(
@@ -93,6 +93,12 @@ public class NotificationService {
 					newReplyNotificationInput, "rk.notification.new-reply", "stalkers")
 			);
 		}
+	}
+
+	@Transactional
+	public void readAllUserUnreadNotifications() {
+		var user = validateAuthorization.getCurrentUser();
+		notificationRecipientRepository.updateAllUserUnreadNotifications(user.getId());
 	}
 
 	@Transactional
