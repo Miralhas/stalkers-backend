@@ -16,6 +16,7 @@ import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.ReviewService;
 import miralhas.github.stalkers.domain.service.UserService;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -49,7 +50,7 @@ public class NotificationListener {
 
 		var novel = input.novel();
 		var chapter = input.chapter();
-		var capitalizedNovelTitle = StringUtils.capitalize(novel.title());
+		var capitalizedNovelTitle = CommonsUtils.capitalize(novel.title());
 
 		log.info("Sending new '{}' chapter notification to users: {}",
 				novel.slug(), recipientIds);

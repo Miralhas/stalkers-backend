@@ -6,6 +6,7 @@ import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
@@ -112,9 +113,7 @@ public class Novel implements Serializable {
 	}
 
 	public String capitalizedTitle() {
-		return Arrays.stream(this.title.split("\\s+"))
-				.map(StringUtils::capitalize)
-				.collect(Collectors.joining(" "));
+		return CommonsUtils.capitalize(this.title);
 	}
 
 	public void generateSlug() {
