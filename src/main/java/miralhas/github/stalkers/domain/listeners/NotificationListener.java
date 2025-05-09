@@ -58,7 +58,6 @@ public class NotificationListener {
 		));
 		notification.setNovelSlug(novel.slug());
 		notification.setNewChapterSlug(chapter.slug());
-		notification.setNewChapterReleaseDate(chapter.createdAt());
 
 		var saved = notificationService.saveNotification(notification, recipientIds);
 		log.info("Notification of id '{}' saved successfully!", saved.getId());
