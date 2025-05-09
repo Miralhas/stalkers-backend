@@ -29,7 +29,7 @@ public class NotificationController {
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PutMapping("/recipients/read")
-	public void readAllUserUnreadNotifcation() {
+	public void readAllUserUnreadNotifications() {
 		notificationService.readAllUserUnreadNotifications();
 	}
 }
