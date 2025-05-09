@@ -6,12 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import miralhas.github.stalkers.domain.model.auth.User;
-import miralhas.github.stalkers.domain.model.comment.enums.Type;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Serial;
 import java.io.Serializable;

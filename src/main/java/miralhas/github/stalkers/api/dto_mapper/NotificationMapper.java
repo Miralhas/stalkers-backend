@@ -11,19 +11,19 @@ import miralhas.github.stalkers.domain.model.notification.Notification;
 import miralhas.github.stalkers.domain.model.notification.UpvoteNotification;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 public class NotificationMapper {
 
 	public NotificationDTO toResponse(Notification n) {
-		if (n instanceof NewChapterNotification newChapterNotification) {
-			return mapNewChapterNotification(newChapterNotification);
-		} else if (n instanceof NewReplyNotification newReplyNotification) {
-			return mapNewReplyNotification(newReplyNotification);
-		} else if (n instanceof UpvoteNotification upvoteNotification) {
-			return mapUpvoteNotification(upvoteNotification);
-		} else {
-			throw new InternalServerError("Unsupported Notification type: " + n.getClass().getName());
-		}
+		return switch (n) {
+			case NewChapterNotification newChapterNotification -> mapNewChapterNotification(newChapterNotification);
+			case NewReplyNotification newReplyNotification -> mapNewReplyNotification(newReplyNotification);
+			case UpvoteNotification upvoteNotification -> mapUpvoteNotification(upvoteNotification);
+			case null, default ->
+					throw new InternalServerError("Unsupported Notification type: " + Objects.requireNonNull(n).getClass().getName());
+		};
 	}
 
 	private NewChapterNotificationDTO mapNewChapterNotification(NewChapterNotification n) {

@@ -113,9 +113,9 @@ public class SecurityConfig {
 
 			// overrides all google scopes and add USER role.
 			authorities.forEach(authority -> {
-				if (OidcUserAuthority.class.isInstance(authority)) {
+				if (authority instanceof OidcUserAuthority) {
 					mappedAuthorities.add(new SimpleGrantedAuthority("USER"));
-				} else if (OAuth2UserAuthority.class.isInstance(authority)) {
+				} else if (authority instanceof OAuth2UserAuthority) {
 					mappedAuthorities.add(new SimpleGrantedAuthority("USER"));
 				}
 			});
