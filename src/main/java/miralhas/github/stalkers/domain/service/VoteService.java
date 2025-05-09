@@ -20,18 +20,22 @@ public class VoteService {
 	private final ValidateAuthorization validateAuthorization;
 	private final VoteRepository voteRepository;
 	private final ErrorMessages errorMessages;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public void createVote(Comment comment, Type voteType) {
 		var currentUser = validateAuthorization.getCurrentUser();
 		validateVote(comment, currentUser);
-		var upvote = Vote.builder()
+		var vote = Vote.builder()
 				.comment(comment)
 				.user(currentUser)
 				.type(voteType)
 				.count(voteType.getCount())
 				.build();
-		voteRepository.save(upvote);
+		voteRepository.save(vote);
+		// onwer of the comment upvoting its own comment: shameless! Should not send notification.
+		if (vote.getUser().equals(vote.getComment().getCommenter())) return;
+		notificationService.sendUpvoteNotification(comment);
 	}
 
 	@Transactional

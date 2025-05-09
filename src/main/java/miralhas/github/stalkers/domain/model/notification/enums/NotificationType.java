@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum NotificationType {
 	NEW_CHAPTER("NEW_CHAPTER"),
-	UPVOTE("UPVOTE"),
+	NEW_VOTE("NEW_VOTE"),
 	NEW_REPLY("NEW_REPLY");
 
 	private final String name;

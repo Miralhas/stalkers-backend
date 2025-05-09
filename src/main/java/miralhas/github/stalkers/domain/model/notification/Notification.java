@@ -54,6 +54,8 @@ public class Notification implements Serializable {
 	)
 	private Set<NotificationRecipient> recipientAssociations = new HashSet<>();
 
+	@Column(nullable = true)
+	private String uri;
 
 	public void addRecipient(User user) {
 		NotificationRecipient association = new NotificationRecipient(this, user);

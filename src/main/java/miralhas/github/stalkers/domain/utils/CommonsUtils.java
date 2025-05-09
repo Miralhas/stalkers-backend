@@ -1,9 +1,12 @@
 package miralhas.github.stalkers.domain.utils;
 
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class CommonsUtils {
@@ -130,6 +133,12 @@ public class CommonsUtils {
 			oneTimePassword.append(randomNumber);
 		}
 		return oneTimePassword.toString().trim();
+	}
+
+	public String capitalize(String value) {
+		return Arrays.stream(value.split("\\s+"))
+				.map(StringUtils::capitalize)
+				.collect(Collectors.joining(" "));
 	}
 
 	public static String getInitialsFromSlug(String slug) {
