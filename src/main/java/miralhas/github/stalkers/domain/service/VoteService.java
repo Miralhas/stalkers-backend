@@ -33,6 +33,8 @@ public class VoteService {
 				.count(voteType.getCount())
 				.build();
 		voteRepository.save(vote);
+		// onwer of the comment upvoting its own comment: shameless! Should not send notification.
+		if (vote.getUser().equals(vote.getComment().getCommenter())) return;
 		notificationService.sendUpvoteNotification(comment);
 	}
 

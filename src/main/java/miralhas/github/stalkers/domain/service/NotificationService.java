@@ -82,6 +82,7 @@ public class NotificationService {
 	// will send a notification to the parent of the comment, informing him of a new reply.
 	public void sendCommentReplyNotification(Comment comment) {
 		if (comment.hasParent()) {
+			if (comment.getCommenter().equals(comment.getParentComment().getCommenter())) return; // same user replying to its own comment
 			var childCommentDTO = commentMapper.toUserCommentDTO(comment);
 			var parentCommentDTO = commentMapper.toUserCommentDTO(comment.getParentComment());
 			var newReplyNotificationInput = new NewReplyNotificationInput(parentCommentDTO, childCommentDTO);
