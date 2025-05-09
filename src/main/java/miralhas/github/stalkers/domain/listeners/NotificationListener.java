@@ -32,6 +32,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class NotificationListener {
 
+	private static final int FIRST_UPVOTE = 1;
+	private static final int SECOND_THRESHOLD = 5;
+	private static final int MULTIPLE_OF_TEN_START = 10;
+	private static final int MULTIPLE_OF_TEN_END = 100;
+	private static final int MULTIPLE_OF_FIFTY_START = 101;
+	private static final int MULTIPLE_OF_TEN = 10;
+	private static final int MULTIPLE_OF_FIFTY = 50;
+
 	private final NotificationService notificationService;
 	private final NovelRepository novelRepository;
 	private final UserService userService;
@@ -121,14 +129,11 @@ public class NotificationListener {
 	}
 
 	private boolean validateUpvoteNotification(long count) {
-		if (count == 1 || count == 5) {
-			// if upvote count is 1 or 5 send notification to comment owner
+		if (isFirstOrSeconThreshold(count)) {
 			return true;
-		} else if (count >= 10 && count <= 100 && count % 10 == 0) {
-			// if upvote >= 10 and <= 100, send notification on multiples of 10
+		} else if (isMultipleOfTenWithinRange(count)) {
 			return true;
-			// if upvote > 100, send notification on multiples of 50
-		} else return count > 100 && count % 50 == 0;
+		} else return isMultipleOfFiftyWithinRange(count);
 	}
 
 	private String getUpvoteDescription(Comment comment) {
@@ -141,6 +146,18 @@ public class NotificationListener {
 					.concat(", %s".formatted(chapterReview.getChapter().getTitle()));
 		}
 		return description.concat(" %s".formatted(suffix));
+	}
+
+	private boolean isFirstOrSeconThreshold(long count) {
+		return count == FIRST_UPVOTE || count == SECOND_THRESHOLD;
+	}
+
+	private boolean isMultipleOfTenWithinRange(long count) {
+		return count >= MULTIPLE_OF_TEN_START && count <= MULTIPLE_OF_TEN_END && count % MULTIPLE_OF_TEN == 0;
+	}
+
+	private boolean isMultipleOfFiftyWithinRange(long count) {
+		return count >= MULTIPLE_OF_FIFTY_START && count % MULTIPLE_OF_FIFTY == 0;
 	}
 
 	private String descriptionSuffix(Long voteCount) {
