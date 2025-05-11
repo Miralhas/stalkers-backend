@@ -4,23 +4,30 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.input.RatingInput;
 import miralhas.github.stalkers.domain.service.NovelService;
-import miralhas.github.stalkers.domain.service.RatingService;
+import miralhas.github.stalkers.domain.service.MetricsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{novelSlug}/rating")
-public class RatingController {
+@RequestMapping("/api/metrics/{novelSlug}")
+public class MetricsController {
 
 	private final NovelService novelService;
-	private final RatingService ratingService;
+	private final MetricsService metricsService;
 
-	@PostMapping
+	@PostMapping("/rating")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void rateNovel(@PathVariable String novelSlug, @RequestBody @Valid RatingInput input) {
 		var novel = novelService.findBySlugOrException(novelSlug);
-		ratingService.createRating(input, novel);
+		metricsService.createRating(input, novel);
+	}
+
+	@PutMapping("/view")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void viewNovel(@PathVariable String novelSlug) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		metricsService.updateNovelViewCount(novel);
 	}
 
 }

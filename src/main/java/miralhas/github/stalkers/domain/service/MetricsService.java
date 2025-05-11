@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RatingService {
+public class MetricsService {
 
 	private final ValidateAuthorization validateAuthorization;
 	private final NovelRepository novelRepository;
@@ -41,6 +41,12 @@ public class RatingService {
 				.build();
 
 		novel.addRating(rating);
+		novelRepository.save(novel);
+	}
+
+	@Transactional
+	public void updateNovelViewCount(Novel novel) {
+		novel.viewsPlusOne();
 		novelRepository.save(novel);
 	}
 }

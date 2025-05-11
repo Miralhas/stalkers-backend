@@ -3,7 +3,8 @@ package miralhas.github.stalkers.api.dto;
 import java.io.Serial;
 import java.io.Serializable;
 
-public record RatingDTO(
+public record MetricsDTO(
+		int views,
 		Double ratingValue,
 		int ratingSize
 ) implements Serializable {

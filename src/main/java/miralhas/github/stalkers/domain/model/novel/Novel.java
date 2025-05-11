@@ -111,6 +111,14 @@ public class Novel implements Serializable {
 	)
 	private Set<Rating> ratings = new HashSet<>();
 
+	@Column
+	@Builder.Default
+	private int views = 0;
+
+	public void viewsPlusOne() {
+		++this.views;
+	}
+
 	public void addReview(NovelReview review) {
 		this.reviews.add(review);
 		review.setNovel(this);
