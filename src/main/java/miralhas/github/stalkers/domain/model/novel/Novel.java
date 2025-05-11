@@ -103,6 +103,13 @@ public class Novel implements Serializable {
 	@Formula("(SELECT ROUND(AVG(r.rating_value),2) FROM Rating r WHERE r.novel_id = id)")
 	private Double ratingValue;
 
+	// 1000 is the minimum views → it should be changed as the database grows.
+	@Formula("((1000 * (SELECT COALESCE(AVG(r.rating_value), 3.0) FROM Rating r)) + " +
+			"(SELECT COALESCE(SUM(r.rating_value), 0) FROM Rating r WHERE r.novel_id = id)) / " +
+			"(1000 + (SELECT COUNT(*) FROM Rating r WHERE r.novel_id = id)) + " +
+			"(LOG(GREATEST(views, 1)) * 0.01)")
+	private Double bayesianScore;
+
 	@Builder.Default
 	@OneToMany(
 			mappedBy = "novel",

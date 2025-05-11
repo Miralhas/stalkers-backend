@@ -49,9 +49,13 @@ public abstract class NovelMapper {
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel update(UpdateNovelInput input, @MappingTarget Novel novel);
 
-	//	@Named("ratingsMapper")
 	MetricsDTO metricsMapper(Novel novel) {
-		return new MetricsDTO(novel.getViews(), novel.getRatingValue(), novel.getRatings().size());
+		return new MetricsDTO(
+				novel.getViews(),
+				novel.getRatingValue(),
+				novel.getRatings().size(),
+				novel.getBayesianScore()
+		);
 	}
 
 	@Named("getFirstChapter")

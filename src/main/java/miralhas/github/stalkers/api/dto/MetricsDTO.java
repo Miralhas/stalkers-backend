@@ -6,7 +6,8 @@ import java.io.Serializable;
 public record MetricsDTO(
 		int views,
 		Double ratingValue,
-		int ratingSize
+		int ratingSize,
+		Double bayesianScore
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
