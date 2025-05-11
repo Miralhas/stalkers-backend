@@ -42,7 +42,7 @@ services:
       mysqldb:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_PROFILES_ACTIVE=prod
