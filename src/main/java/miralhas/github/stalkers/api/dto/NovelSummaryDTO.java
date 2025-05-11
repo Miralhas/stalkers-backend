@@ -11,7 +11,8 @@ public record NovelSummaryDTO(
 		String status,
 		String description,
 		Boolean isHidden,
-		long chaptersCount
+		long chaptersCount,
+		Double ratingValue
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;

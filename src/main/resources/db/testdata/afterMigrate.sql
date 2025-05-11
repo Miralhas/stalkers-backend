@@ -18,6 +18,7 @@ delete from notification;
 delete from vote;
 delete from comments;
 delete from chap_seq;
+delete from rating;
 
 set foreign_key_checks = 1;
 
@@ -40,6 +41,7 @@ alter table notification auto_increment = 1;
 alter table vote auto_increment = 1;
 alter table comments auto_increment = 1;
 alter table chap_seq auto_increment = 1;
+alter table rating auto_increment = 1;
 
 insert into chap_seq(next_val) values(1);
 
