@@ -99,6 +99,7 @@ public class SecurityConfig {
 							"/api/auth/forgotPassword",
 							"/api/auth/resetPassword/*"
 					).permitAll();
+					authz.requestMatchers(HttpMethod.PUT, "/api/metrics/*/view").permitAll();
 					authz.requestMatchers(HttpMethod.GET, "/**").permitAll();
 					authz.anyRequest().authenticated();
 				})
@@ -110,7 +111,6 @@ public class SecurityConfig {
 	public GrantedAuthoritiesMapper userAuthoritiesMapper() {
 		return (authorities) -> {
 			Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
 			// overrides all google scopes and add USER role.
 			authorities.forEach(authority -> {
 				if (authority instanceof OidcUserAuthority) {

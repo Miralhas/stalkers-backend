@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
@@ -34,6 +35,7 @@ public abstract class NovelMapper {
 	@Mapping(target = "genres", qualifiedByName = "genresMapper")
 	@Mapping(target = "firstChapter", expression = "java(getFirstChapter(novel))")
 	@Mapping(target = "lastChapter", expression = "java(getLastChapter(novel))")
+	@Mapping(target = "metrics", expression = "java(metricsMapper(novel))")
 	public abstract NovelDTO toResponse(Novel novel);
 
 	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
@@ -46,6 +48,15 @@ public abstract class NovelMapper {
 	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel update(UpdateNovelInput input, @MappingTarget Novel novel);
+
+	MetricsDTO metricsMapper(Novel novel) {
+		return new MetricsDTO(
+				novel.getViews(),
+				novel.getRatingValue(),
+				novel.getRatings().size(),
+				novel.getBayesianScore()
+		);
+	}
 
 	@Named("getFirstChapter")
 	ChapterSummaryDTO getFirstChapter(Novel novel) {

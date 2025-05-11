@@ -39,7 +39,7 @@ public class NovelController {
 
 	@GetMapping
 	public PageDTO<NovelSummaryDTO> findAll(
-			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
+			@PageableDefault(size = 10, sort = {"bayesianScore", "id"}, direction = Sort.Direction.ASC) Pageable pageable,
 			@Valid NovelFilter filter
 	) {
 		var novelsPage = novelService.findAll(pageable, filter);

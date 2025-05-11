@@ -13,6 +13,7 @@ public record NovelDTO(
 		Boolean isHidden,
 		String description,
 		long chaptersCount,
+		MetricsDTO metrics,
 		List<String> genres,
 		List<String> tags,
 		ChapterSummaryDTO firstChapter,

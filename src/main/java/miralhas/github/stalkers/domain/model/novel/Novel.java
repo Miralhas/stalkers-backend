@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
+import miralhas.github.stalkers.domain.model.metrics.Rating;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
@@ -99,6 +100,32 @@ public class Novel implements Serializable {
 	@Formula("(SELECT COUNT(*) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
 	private long chaptersCount;
 
+	@Formula("(SELECT ROUND(AVG(r.rating_value),2) FROM Rating r WHERE r.novel_id = id)")
+	private Double ratingValue;
+
+	// 1000 is the minimum views → it should be changed as the database grows.
+	@Formula("((1000 * (SELECT COALESCE(AVG(r.rating_value), 3.0) FROM Rating r)) + " +
+			"(SELECT COALESCE(SUM(r.rating_value), 0) FROM Rating r WHERE r.novel_id = id)) / " +
+			"(1000 + (SELECT COUNT(*) FROM Rating r WHERE r.novel_id = id)) + " +
+			"(LOG(GREATEST(views, 1)) * 0.01)")
+	private Double bayesianScore;
+
+	@Builder.Default
+	@OneToMany(
+			mappedBy = "novel",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true
+	)
+	private Set<Rating> ratings = new HashSet<>();
+
+	@Column
+	@Builder.Default
+	private int views = 0;
+
+	public void viewsPlusOne() {
+		++this.views;
+	}
+
 	public void addReview(NovelReview review) {
 		this.reviews.add(review);
 		review.setNovel(this);
@@ -107,6 +134,16 @@ public class Novel implements Serializable {
 	public void removeReview(NovelReview review) {
 		this.reviews.remove(review);
 		review.setNovel(null);
+	}
+
+	public void addRating(Rating rating) {
+		ratings.add(rating);
+		rating.setNovel(this);
+	}
+
+	public void removeRating(Rating rating) {
+		ratings.remove(rating);
+		rating.setNovel(null);
 	}
 
 	public String capitalizedTitle() {
