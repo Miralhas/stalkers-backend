@@ -2,14 +2,16 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.*;
+import miralhas.github.stalkers.api.dto.ImageDTO;
+import miralhas.github.stalkers.api.dto.UserCommentDTO;
+import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
-import miralhas.github.stalkers.api.dto_mapper.CommentMapper;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
+import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.NotificationRepository;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
@@ -40,21 +42,22 @@ public class UserController implements UserControllerSwagger {
 	private final NotificationService notificationService;
 	private final ValidateAuthorization validateAuthorization;
 	private final UserRepository userRepository;
-	private final CommentMapper commentMapper;
 	private final NotificationRepository notificationRepository;
 
 	@Override
 	@GetMapping
-	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	public List<UserDTO> getAllUsers() {
 		var users = userService.findAll();
 		return userMapper.toCollectionResponse(users);
 	}
 
-	@GetMapping("/{id}")
-	public UserDTO getUserById(@PathVariable Long id) {
-		var user = userService.findUserByIdOrException(id);
+	@GetMapping("/validate")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public UserDTO verifyUserAccessToken(JwtAuthenticationToken authToken) {
+		User user = userService.findUserByEmailOrException(authToken.getName());
 		return userMapper.toResponse(user);
 	}
 
@@ -122,7 +125,7 @@ public class UserController implements UserControllerSwagger {
 	@PreAuthorize("hasRole('USER')")
 	public List<UserCommentDTO> getUserNovelReviews() {
 		var currentUser = validateAuthorization.getCurrentUser();
-		return userRepository.findAllUserNovelComments(currentUser.getId());
+		return userRepository.findAllUserNovelReviews(currentUser.getId());
 	}
 
 

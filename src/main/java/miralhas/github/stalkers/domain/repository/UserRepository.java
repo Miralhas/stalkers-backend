@@ -34,6 +34,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			"c.id, c.commenter.email, c.createdAt, c.updatedAt, c.isSpoiler, c.voteCount, c.message, 'NOVEL_REVIEW', c.novel.slug) " +
 			"from NovelReview c " +
 			"WHERE c.commenter.id = :userId ORDER BY c.createdAt DESC")
-	List<UserCommentDTO> findAllUserNovelComments(Long userId);
+	List<UserCommentDTO> findAllUserNovelReviews(Long userId);
 
 }
