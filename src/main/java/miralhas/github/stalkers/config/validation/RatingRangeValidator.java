@@ -17,6 +17,7 @@ public class RatingRangeValidator implements ConstraintValidator<RatingRange, Do
 		for (int i = RANGE_START; i < RANGE_END; i++) {
 			acceptedValues.add(i * 0.5 + 1);
 		}
+		// generates -> [0.5, 1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
 	}
 
 	@Override

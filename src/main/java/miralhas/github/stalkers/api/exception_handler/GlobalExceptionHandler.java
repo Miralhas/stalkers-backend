@@ -9,6 +9,7 @@ import miralhas.github.stalkers.domain.exception.ResourceNotFoundException;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -36,6 +38,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+	@Value("${spring.servlet.multipart.max-file-size}")
+	private Object maxFileSize;
 
 	private final MessageSource messageSource;
 	private final ErrorMessages errorMessages;
@@ -170,6 +175,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
+	@Override
+	protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+			MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
+	) {
+		String detail = errorMessages.get("maximumUploadSize", maxFileSize);
+
+		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, detail);
+		problemDetail.setTitle("Maximum Upload Size");
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/maximum-upload-size-exceeded"));
+		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
+	}
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
