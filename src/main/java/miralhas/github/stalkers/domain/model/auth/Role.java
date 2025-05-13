@@ -30,7 +30,9 @@ public class Role implements Serializable {
 	@Getter
 	public enum Value {
 		USER(new SimpleGrantedAuthority("USER")),
-		ADMIN(new SimpleGrantedAuthority("ADMIN"));
+		ADMIN(new SimpleGrantedAuthority("ADMIN")),
+		ROBOT(new SimpleGrantedAuthority("ROBOT"));
+
 		private final SimpleGrantedAuthority authority;
 
 		Value(SimpleGrantedAuthority authority) {

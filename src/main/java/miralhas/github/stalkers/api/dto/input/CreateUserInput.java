@@ -3,6 +3,7 @@ package miralhas.github.stalkers.api.dto.input;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CreateUserInput (
@@ -13,6 +14,7 @@ public record CreateUserInput (
 
 		@NotBlank
 		@Size(min = 3, max = 20)
+		@Pattern(regexp = "^[a-zA-Z0-9_]*$")
 		@Schema(description = "User name", example = "batman420")
 		String username,
 

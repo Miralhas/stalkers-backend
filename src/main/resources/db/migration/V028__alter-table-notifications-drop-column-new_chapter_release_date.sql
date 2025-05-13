@@ -1,0 +1,1 @@
+ALTER TABLE notification DROP COLUMN `new_chapter_release_date`;

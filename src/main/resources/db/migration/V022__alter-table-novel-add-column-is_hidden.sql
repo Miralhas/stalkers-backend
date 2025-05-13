@@ -1,0 +1,1 @@
+ALTER TABLE novel ADD COLUMN is_hidden BIT(1) NOT NULL;

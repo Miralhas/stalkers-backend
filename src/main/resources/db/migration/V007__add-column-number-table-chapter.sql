@@ -1,0 +1,1 @@
+ALTER TABLE chapter add column number BIGINT NOT NULL;

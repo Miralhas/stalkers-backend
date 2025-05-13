@@ -1,0 +1,1 @@
+ALTER TABLE notification CHANGE `notifcation_type` `notification_type` VARCHAR(31) NULL DEFAULT NULL;

@@ -2,12 +2,14 @@ package miralhas.github.stalkers.api.dto.input;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
 @With
 public record UpdateUserInput(
 		@Size(min = 3, max = 20)
+		@Pattern(regexp = "^[a-zA-Z0-9_]*$")
 		@Schema(description = "User name", example = "batman420")
 		String username,
 

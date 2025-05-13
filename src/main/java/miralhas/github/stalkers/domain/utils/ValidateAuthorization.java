@@ -18,10 +18,14 @@ public class ValidateAuthorization {
 		this.errorMessages = errorMessages;
 	}
 
-	public void validate(User imageOwner) {
-		var currentUser = userService.findUserByEmailOrException(
+	public User getCurrentUser() {
+		return  userService.findUserByEmailOrException(
 				SecurityContextHolder.getContext().getAuthentication().getName()
 		);
+	}
+
+	public void validate(User imageOwner) {
+		var currentUser = getCurrentUser();
 		if (currentUser.isAdmin() || currentUser.equals(imageOwner)) return;
 		throw new AccessDeniedException(errorMessages.get("AbstractAccessDecisionManager.accessDenied"));
 	}

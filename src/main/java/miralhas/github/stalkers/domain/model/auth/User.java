@@ -20,7 +20,6 @@ import java.util.Set;
 @Setter
 @Entity
 @Builder
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Serializable {
@@ -47,15 +46,20 @@ public class User implements Serializable {
 	@CreationTimestamp
 	private OffsetDateTime createdAt;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	@ToString.Exclude
+	@ManyToMany(
+			fetch = FetchType.LAZY,
+			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+	)
+	@JoinTable(
+			name = "user_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id")
+	)
 	private Set<Role> roles;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
 
-	@JsonIgnore
 	public List<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream().map(r -> r.getName().getAuthority()).toList();
 	}
@@ -71,7 +75,8 @@ public class User implements Serializable {
 	}
 
 	public String getImageFileName() {
-		return hasImage() ? image.getFileName() : "";
+		if (hasImage()) return this.image.getFileName();
+		return null;
 	}
 
 	@Override

@@ -42,12 +42,12 @@ services:
       mysqldb:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_RABBITMQ_HOST=rabbitmq
-      - SMTP_PASSWORD=${SMTP}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - LOCAL_IMAGE_DIRECTORY=/app/images
     volumes:
       - api-images:/app/images

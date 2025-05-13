@@ -9,8 +9,10 @@ import miralhas.github.stalkers.domain.exception.ResourceNotFoundException;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,7 +22,9 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -35,6 +39,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+	@Value("${spring.servlet.multipart.max-file-size}")
+	private Object maxFileSize;
+
 	private final MessageSource messageSource;
 	private final ErrorMessages errorMessages;
 
@@ -45,7 +52,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		var detail = errorMessages.get("internalServerError");
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Internal Server Error");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/internal-server-error"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/internal-server-error"));
 		return problemDetail;
 	}
 
@@ -56,21 +63,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		var status = HttpStatus.CONFLICT;
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Authentication Conflict");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/authentication-conflict"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/authentication-conflict"));
 		if (Objects.nonNull(errors)) {
 			problemDetail.setProperty("errors", errors);
 		}
 		return problemDetail;
 	}
 
-
+	@ExceptionHandler(PropertyReferenceException.class)
+	public ProblemDetail handlePropertyReferenceException(PropertyReferenceException ex, WebRequest webRequest) {
+		var detail = ex.getMessage();
+		var status = HttpStatus.BAD_REQUEST;
+		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
+		problemDetail.setTitle("Pagination Bad Request");
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/pagination-bad-request"));
+		return problemDetail;
+	}
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ProblemDetail handleAccessDeniedException(AccessDeniedException ex, WebRequest webRequest) {
-		var detail = ex.getMessage();
+		var detail = errorMessages.get("forbidden");
 		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
 		problemDetail.setTitle("Forbidden");
-		problemDetail.setType(URI.create("http://localhost:8080/forbidden-access"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/forbidden-access"));
 		return problemDetail;
 	}
 
@@ -78,7 +93,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
 		problemDetail.setTitle("Resource Not Found");
-		problemDetail.setType(URI.create("http://localhost:8080/error/resource-not-found"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/resource-not-found"));
 		return problemDetail;
 	}
 
@@ -86,7 +101,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ProblemDetail handleBusinessException(BusinessException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
 		problemDetail.setTitle("Invalid Request");
-		problemDetail.setType(URI.create("http://localhost:8080/error/invalid-request"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/invalid-request"));
 		return problemDetail;
 	}
 
@@ -95,7 +110,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = errorMessages.get("PasswordComparisonAuthenticator.badCredentials");
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
 		problemDetail.setTitle("Invalid Authentication");
-		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/authentication"));
 		return problemDetail;
 	}
 
@@ -103,7 +118,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ProblemDetail handleAuthenticationException(AuthenticationException ex, WebRequest webRequest) {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
 		problemDetail.setTitle("Invalid Authentication");
-		problemDetail.setType(URI.create("http://localhost:8080/error/authentication"));
+		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/authentication"));
 		return problemDetail;
 	}
 
@@ -119,7 +134,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		var detail = errorMessages.get("methodArgumentNotValid");
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
 		problemDetail.setTitle("Invalid Fields");
-		problemDetail.setType(URI.create("http://localhost:8080/error/invalid-fields"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/invalid-fields"));
 		problemDetail.setProperty("errors", errorsMap);
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
@@ -131,7 +146,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = errorMessages.get("noResourceFound", ex.getResourcePath());
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Inexistent Resource");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/inexistent-resource"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/inexistent-resource"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
@@ -143,7 +158,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = errorMessages.get("httpMethodNotSupported", ex.getMethod(), ex.getSupportedHttpMethods());
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, detail);
 		problemDetail.setTitle("HTTP Method not supported");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/http-method-not-supported"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/http-method-not-supported"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
@@ -156,10 +171,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
 		problemDetail.setTitle("Type Mismatch");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/type-mismatch"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/type-mismatch"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
+	@Override
+	protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+			MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request
+	) {
+		String detail = errorMessages.get("maximumUploadSize", maxFileSize);
+
+		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, detail);
+		problemDetail.setTitle("Maximum Upload Size");
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/maximum-upload-size-exceeded"));
+		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
+	}
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
@@ -172,7 +198,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Incomprehensible Message");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/incomprehensible-message"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/incomprehensible-message"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
@@ -184,7 +210,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		var problemDetail = ProblemDetail.forStatusAndDetail(status, detail);
 		problemDetail.setTitle("Invalid Property Format");
-		problemDetail.setType(URI.create("https://localhost:8080/errors/invalid-property-format"));
+		problemDetail.setType(URI.create(getBaseUrl(request)+"/errors/invalid-property-format"));
 		return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
 	}
 
@@ -193,6 +219,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.stream()
 				.map(JsonMappingException.Reference::getFieldName)
 				.filter(Objects::nonNull).collect(Collectors.joining("."));
+	}
+
+	private URI getBaseUrl(WebRequest webRequest) {
+		var request = ((ServletWebRequest) webRequest).getRequest();
+		var scheme = request.getScheme();
+		var serverName = request.getServerName();
+		var serverPort = request.getServerPort();
+		return URI.create(scheme + "://" + serverName + ":" + serverPort);
 	}
 
 }
