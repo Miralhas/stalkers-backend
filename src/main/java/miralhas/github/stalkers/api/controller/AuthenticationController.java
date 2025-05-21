@@ -11,6 +11,7 @@ import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.service.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -75,5 +76,12 @@ public class AuthenticationController implements AuthenticationControllerSwagger
 				tokenPropertiesConfig.accessToken().expirationTime(),
 				tokenPropertiesConfig.refreshToken().expirationTime()
 		);
+	}
+
+	@PostMapping("/google")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasAnyRole('ADMIN', 'OAUTH2')")
+	public AuthenticationDTO googleOAuth2(@RequestBody @Valid GoogleOAuth2Input input) {
+		return authenticationService.authenticateOAuth2(input.email());
 	}
 }

@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.input.SigninInput;
 import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.security.SecurityUser;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ public class AuthenticationService {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final RefreshTokenService refreshTokenService;
+	private final UserService userService;
 
 	@Transactional
 	public AuthenticationDTO authenticate(SigninInput signinInput) {
@@ -41,6 +43,18 @@ public class AuthenticationService {
 				tokenPropertiesConfig.accessToken().expirationTime(),
 				tokenPropertiesConfig.refreshToken().expirationTime()
 		);
+	}
+
+	@Transactional
+	public AuthenticationDTO authenticateOAuth2(String email) {
+		String username = CommonsUtils.randomUsernameGenerator();
+		var user = User.builder()
+				.email(email)
+				.username(username)
+				.isOAuth2Authenticated(true)
+				.build();
+		user = userService.findOrCreateNewUser(user);
+		return generateTokens(user);
 	}
 
 }
