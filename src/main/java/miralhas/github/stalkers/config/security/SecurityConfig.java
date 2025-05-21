@@ -54,7 +54,8 @@ public class SecurityConfig {
 			HttpSecurity httpSecurity,
 			CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
 			CustomOauth2FailureHandler customOauth2FailureHandler,
-			RobotFilter robotFilter
+			RobotFilter robotFilter,
+			OAuth2Filter oAuth2Filter
 	) throws Exception {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
@@ -104,6 +105,7 @@ public class SecurityConfig {
 					authz.anyRequest().authenticated();
 				})
 				.addFilterBefore(robotFilter, OAuth2AuthorizationRequestRedirectFilter.class)
+				.addFilterBefore(oAuth2Filter, OAuth2AuthorizationRequestRedirectFilter.class)
 				.build();
 	}
 
