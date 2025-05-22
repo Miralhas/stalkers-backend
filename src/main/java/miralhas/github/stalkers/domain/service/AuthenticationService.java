@@ -39,9 +39,9 @@ public class AuthenticationService {
 		var refreshToken = refreshTokenService.save(user);
 		return new AuthenticationDTO(
 				jwt.getTokenValue(),
-				refreshToken.getId().toString(),
-				tokenPropertiesConfig.accessToken().expirationTime(),
-				tokenPropertiesConfig.refreshToken().expirationTime()
+//				refreshToken.getId().toString(),
+				tokenPropertiesConfig.accessToken().expirationTime()
+//				tokenPropertiesConfig.refreshToken().expirationTime()
 		);
 	}
 

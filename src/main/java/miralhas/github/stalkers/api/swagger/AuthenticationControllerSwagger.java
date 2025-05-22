@@ -58,12 +58,12 @@ public interface AuthenticationControllerSwagger {
 			@RequestBody @Valid ChangePasswordInput changePasswordInput
 	);
 
-	@Operation(summary = "Refresh token")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Token refreshed", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthenticationDTO.class))),
-			@ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class))),
-			@ApiResponse(responseCode = "404", description = "Refresh token not found", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class))),
-			@ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
-	})
-	AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput);
+//	@Operation(summary = "Refresh token")
+//	@ApiResponses(value = {
+//			@ApiResponse(responseCode = "200", description = "Token refreshed", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthenticationDTO.class))),
+//			@ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class))),
+//			@ApiResponse(responseCode = "404", description = "Refresh token not found", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class))),
+//			@ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
+//	})
+//	AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput);
 }

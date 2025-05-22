@@ -97,8 +97,8 @@ public class SecurityConfig {
 					).permitAll();
 					authz.requestMatchers(
 							HttpMethod.PUT,
-							"/api/auth/forgotPassword",
-							"/api/auth/resetPassword/*"
+							"/api/auth/forgot-password",
+							"/api/auth/reset-password/*"
 					).permitAll();
 					authz.requestMatchers(HttpMethod.PUT, "/api/metrics/*/view").permitAll();
 					authz.requestMatchers(HttpMethod.GET, "/**").permitAll();
