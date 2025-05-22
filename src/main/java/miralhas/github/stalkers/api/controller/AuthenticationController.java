@@ -44,7 +44,7 @@ public class AuthenticationController implements AuthenticationControllerSwagger
 		return authenticationService.authenticate(signinInput);
 	}
 
-	@PutMapping("/forgotPassword")
+	@PutMapping("/forgot-password")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Override
 	public void createPasswordResetToken(@RequestBody @Valid ForgotPasswordInput forgotPasswordInput) {
@@ -53,7 +53,7 @@ public class AuthenticationController implements AuthenticationControllerSwagger
 
 
 	@Override
-	@PutMapping("/resetPassword/{token}")
+	@PutMapping("/reset-password/{token}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void resetPassword(
 			@PathVariable String token,
@@ -62,21 +62,21 @@ public class AuthenticationController implements AuthenticationControllerSwagger
 		passwordResetService.resetPassword(token, changePasswordInput);
 	}
 
-	@Override
-	@PostMapping("/refresh-token")
-	@ResponseStatus(HttpStatus.OK)
-	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {
-		var refreshToken = refreshTokenService.validateRefreshToken(refreshTokenInput.refreshToken());
-		var user = userService.findUserByEmailOrException(refreshToken.getUser().getEmail());
-		var newAccessToken = tokenService.generateToken(user);
-		var newRefreshToken = refreshTokenService.update(refreshToken, user);
-		return new AuthenticationDTO(
-				newAccessToken.getTokenValue(),
-				newRefreshToken.getId().toString(),
-				tokenPropertiesConfig.accessToken().expirationTime(),
-				tokenPropertiesConfig.refreshToken().expirationTime()
-		);
-	}
+//	@Override
+//	@PostMapping("/refresh-token")
+//	@ResponseStatus(HttpStatus.OK)
+//	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {
+//		var refreshToken = refreshTokenService.validateRefreshToken(refreshTokenInput.refreshToken());
+//		var user = userService.findUserByEmailOrException(refreshToken.getUser().getEmail());
+//		var newAccessToken = tokenService.generateToken(user);
+//		var newRefreshToken = refreshTokenService.update(refreshToken, user);
+//		return new AuthenticationDTO(
+//				newAccessToken.getTokenValue(),
+//				newRefreshToken.getId().toString(),
+//				tokenPropertiesConfig.accessToken().expirationTime(),
+//				tokenPropertiesConfig.refreshToken().expirationTime()
+//		);
+//	}
 
 	@PostMapping("/google")
 	@ResponseStatus(HttpStatus.OK)
