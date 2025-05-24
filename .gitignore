@@ -40,3 +40,5 @@ src/main/resources/public.pem
 
 private.pem
 public.pem
+
+.env
