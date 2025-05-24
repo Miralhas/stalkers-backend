@@ -15,6 +15,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @Builder
+@Table(name = "rating")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rating implements Serializable {
