@@ -1,4 +1,17 @@
 services:
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    environment:
+    - DISABLE_IPV6=true
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: "rabbitmq"
@@ -49,6 +62,12 @@ services:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - LOCAL_IMAGE_DIRECTORY=/app/images
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - OAUTH2_GOOGLE_HEADER=${OAUTH2_GOOGLE_HEADER}
+      - OAUTH2_GOOGLE_SECRET=${OAUTH2_GOOGLE_SECRET}
+      - ROBOT_HEADER=${ROBOT_HEADER}
+      - ROBOT_SECRET=${ROBOT_SECRET}
     volumes:
       - api-images:/app/images
     networks:
