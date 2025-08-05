@@ -143,14 +143,18 @@ public class CommonsUtils {
 
 	public static String getInitialsFromSlug(String slug) {
 		String[] words = slug.split("-");
-		StringBuilder initials = new StringBuilder();
 
-		for (String word : words) {
-			if (!word.isEmpty()) {
-				initials.append(word.charAt(0));
-			}
+		if (words.length <= 2) {
+			return Arrays.stream(words)
+				.filter(word -> !word.isEmpty())
+				.map(word -> word.length() > 2 ? word.substring(0, 2) : word.substring(0, 1))
+				.collect(Collectors.joining());
 		}
-		return initials.toString();
+
+		return Arrays.stream(slug.split("-"))
+				.filter(word -> !word.isEmpty())
+				.map(word -> word.substring(0, 1))
+				.collect(Collectors.joining());
 	}
 
 }
