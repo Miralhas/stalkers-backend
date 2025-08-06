@@ -22,6 +22,7 @@ public interface ChapterMapper {
 	Chapter fromInput(ChapterInput chapterInput);
 	List<Chapter> fromInputCollection(List<ChapterInput> chapterInputList);
 
+	@Mapping(target = "novelSlug", source = "novel.slug")
 	ChapterDTO toResponse(Chapter chapter);
 
 	ChapterSummaryDTO toSummaryResponse(Chapter chapter);
