@@ -8,7 +8,7 @@ echo "Restarting services..."
 # Stop all services
 docker compose down --remove-orphans
 docker system prune --force
-docker system prune volumes --force
+docker system prune --volumes --force
 
 # Check if .env file exists
 if [ ! -f .env ]; then
