@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
@@ -22,6 +23,22 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 			"FROM Chapter c WHERE c.novel.slug = :slug"
 	)
 	Page<ChapterSummaryDTO> findAllByNovelSlug(String slug, Pageable pageable);
+
+//                c.id, n.id, c.slug, c.number, c.title, n.author, n.title, n.slug, c.createdAt
+
+	@Query(value = """
+        SELECT c.id, n.id, c.slug, c.number, c.title, n.author, n.title, n.slug, c.created_at
+        FROM chapter c
+        JOIN (
+            SELECT novel_id, MAX(created_at) AS latest_created_at
+            FROM chapter
+            GROUP BY novel_id
+        ) AS latest ON c.novel_id = latest.novel_id AND c.created_at = latest.latest_created_at
+        JOIN novel n ON n.id = c.novel_id
+        ORDER BY c.created_at DESC, c.number DESC
+        LIMIT 45
+        """, nativeQuery = true)
+	List<Object[]> findAllLatestChaptersDTO();
 
 	@Query("SELECT c FROM Chapter c LEFT JOIN FETCH c.novel WHERE c.slug = :slug")
 	Optional<Chapter> findBySlug(String slug);

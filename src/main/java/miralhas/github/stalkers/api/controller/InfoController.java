@@ -2,10 +2,12 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
+import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.InfoService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +26,12 @@ import java.util.List;
 public class InfoController {
 
 	private final InfoService infoService;
+	private final ChapterService chapterService;
+
+	@GetMapping("/latest-chapters")
+	public List<LatestChapterDTO> getLatestChaptersDTO() {
+		return chapterService.getLatestChaptersDTO();
+	}
 
 	@GetMapping("/tags")
 	@ResponseStatus(HttpStatus.OK)

@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.domain.exception.ChapterNotFoundException;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -32,6 +35,17 @@ public class ChapterService {
 	private final ChapterMapper chapterMapper;
 	private final CacheManagerUtils cacheManager;
 	private final NotificationService notificationService;
+
+	public List<LatestChapterDTO> getLatestChaptersDTO() {
+		return chapterRepository.findAllLatestChaptersDTO()
+				.stream()
+				.map(c -> new LatestChapterDTO(
+						(Long) c[0], (Long) c[1], (String) c[2], (Long) c[3],
+						(String) c[4], (String) c[5], (String) c[6], (String) c[7],
+						((Timestamp) c[8]).toLocalDateTime().atOffset(ZoneOffset.UTC)
+				))
+				.toList();
+	}
 
 	@Cacheable(value = "chapters.list", unless = "#result.getContent().isEmpty()", keyGenerator = "novelChaptersKeyGenerator")
 	public Page<ChapterSummaryDTO> findAllByNovelSlug(String novelSlug, Pageable pageable) {

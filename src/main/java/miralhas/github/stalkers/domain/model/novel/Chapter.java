@@ -40,7 +40,7 @@ public class Chapter implements Serializable {
 	@Column(nullable = false)
 	private Long number;
 
-	@Column(nullable = false, columnDefinition = "TEXT")
+	@Column(nullable = false, columnDefinition = "MEDIUMTEXT")
 	private String body;
 
 	@Column(nullable = false, unique = true)
