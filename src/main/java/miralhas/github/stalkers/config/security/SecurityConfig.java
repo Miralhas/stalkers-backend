@@ -33,7 +33,6 @@ import java.util.Set;
 
 @Configuration
 @EnableMethodSecurity
-@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
