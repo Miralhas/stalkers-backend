@@ -24,7 +24,21 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	)
 	Page<ChapterSummaryDTO> findAllByNovelSlug(String slug, Pageable pageable);
 
-//                c.id, n.id, c.slug, c.number, c.title, n.author, n.title, n.slug, c.createdAt
+	@Query(value = "select " +
+			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
+			"FROM Chapter c " +
+			"WHERE c.novel.id = :novelId AND c.number = :chapterNumber-1 ORDER BY c.id LIMIT 1"
+	)
+	ChapterSummaryDTO findPreviousChapter(Long novelId, Long chapterNumber);
+
+	@Query(value = "select " +
+			"new miralhas.github.stalkers.api.dto.ChapterSummaryDTO(" +
+			"c.id, c.title, c.slug, c.number, c.createdAt, c.updatedAt) " +
+			"FROM Chapter c " +
+			"WHERE c.novel.id = :novelId AND c.number = :chapterNumber+1 ORDER BY c.id LIMIT 1"
+	)
+	ChapterSummaryDTO findNextChapter(Long novelId, Long chapterNumber);
 
 	@Query(value = """
         SELECT c.id, n.id, c.slug, c.number, c.title, n.author, n.title, n.slug, c.created_at

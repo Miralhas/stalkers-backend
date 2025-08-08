@@ -8,7 +8,9 @@ public record ChapterDTO(
 		String title,
 		String slug,
 		String body,
-		String novelSlug
+		String novelSlug,
+		ChapterSummaryDTO previous,
+		ChapterSummaryDTO next
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
