@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,12 +62,16 @@ public abstract class NovelMapper {
 
 	@Named("getFirstChapter")
 	ChapterSummaryDTO getFirstChapter(Novel novel) {
-		return novelRepository.findNovelFirstChapterByNovelId(novel.getId());
+		var chapter = novelRepository.findNovelFirstChapterByNovelId(novel.getId());
+		if (Objects.isNull(chapter.id())) return null;
+		return chapter;
 	}
 
 	@Named("getLastChapter")
 	ChapterSummaryDTO getLastChapter(Novel novel) {
-		return novelRepository.findNovelLastChapterByNovelId(novel.getId());
+		var chapter = novelRepository.findNovelLastChapterByNovelId(novel.getId());
+		if (Objects.isNull(chapter.id())) return null;
+		return chapter;
 	}
 
 	@Named("tagsMapper")
