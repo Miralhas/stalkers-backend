@@ -146,7 +146,7 @@ public class CommonsUtils {
 
 		if (words.length <= 2) {
 			return Arrays.stream(words)
-				.filter(word -> !word.isEmpty())
+				.filter(org.springframework.util.StringUtils::hasText)
 				.map(word -> word.length() > 2 ? word.substring(0, 2) : word.substring(0, 1))
 				.collect(Collectors.joining());
 		}

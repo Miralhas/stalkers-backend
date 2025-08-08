@@ -27,7 +27,7 @@ public class EldersChoice {
 
 	@ToString.Exclude
 	@OneToOne(fetch = FetchType.LAZY)
-	public Novel novel;
+	private Novel novel;
 
 	@Override
 	public final boolean equals(Object o) {
