@@ -9,6 +9,7 @@ public record ChapterDTO(
 		String slug,
 		String body,
 		String novelSlug,
+		Long number,
 		ChapterSummaryDTO previous,
 		ChapterSummaryDTO next
 ) implements Serializable {
