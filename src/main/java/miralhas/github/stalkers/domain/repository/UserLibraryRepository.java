@@ -55,4 +55,9 @@ public interface UserLibraryRepository extends JpaRepository<UserLibrary, Long> 
 	)
 	boolean isNovelBookmarkedByUser(String novelSlug, Long userId);
 
+	@Query(nativeQuery = true,
+			value = "SELECT COALESCE((SELECT c.number FROM user_library ul " +
+					"LEFT JOIN chapter c ON c.id = ul.current_chapter_id " +
+					"WHERE ul.user_id = :userId AND ul.novel_id = :novelId), 0)")
+	Long findNovelChapterOnUserHistory(Long novelId, Long userId);
 }

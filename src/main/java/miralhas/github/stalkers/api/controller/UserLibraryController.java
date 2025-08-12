@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/library")
@@ -90,10 +91,12 @@ public class UserLibraryController {
 
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping("/bookmark/is-novel-bookmarked/{novelSlug}")
-	public Map<String, Boolean> isNovelBookmarkedByUser(@PathVariable String novelSlug, JwtAuthenticationToken authToken) {
+	@GetMapping("/user-history-info/{novelSlug}")
+	public Map<String, ?> isNovelBookmarkedByUser(@PathVariable String novelSlug, JwtAuthenticationToken authToken) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
-		var isBookmarked = userLibraryRepository.isNovelBookmarkedByUser(novelSlug, user.getId());
-		return Map.of("isBookmarked", isBookmarked);
+		var novel = novelService.findBySlugOrException(novelSlug);
+		var isBookmarked = userLibraryRepository.isNovelBookmarkedByUser(novel.getSlug(), user.getId());
+		Long userHistoryChapter = userLibraryRepository.findNovelChapterOnUserHistory(novel.getId(), user.getId());
+		return Map.of("isBookmarked", isBookmarked, "currentChapter", userHistoryChapter);
 	}
 }

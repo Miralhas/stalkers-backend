@@ -10,4 +10,5 @@ import lombok.ToString;
 public class LibraryFilter {
 	private Boolean completed = false;
 	private Boolean bookmarked = false;
+	private String novelSlug;
 }
