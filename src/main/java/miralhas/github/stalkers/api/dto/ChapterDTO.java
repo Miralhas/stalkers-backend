@@ -9,6 +9,7 @@ public record ChapterDTO(
 		String slug,
 		String body,
 		String novelSlug,
+		Long novelId,
 		Long number,
 		ChapterSummaryDTO previous,
 		ChapterSummaryDTO next
