@@ -44,6 +44,16 @@ public interface UserLibraryRepository extends JpaRepository<UserLibrary, Long> 
 	)
 	Page<Object[]> findUserLibraryCompletedByUserId(Long userId, Pageable pageable);
 
+	@Query("select ul, " +
+			"(SELECT COUNT(c) FROM Chapter c WHERE c.novel.id = ul.novel.id) AS totalChapters " +
+			"from UserLibrary ul " +
+			"LEFT JOIN FETCH ul.user " +
+			"LEFT JOIN FETCH ul.novel " +
+			"LEFT JOIN FETCH ul.currentChapter " +
+			"WHERE ul.user.id = :userId and ul.novel.slug = :novelSlug"
+	)
+	Page<Object[]> findUserLibraryByNovelSlug(Long userId, String novelSlug, Pageable pageable);
+
 	@Query(
 			nativeQuery = true,
 			value = "SELECT IF(EXISTS(" +

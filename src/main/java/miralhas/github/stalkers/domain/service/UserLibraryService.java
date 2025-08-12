@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.OffsetDateTime;
 
@@ -160,6 +161,8 @@ public class UserLibraryService {
 			userLibrary = userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable);
 		} else if (filter.getCompleted()) {
 			userLibrary = userLibraryRepository.findUserLibraryCompletedByUserId(user.getId(), pageable);
+		} else if (StringUtils.hasText(filter.getNovelSlug())) {
+			userLibrary = userLibraryRepository.findUserLibraryByNovelSlug(user.getId(), filter.getNovelSlug(), pageable);
 		} else {
 			userLibrary = userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
 		}
