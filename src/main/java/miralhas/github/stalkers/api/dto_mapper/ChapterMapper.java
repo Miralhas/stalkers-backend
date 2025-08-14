@@ -33,6 +33,7 @@ public abstract class ChapterMapper {
 
 	@Mapping(target = "novelSlug", source = "novel.slug")
 	@Mapping(target = "novelId", source = "novel.id")
+	@Mapping(target = "novelChaptersCount", source = "novel.chaptersCount")
 	@Mapping(target = "previous", expression = "java(getPreviousChapter(chapter))")
 	@Mapping(target = "next", expression = "java(getNextChapter(chapter))")
 	public abstract ChapterDTO toResponse(Chapter chapter);

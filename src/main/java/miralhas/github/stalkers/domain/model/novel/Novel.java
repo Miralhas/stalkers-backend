@@ -126,6 +126,10 @@ public class Novel implements Serializable {
 		++this.views;
 	}
 
+	public void viewsPlusThousand() {
+		this.views += 1000;
+	}
+
 	public void addReview(NovelReview review) {
 		this.reviews.add(review);
 		review.setNovel(this);
