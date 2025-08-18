@@ -17,6 +17,8 @@ public class UserLibraryDTO implements Serializable {
 	private Long libraryElementId;
 	private String chapterSlug;
 	private String novelSlug;
+	private String novelTitle;
+	private String chapterTitle;
 	private Long userId;
 	private OffsetDateTime lastReadAt;
 	private boolean isBookmarked;

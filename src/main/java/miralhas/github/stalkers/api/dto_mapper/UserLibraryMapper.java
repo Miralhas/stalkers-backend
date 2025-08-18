@@ -17,7 +17,9 @@ import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 public interface UserLibraryMapper {
 
 	@Mapping(target = "chapterSlug", source = "currentChapter.slug")
+	@Mapping(target = "chapterTitle", source = "currentChapter.title")
 	@Mapping(target = "novelSlug", source = "novel.slug")
+	@Mapping(target = "novelTitle", source = "novel.title")
 	@Mapping(target = "userId", source = "user.id")
 	@Mapping(target = "totalChapters", ignore = true)
 	@Mapping(target = "libraryElementId", source = "id")
