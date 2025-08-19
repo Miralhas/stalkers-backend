@@ -41,6 +41,8 @@ public class UserLibraryService {
 		));
 	}
 
+
+
 	@Cacheable(
 			cacheNames = "user.library.list",
 			key = "{#user.getEmail(), #filter, #pageable}",
@@ -157,9 +159,9 @@ public class UserLibraryService {
 
 	private Page<Object[]> getUserLibrary(User user, LibraryFilter filter, Pageable pageable) {
 		Page<Object[]> userLibrary;
-		if (filter.getBookmarked()) {
+		if (filter.isBookmarked()) {
 			userLibrary = userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable);
-		} else if (filter.getCompleted()) {
+		} else if (filter.isCompleted()) {
 			userLibrary = userLibraryRepository.findUserLibraryCompletedByUserId(user.getId(), pageable);
 		} else if (StringUtils.hasText(filter.getNovelSlug())) {
 			userLibrary = userLibraryRepository.findUserLibraryByNovelSlug(user.getId(), filter.getNovelSlug(), pageable);

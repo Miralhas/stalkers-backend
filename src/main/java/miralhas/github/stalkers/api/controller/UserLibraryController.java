@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/library")
@@ -37,14 +36,13 @@ public class UserLibraryController {
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<UserLibraryDTO> findUserLibrary(
 			@PageableDefault(size = 20, sort = {"lastReadAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable,
-			LibraryFilter filter,
+			@Valid LibraryFilter filter,
 			JwtAuthenticationToken authToken
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
 		Page<UserLibraryDTO> userLibraryDTOPage = userLibraryService.findUserLibrary(user, filter, pageable);
 		return new PageDTO<>(userLibraryDTOPage);
 	}
-
 
 	@PutMapping
 	@PreAuthorize("hasRole('USER')")
