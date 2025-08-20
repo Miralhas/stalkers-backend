@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ImageDTO;
 import miralhas.github.stalkers.api.dto.UserCommentDTO;
 import miralhas.github.stalkers.api.dto.UserDTO;
+import miralhas.github.stalkers.api.dto.UserInfoDTO;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
@@ -51,6 +52,13 @@ public class UserController implements UserControllerSwagger {
 	public List<UserDTO> getAllUsers() {
 		var users = userService.findAll();
 		return userMapper.toCollectionResponse(users);
+	}
+
+	@GetMapping("/info")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public UserInfoDTO getUserInfo(JwtAuthenticationToken authToken) {
+		return userService.getUserInfoOrException(authToken.getName());
 	}
 
 	@GetMapping("/validate")

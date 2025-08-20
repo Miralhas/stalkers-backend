@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.UserInfoDTO;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
@@ -37,6 +38,14 @@ public class UserService  {
 	@Cacheable
 	public List<User> findAll() {
 		return userRepository.findAll();
+	}
+
+	public UserInfoDTO getUserInfoOrException(String email) {
+		var infoOptional = userRepository.findUserInfoById(email).orElseThrow(() -> {
+			var message = errorMessages.get("user.info.notFound", email);
+			return new UsernameNotFoundException(message);
+		});
+		return infoOptional.getUserInfoDTO();
 	}
 
 	public User findUserByEmailOrException(String email) {
