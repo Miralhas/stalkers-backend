@@ -1,12 +1,13 @@
 package miralhas.github.stalkers.api.dto;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public record UserInfoDTO(
 		Long id,
 		String username,
 		String email,
-		String roles,
+		List<String> roles,
 		Long readCount,
 		Long bookmarkCount,
 		Long completedCount,

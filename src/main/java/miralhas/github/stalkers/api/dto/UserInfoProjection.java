@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.api.dto;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.TimeZone;
 
 public interface UserInfoProjection {
@@ -20,7 +21,7 @@ public interface UserInfoProjection {
 				this.getId(),
 				this.getUsername(),
 				this.getEmail(),
-				this.getRoles(),
+				Arrays.stream(this.getRoles().split(",")).toList(),
 				this.getReadCount(),
 				this.getBookmarkCount(),
 				this.getCompletedCount(),
