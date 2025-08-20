@@ -2,6 +2,7 @@ package miralhas.github.stalkers.api.dto;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public interface UserInfoProjection {
@@ -18,17 +19,26 @@ public interface UserInfoProjection {
 	String getRegisterType();
 
 	default UserInfoDTO getUserInfoDTO() {
+		var lastActivity = Objects.isNull(getLastActivity()) ? null :
+				getLastActivity().atZone(TimeZone.getDefault().toZoneId()).toOffsetDateTime();
+
+		var createdAt = Objects.isNull(getCreatedAt()) ? null :
+				getCreatedAt().atZone(TimeZone.getDefault().toZoneId()).toOffsetDateTime();
+
+		var roles = Objects.isNull(getRoles()) ? null :
+				Arrays.stream(this.getRoles().split(",")).toList();
+
 		return new UserInfoDTO(
 				this.getId(),
 				this.getUsername(),
 				this.getEmail(),
-				this.getCreatedAt().atZone(TimeZone.getDefault().toZoneId()).toOffsetDateTime(),
-				Arrays.stream(this.getRoles().split(",")).toList(),
+				createdAt,
+				roles,
 				this.getReadCount(),
 				this.getBookmarkCount(),
 				this.getCompletedCount(),
 				this.getReviewsCount(),
-				this.getLastActivity().atZone(TimeZone.getDefault().toZoneId()).toOffsetDateTime(),
+				lastActivity,
 				this.getRegisterType()
 		);
 	}
