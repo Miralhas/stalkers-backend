@@ -7,6 +7,7 @@ public record UserInfoDTO(
 		Long id,
 		String username,
 		String email,
+		OffsetDateTime createdAt,
 		List<String> roles,
 		Long readCount,
 		Long bookmarkCount,

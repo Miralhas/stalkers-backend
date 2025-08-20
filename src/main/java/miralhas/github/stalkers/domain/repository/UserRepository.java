@@ -37,7 +37,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 			"WHERE c.commenter.id = :userId ORDER BY c.createdAt DESC")
 	List<UserCommentDTO> findAllUserNovelReviews(Long userId);
 
-	@Query(nativeQuery = true, value = "SELECT  u.id, u.username, u.email, " +
+	@Query(nativeQuery = true, value = "SELECT  u.id, u.username, u.email, u.created_at, " +
 			"(SELECT GROUP_CONCAT(r.`name` SEPARATOR ',') FROM user_roles ur LEFT JOIN role r ON r.id = ur.role_id WHERE ur.user_id = u.id) AS roles, " +
 			"(SELECT DISTINCT COUNT(*) FROM user_library ul WHERE ul.user_id = u.id) AS readCount, " +
 			"(SELECT COUNT(*) FROM user_library ul WHERE ul.user_id = u.id AND ul.is_bookmarked) AS bookmarkCount, " +

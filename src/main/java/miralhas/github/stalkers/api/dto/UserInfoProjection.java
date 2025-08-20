@@ -9,6 +9,7 @@ public interface UserInfoProjection {
 	String getUsername();
 	String getEmail();
 	String getRoles();
+	LocalDateTime getCreatedAt();
 	Long getReadCount();
 	Long getBookmarkCount();
 	Long getCompletedCount();
@@ -21,6 +22,7 @@ public interface UserInfoProjection {
 				this.getId(),
 				this.getUsername(),
 				this.getEmail(),
+				this.getCreatedAt().atZone(TimeZone.getDefault().toZoneId()).toOffsetDateTime(),
 				Arrays.stream(this.getRoles().split(",")).toList(),
 				this.getReadCount(),
 				this.getBookmarkCount(),
