@@ -2,8 +2,6 @@ package miralhas.github.stalkers.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.EldersChoiceDTO;
-import miralhas.github.stalkers.api.dto_mapper.EldersChoiceMapper;
-import miralhas.github.stalkers.domain.repository.EldersChoiceRepository;
 import miralhas.github.stalkers.domain.service.EldersChoiceService;
 import miralhas.github.stalkers.domain.service.NovelService;
 import org.springframework.http.HttpStatus;
@@ -19,13 +17,11 @@ public class EldersChoiceController {
 
 	private final EldersChoiceService eldersChoiceService;
 	private final NovelService novelService;
-	private final EldersChoiceRepository eldersChoiceRepository;
-	private final EldersChoiceMapper eldersChoiceMapper;
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<EldersChoiceDTO> getEldersChoice() {
-		return eldersChoiceRepository.findAll().stream().map(eldersChoiceMapper::toResponse).toList();
+		return eldersChoiceService.getEldersChoiceDTO();
 	}
 
 	@PostMapping("/{novelSlug}")

@@ -11,4 +11,8 @@ public interface EldersChoiceRepository extends JpaRepository<EldersChoice, Long
 	@Override
 	@Query(value = "from EldersChoice ec left join fetch ec.novel")
 	List<EldersChoice> findAll();
+
+	@Query(nativeQuery = true, value = "SELECT IF(" +
+			"EXISTS(SELECT 1 FROM elders_choice ec WHERE ec.novel_id = :novelId), 'true', 'false')")
+	boolean novelAlreadySelected(Long novelId);
 }
