@@ -46,7 +46,7 @@ public class MetricsService {
 
 	@Transactional
 	public void updateNovelViewCount(Novel novel) {
-		novel.viewsPlusOne();
+		novel.viewsPlusThousand();
 		novelRepository.save(novel);
 	}
 }

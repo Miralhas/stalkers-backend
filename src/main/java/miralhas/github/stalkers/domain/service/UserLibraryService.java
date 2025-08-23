@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.OffsetDateTime;
 
@@ -39,6 +40,8 @@ public class UserLibraryService {
 				errorMessages.get("library.notFound.id", libraryElementId)
 		));
 	}
+
+
 
 	@Cacheable(
 			cacheNames = "user.library.list",
@@ -156,10 +159,12 @@ public class UserLibraryService {
 
 	private Page<Object[]> getUserLibrary(User user, LibraryFilter filter, Pageable pageable) {
 		Page<Object[]> userLibrary;
-		if (filter.getBookmarked()) {
+		if (filter.isBookmarked()) {
 			userLibrary = userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable);
-		} else if (filter.getCompleted()) {
+		} else if (filter.isCompleted()) {
 			userLibrary = userLibraryRepository.findUserLibraryCompletedByUserId(user.getId(), pageable);
+		} else if (StringUtils.hasText(filter.getNovelSlug())) {
+			userLibrary = userLibraryRepository.findUserLibraryByNovelSlug(user.getId(), filter.getNovelSlug(), pageable);
 		} else {
 			userLibrary = userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
 		}

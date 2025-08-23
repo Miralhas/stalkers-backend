@@ -5,17 +5,22 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import jakarta.servlet.ServletContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
 
 	@Bean
-	public OpenAPI myOpenAPI() {
+	public OpenAPI myOpenAPI(ServletContext servletContext) {
+		Server server = new Server().url(servletContext.getContextPath());
+
 		Contact contact = new Contact();
 		contact.setEmail("stalkers@gmail.com");
 		contact.setName("Stalkers Corp.");
@@ -35,12 +40,11 @@ public class SwaggerConfig {
 				.scheme("bearer")
 				.bearerFormat("JWT");
 
-//		OAuthFlows oauthFlow = new OAuthFlows().clientCredentials(new OAuth2Client)
-
 		SecurityRequirement securityRequirement = new SecurityRequirement().addList("bearer-key");
 
 		return new OpenAPI()
 				.info(info)
+				.servers(List.of(server))
 				.components(new Components().addSecuritySchemes("bearer-key", securityScheme))
 				.addSecurityItem(securityRequirement);
 	}

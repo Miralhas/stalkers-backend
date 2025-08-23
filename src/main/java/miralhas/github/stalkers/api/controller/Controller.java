@@ -22,6 +22,6 @@ public class Controller {
 	@GetMapping("/test")
 	public ResponseEntity<?> test() {
 		var str = CommonsUtils.randomUsernameGenerator();
-		return ResponseEntity.ok(Map.of("message", str));
+		return ResponseEntity.ok(Map.of("random username", str));
 	}
 }

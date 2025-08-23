@@ -100,13 +100,13 @@ public class Novel implements Serializable {
 	@Formula("(SELECT COUNT(*) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
 	private long chaptersCount;
 
-	@Formula("(SELECT ROUND(AVG(r.rating_value),2) FROM Rating r WHERE r.novel_id = id)")
+	@Formula("(SELECT ROUND(AVG(r.rating_value),2) FROM rating r WHERE r.novel_id = id)")
 	private Double ratingValue;
 
 	// 1000 is the minimum views → it should be changed as the database grows.
-	@Formula("((1000 * (SELECT COALESCE(AVG(r.rating_value), 3.0) FROM Rating r)) + " +
-			"(SELECT COALESCE(SUM(r.rating_value), 0) FROM Rating r WHERE r.novel_id = id)) / " +
-			"(1000 + (SELECT COUNT(*) FROM Rating r WHERE r.novel_id = id)) + " +
+	@Formula("((1000 * (SELECT COALESCE(AVG(r.rating_value), 3.0) FROM rating r)) + " +
+			"(SELECT COALESCE(SUM(r.rating_value), 0) FROM rating r WHERE r.novel_id = id)) / " +
+			"(1000 + (SELECT COUNT(*) FROM rating r WHERE r.novel_id = id)) + " +
 			"(LOG(GREATEST(views, 1)) * 0.01)")
 	private Double bayesianScore;
 
@@ -124,6 +124,10 @@ public class Novel implements Serializable {
 
 	public void viewsPlusOne() {
 		++this.views;
+	}
+
+	public void viewsPlusThousand() {
+		this.views += 1000;
 	}
 
 	public void addReview(NovelReview review) {

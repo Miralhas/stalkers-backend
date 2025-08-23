@@ -2,10 +2,7 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ChapterDTO;
-import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.api.dto.CommentDTO;
-import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
@@ -48,6 +45,7 @@ public class ChapterController {
 		var chaptersSummaryDTOsPage = new PageImpl<>(chapterSummaryDTOs, pageable, chaptersPage.getTotalElements());
 		return new PageDTO<>(chaptersSummaryDTOsPage);
 	}
+
 
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("/{chapterSlug}")
