@@ -1,4 +1,14 @@
 services:
+  libretranslate:
+    container_name: libretranslate
+    image: libretranslate/libretranslate:latest
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    command: --disable-web-ui --load-only en,pb
+    networks:
+      - stalkers-network
+
   nginx-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
