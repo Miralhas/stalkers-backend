@@ -16,12 +16,13 @@ public record NovelFilter(
 		List<String> genres,
 		String author,
 		Boolean showAll,
-		ChapterCount chapterCount
+		ChapterCount chapterCount,
+		ChaptersRange chaptersRange
 ) {
 
 	public NovelFilter(@EnumPattern(enumClass = Status.class)
 					   String status, String q, List<String> tags, List<String> genres, String author, Boolean showAll,
-					   ChapterCount chapterCount
+					   ChapterCount chapterCount, ChaptersRange chaptersRange
 	) {
 		this.status = status;
 		this.q = q;
@@ -30,6 +31,7 @@ public record NovelFilter(
 		this.author = author;
 		this.showAll = showAll == null ? Boolean.FALSE : showAll;
 		this.chapterCount = chapterCount;
+		this.chaptersRange = chaptersRange;
 	}
 
 	public Specification<Novel> toSpecification() {
@@ -39,7 +41,8 @@ public record NovelFilter(
 				.and(tagsNameEqual(tags))
 				.and(genresNameEqual(genres))
 				.and(showEveryNovel(showAll))
-				.and(chaptersCountRange(chapterCount));
+				.and(chaptersCount(chapterCount))
+				.and(chaptersRangeBetween(chaptersRange));
 	}
 
 }
