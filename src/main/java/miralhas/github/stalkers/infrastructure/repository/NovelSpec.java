@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import lombok.experimental.UtilityClass;
 import miralhas.github.stalkers.api.dto.filter.ChapterCount;
+import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.model.novel.Tag;
@@ -28,13 +29,20 @@ public class NovelSpec {
 		};
 	}
 
-	public static Specification<Novel> chaptersCountRange(ChapterCount count) {
+	public static Specification<Novel> chaptersCount(ChapterCount count) {
 		return (root, query, builder) -> {
 			if (Objects.isNull(count)) return null;
 			return switch (count.getOperator()) {
 				case GTE -> builder.greaterThanOrEqualTo(root.get("chaptersCount"), count.getCount());
 				case LTE -> builder.lessThanOrEqualTo(root.get("chaptersCount"), count.getCount());
 			};
+		};
+	}
+
+	public static Specification<Novel> chaptersRangeBetween(ChaptersRange range) {
+		return (root, query, builder) -> {
+			if (Objects.isNull(range)) return null;
+			return builder.between(root.get("chaptersCount"), range.getFirstValue(), range.getSecondValue());
 		};
 	}
 
