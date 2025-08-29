@@ -22,7 +22,10 @@ public record NovelInput(
 		@NotBlank
 		String description,
 
+		String alias,
+
 		@Valid
+		@NotNull
 		List<ChapterInput> chapters,
 
 		@NotNull

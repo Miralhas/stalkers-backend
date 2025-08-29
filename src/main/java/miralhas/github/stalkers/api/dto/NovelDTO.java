@@ -10,6 +10,7 @@ public record NovelDTO(
 		String title,
 		String author,
 		String status,
+		String alias,
 		Boolean isHidden,
 		String description,
 		long chaptersCount,
