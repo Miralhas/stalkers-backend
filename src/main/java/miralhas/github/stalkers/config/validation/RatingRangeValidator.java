@@ -8,16 +8,11 @@ import java.util.List;
 
 public class RatingRangeValidator implements ConstraintValidator<RatingRange, Double> {
 
-	public static final int RANGE_START = 0;
-	public static final int RANGE_END = 9;
 	private final List<Double> acceptedValues = new ArrayList<>();
 
 	@Override
 	public void initialize(RatingRange constraintAnnotation) {
-		for (int i = RANGE_START; i < RANGE_END; i++) {
-			acceptedValues.add(i * 0.5 + 1);
-		}
-		// generates -> [0.5, 1.0, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+		acceptedValues.addAll(List.of(0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0));
 	}
 
 	@Override

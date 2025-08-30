@@ -7,7 +7,7 @@ import miralhas.github.stalkers.config.validation.RatingRange;
 
 public record RatingInput(
 
-		@Min(1)
+		@Min(0)
 		@Max(5)
 		@NotNull
 		@RatingRange
