@@ -1,11 +1,15 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.RatingDTO;
 import miralhas.github.stalkers.api.dto.input.RatingInput;
+import miralhas.github.stalkers.domain.exception.BusinessException;
+import miralhas.github.stalkers.domain.exception.RatingNotFoundException;
 import miralhas.github.stalkers.domain.model.metrics.Rating;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.repository.RatingRepository;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,14 @@ public class MetricsService {
 	private final ValidateAuthorization validateAuthorization;
 	private final NovelRepository novelRepository;
 	private final RatingRepository ratingRepository;
+	private final ErrorMessages errorMessages;
+
+	public RatingDTO getUserRatingOnNovel(Long userId, Long novelId) {
+		return ratingRepository.getUserRatingOnNovel(userId, novelId)
+				.map(r -> new RatingDTO(r.getNovel().getId(), r.getUser().getId(), r.getRatingValue()))
+				.orElseThrow(() -> new RatingNotFoundException(
+						errorMessages.get("rating.notFound", userId, novelId)));
+	}
 
 	@Transactional
 	public void createRating(RatingInput ratingInput, Novel novel) {

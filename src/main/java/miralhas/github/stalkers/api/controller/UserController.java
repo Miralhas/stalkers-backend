@@ -2,20 +2,21 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ImageDTO;
-import miralhas.github.stalkers.api.dto.UserCommentDTO;
-import miralhas.github.stalkers.api.dto.UserDTO;
-import miralhas.github.stalkers.api.dto.UserInfoDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.input.ImageInput;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
+import miralhas.github.stalkers.domain.exception.BusinessException;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.model.metrics.Rating;
 import miralhas.github.stalkers.domain.repository.NotificationRepository;
+import miralhas.github.stalkers.domain.repository.RatingRepository;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
+import miralhas.github.stalkers.domain.service.MetricsService;
 import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
@@ -44,6 +45,8 @@ public class UserController implements UserControllerSwagger {
 	private final ValidateAuthorization validateAuthorization;
 	private final UserRepository userRepository;
 	private final NotificationRepository notificationRepository;
+	private final RatingRepository ratingRepository;
+	private final MetricsService metricsService;
 
 	@Override
 	@GetMapping
@@ -136,5 +139,12 @@ public class UserController implements UserControllerSwagger {
 		return userRepository.findAllUserNovelReviews(currentUser.getId());
 	}
 
+	@GetMapping("/ratings/{novelId}")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public RatingDTO getUserRatingOnNovel(@PathVariable Long novelId, JwtAuthenticationToken token) {
+		var user = userService.findUserByEmailOrException(token.getName());
+		return metricsService.getUserRatingOnNovel(user.getId(), novelId);
+	}
 
 }
