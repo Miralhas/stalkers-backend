@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -50,5 +51,10 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	@Modifying
 	@Query("delete from Novel n where n.slug = :slug ")
 	void deleteBySlug(String slug);
+
+	@Query("SELECT " +
+			"new miralhas.github.stalkers.api.dto.MetricsDTO(n.views, n.ratingValue, size(n.ratings) , n.bayesianScore) " +
+			"from Novel n where n.slug = :slug")
+	MetricsDTO findNovelMetrics(String slug);
 
 }
