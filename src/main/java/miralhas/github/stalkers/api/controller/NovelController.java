@@ -10,6 +10,7 @@ import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.model.comment.Comment;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.service.ImageService;
 import miralhas.github.stalkers.domain.service.NovelService;
 import miralhas.github.stalkers.domain.service.ReviewService;
@@ -36,6 +37,7 @@ public class NovelController {
 	private final ImageService imageService;
 	private final ReviewService reviewService;
 	private final CommentMapper commentMapper;
+	private final NovelRepository novelRepository;
 
 	@GetMapping
 	public PageDTO<NovelSummaryDTO> findAll(
@@ -138,5 +140,11 @@ public class NovelController {
 	@DeleteMapping("/{novelSlug}/reviews/{reviewId}")
 	public void deleteReview(@PathVariable String novelSlug, @PathVariable Long reviewId) {
 		reviewService.deleteReview(reviewId);
+	}
+
+
+	@GetMapping("/{novelSlug}/ratings")
+	public MetricsDTO getNovelMetrics(@PathVariable String novelSlug) {
+		return novelRepository.findNovelMetrics(novelSlug);
 	}
 }

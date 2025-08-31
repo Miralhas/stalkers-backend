@@ -9,9 +9,7 @@ import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
-import miralhas.github.stalkers.domain.exception.BusinessException;
 import miralhas.github.stalkers.domain.model.auth.User;
-import miralhas.github.stalkers.domain.model.metrics.Rating;
 import miralhas.github.stalkers.domain.repository.NotificationRepository;
 import miralhas.github.stalkers.domain.repository.RatingRepository;
 import miralhas.github.stalkers.domain.repository.UserRepository;
@@ -142,7 +140,7 @@ public class UserController implements UserControllerSwagger {
 	@GetMapping("/ratings/{novelId}")
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('USER')")
-	public RatingDTO getUserRatingOnNovel(@PathVariable Long novelId, JwtAuthenticationToken token) {
+	public UserRatingDTO getUserRatingOnNovel(@PathVariable Long novelId, JwtAuthenticationToken token) {
 		var user = userService.findUserByEmailOrException(token.getName());
 		return metricsService.getUserRatingOnNovel(user.getId(), novelId);
 	}
