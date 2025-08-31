@@ -143,7 +143,7 @@ public class NovelController {
 	}
 
 
-	@GetMapping("/{novelSlug}/ratings")
+	@GetMapping("/{novelSlug}/metric")
 	public MetricsDTO getNovelMetrics(@PathVariable String novelSlug) {
 		return novelRepository.findNovelMetrics(novelSlug);
 	}
