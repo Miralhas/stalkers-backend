@@ -8,11 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface NovelReviewRepository extends JpaRepository<NovelReview, Long> {
 	@Query("SELECT nr from NovelReview nr " +
-			"LEFT JOIN FETCH nr.childComments " +
+			"LEFT JOIN FETCH nr.childComments ch " +
 			"LEFT JOIN FETCH nr.parentComment " +
 			"LEFT JOIN FETCH nr.votes up " +
 			"LEFT JOIN FETCH nr.commenter co " +
-			"LEFT JOIN FETCH co.roles " +
 			"LEFT JOIN FETCH up.user u " +
 			"LEFT JOIN FETCH u.roles " +
 			"WHERE nr.novel.slug = :slug " +
