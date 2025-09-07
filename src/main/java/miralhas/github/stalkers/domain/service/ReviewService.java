@@ -14,6 +14,7 @@ import miralhas.github.stalkers.domain.model.novel.Chapter;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.repository.*;
 import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.cache.annotation.Cacheable;
@@ -73,6 +74,9 @@ public class ReviewService {
 		var novel = novelService.findBySlugOrException(novelSlug);
 		var user = validateAuthorization.getCurrentUser();
 		NovelReview novelReview = commentMapper.fromInputToNovelReview(input);
+
+		sanitizeComment(novelReview);
+
 		var parentComment = novelReview.hasParent() ? findCommentByIdOrThrowException(novelReview.getParentId()) : null;
 
 		novelReview.setParentComment(parentComment);
@@ -91,6 +95,9 @@ public class ReviewService {
 	public Comment addChapterReview(CommentInput input, String chapterSlug) {
 		var chapter = chapterService.findChapterBySlug(chapterSlug);
 		ChapterReview chapterReview = commentMapper.fromInputToChapterReview(input);
+
+		sanitizeComment(chapterReview);
+
 		var parentComment = chapterReview.hasParent()
 				? findCommentByIdOrThrowException(chapterReview.getParentId())
 				: null;
@@ -154,5 +161,9 @@ public class ReviewService {
 		} else if (comment instanceof ChapterReview chapterReview) {
 			cacheManagerUtils.evictNovelReviewsEntry(chapterReview.getChapter().getSlug());
 		}
+	}
+
+	private void sanitizeComment(Comment comment) {
+		comment.setMessage(CommonsUtils.sanitize(comment.getMessage()));
 	}
 }
