@@ -2,6 +2,8 @@ package miralhas.github.stalkers.domain.utils;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -118,6 +120,10 @@ public class CommonsUtils {
 			"Pitcher"
 	);
 
+	private static final PolicyFactory TEXT_ONLY_POLICY = new HtmlPolicyBuilder()
+			.allowElements("p", "br", "b", "strong", "i", "em", "s", "strike", "u")
+			.toFactory();
+
 	public String randomUsernameGenerator() {
 		var random = new SecureRandom();
 		var randomNumber = random.nextInt(WORDS_ARRAY_SIZE);
@@ -155,6 +161,10 @@ public class CommonsUtils {
 				.filter(word -> !word.isEmpty())
 				.map(word -> word.substring(0, 1))
 				.collect(Collectors.joining());
+	}
+
+	public static String sanitize(String dirtyHtml) {
+		return TEXT_ONLY_POLICY.sanitize(dirtyHtml);
 	}
 
 }
