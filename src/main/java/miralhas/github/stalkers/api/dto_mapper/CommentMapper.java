@@ -2,6 +2,7 @@ package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.CommentDTO;
 import miralhas.github.stalkers.api.dto.UserCommentDTO;
+import miralhas.github.stalkers.api.dto.VoteDTO;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
 import miralhas.github.stalkers.api.dto.input.UpdateCommentInput;
 import miralhas.github.stalkers.domain.exception.InternalServerError;
@@ -36,6 +37,7 @@ public interface CommentMapper {
 	@Mapping(target = "parentId", source = "parentComment.id")
 	@Mapping(target = "childComments", source = "childComments", qualifiedByName = "childCommentsMapper")
 	@Mapping(target = "voters", source = "votes", qualifiedByName = "votersMap")
+	@Mapping(target = "type", expression = "java(typeMapper(comment))")
 	CommentDTO toResponse(Comment comment);
 
 	@Mapping(target = "type", expression = "java(typeMapper(comment))")
@@ -53,9 +55,9 @@ public interface CommentMapper {
 	}
 
 	@Named("votersMap")
-	default List<String> upvotersMap(Set<Vote> votes) {
+	default List<VoteDTO> upvotersMap(Set<Vote> votes) {
 		if (ObjectUtils.isEmpty(votes)) return List.of();
-		return votes.stream().map(u -> u.getUser().getEmail()).toList();
+		return votes.stream().map(v -> new VoteDTO(v.getUser().getEmail(), v.getType())).toList();
 	}
 
 	default String typeMapper(Comment comment) {
