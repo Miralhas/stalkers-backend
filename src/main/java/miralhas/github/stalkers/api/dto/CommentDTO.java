@@ -12,10 +12,11 @@ public record CommentDTO(
 		OffsetDateTime createdAt,
 		OffsetDateTime updatedAt,
 		boolean isSpoiler,
-		List<String> voters,
+		List<VoteDTO> voters,
 		long voteCount,
 		String message,
-		List<CommentDTO> childComments
+		List<CommentDTO> childComments,
+		String type
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
