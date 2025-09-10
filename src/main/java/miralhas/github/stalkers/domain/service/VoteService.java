@@ -25,17 +25,9 @@ public class VoteService {
 	@Transactional
 	public void createVote(Comment comment, Type voteType) {
 		var currentUser = validateAuthorization.getCurrentUser();
-		validateVote(comment, currentUser);
-		var vote = Vote.builder()
-				.comment(comment)
-				.user(currentUser)
-				.type(voteType)
-				.count(voteType.getCount())
-				.build();
+		var vote = validateVote(comment, currentUser, voteType);
 		voteRepository.save(vote);
-		// onwer of the comment upvoting its own comment: shameless! Should not send notification.
-		if (vote.getUser().equals(vote.getComment().getCommenter())) return;
-		notificationService.sendUpvoteNotification(comment);
+//		sendNotification(comment, voteType, vote);
 	}
 
 	@Transactional
@@ -44,13 +36,35 @@ public class VoteService {
 		voteRepository.deleteVoteByUserEmailAndCommentId(currentUser.getEmail(), commentId);
 	}
 
-	private void validateVote(Comment comment, User user) {
-		var hasUserAlreadyVoted = comment.getVotes()
-				.stream()
-				.anyMatch(up -> up.getUser().getId().equals(user.getId()));
-		if (!hasUserAlreadyVoted) return;
-		throw new BusinessException(
-				errorMessages.get("vote.alreadyVoted", user.getEmail(), comment.getId())
-		);
+	private void sendNotification(Comment comment, Type voteType, Vote vote) {
+		// onwer of the comment upvoting its own comment: shameless! Should not send notification.
+		if (vote.getUser().equals(comment.getCommenter())) return;
+		if (voteType.equals(Type.DOWNVOTE)) return;
+		notificationService.sendUpvoteNotification(comment);
+	}
+
+	private Vote validateVote(Comment comment, User user, Type type) {
+		var voteOptional = comment.getVotes().stream()
+				.filter(up -> up.getUser().getId().equals(user.getId()))
+				.findFirst();
+
+		if (voteOptional.isPresent()) {
+			var vote = voteOptional.get();
+			if (vote.getType().equals(type))  {
+				throw new BusinessException(
+						errorMessages.get("vote.alreadyVoted", user.getEmail(), type, comment.getId())
+				);
+			}
+			vote.setType(type);
+			vote.setCount(type.getCount());
+			return vote;
+		}
+
+		return Vote.builder()
+				.comment(comment)
+				.user(user)
+				.type(type)
+				.count(type.getCount())
+				.build();
 	}
 }
