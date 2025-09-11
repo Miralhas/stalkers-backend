@@ -115,27 +115,46 @@ public class ReviewService {
 	}
 
 	@Transactional
-	public Comment update(UpdateCommentInput input, Long commentId) {
+	public Comment updateNovelReview(UpdateCommentInput input, Long commentId, String novelSlug) {
 		var comment = findCommentByIdOrThrowException(commentId);
 		validateAuthorization.validate(comment.getCommenter());
 		comment = commentMapper.update(input, comment);
 		comment = commentRepository.save(comment);
-		invalidateCommentCacheEntry(comment);
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
 		return comment;
 	}
 
 	@Transactional
-	public void deleteReview(Long reviewId) {
+	public Comment updateChapterComment(UpdateCommentInput input, Long commentId, String chapterSlug) {
+		var comment = findCommentByIdOrThrowException(commentId);
+		validateAuthorization.validate(comment.getCommenter());
+		comment = commentMapper.update(input, comment);
+		comment = commentRepository.save(comment);
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		return comment;
+	}
+
+	@Transactional
+	public void deleteNovelReview(Long reviewId, String novelSlug) {
 		var comment = findCommentByIdOrThrowException(reviewId);
 		validateAuthorization.validate(comment.getCommenter());
-		invalidateCommentCacheEntry(comment);
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
 		if (comment instanceof NovelReview novelReview) {
 			Novel novel = novelReview.getNovel();
 			if (novel != null) {
 				novel.removeReview(novelReview);
 				novelRepository.save(novel);
 			}
-		} else if (comment instanceof ChapterReview chapterReview) {
+		}
+		deleteCommentAndChildren(comment.getId());
+	}
+
+	@Transactional
+	public void deleteChapterComment(Long commentId, String chapterSlug) {
+		var comment = findCommentByIdOrThrowException(commentId);
+		validateAuthorization.validate(comment.getCommenter());
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		if (comment instanceof ChapterReview chapterReview) {
 			Chapter chapter = chapterReview.getChapter();
 			if (chapter != null) {
 				chapter.removeReview(chapterReview);

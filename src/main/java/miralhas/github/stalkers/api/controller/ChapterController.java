@@ -119,7 +119,7 @@ public class ChapterController {
 			@PathVariable String chapterSlug,
 			@PathVariable Long reviewId
 	) {
-		Comment updatedComment = reviewService.update(input, reviewId);
+		Comment updatedComment = reviewService.updateChapterComment(input, reviewId, chapterSlug);
 		return commentMapper.toResponse(updatedComment);
 	}
 
@@ -131,7 +131,7 @@ public class ChapterController {
 			@PathVariable String chapterSlug,
 			@PathVariable Long reviewId
 	) {
-		reviewService.deleteReview(reviewId);
+		reviewService.deleteChapterComment(reviewId, chapterSlug);
 	}
 
 

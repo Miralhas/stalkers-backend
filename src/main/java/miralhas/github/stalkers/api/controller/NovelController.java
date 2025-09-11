@@ -131,7 +131,7 @@ public class NovelController {
 			@PathVariable String novelSlug,
 			@PathVariable Long reviewId
 	) {
-		Comment updatedComment = reviewService.update(input, reviewId);
+		Comment updatedComment = reviewService.updateNovelReview(input, reviewId, novelSlug);
 		return commentMapper.toResponse(updatedComment);
 	}
 
@@ -139,7 +139,7 @@ public class NovelController {
 	@PreAuthorize("hasRole('USER')")
 	@DeleteMapping("/{novelSlug}/reviews/{reviewId}")
 	public void deleteReview(@PathVariable String novelSlug, @PathVariable Long reviewId) {
-		reviewService.deleteReview(reviewId);
+		reviewService.deleteNovelReview(reviewId, novelSlug);
 	}
 
 
