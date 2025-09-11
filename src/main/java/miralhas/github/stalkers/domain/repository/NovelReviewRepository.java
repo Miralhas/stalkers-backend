@@ -13,7 +13,6 @@ public interface NovelReviewRepository extends JpaRepository<NovelReview, Long> 
 			"LEFT JOIN FETCH nr.votes up " +
 			"LEFT JOIN FETCH nr.commenter co " +
 			"LEFT JOIN FETCH up.user u " +
-			"LEFT JOIN FETCH u.roles " +
 			"WHERE nr.novel.slug = :slug " +
 			"AND nr.parentComment.id IS NULL"
 	)
