@@ -24,7 +24,7 @@ jobs:
       - name: Deploy JAR to Server
         run: |
           REMOTE_SERVER="${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}"
-          HOME_DIR="~/../victor2_miralhas"
+          HOME_DIR="~/"
 
           ssh $REMOTE_SERVER << EOF
             cd $HOME_DIR
