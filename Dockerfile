@@ -5,11 +5,6 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Generate RSA key pair for the authentication to work
-RUN mkdir -p src/main/resources/keys && \
-    openssl genrsa -out src/main/resources/keys/private.pem 2048 && \
-    openssl rsa -in src/main/resources/keys/private.pem -pubout -out src/main/resources/keys/public.pem
-
 RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
