@@ -7,9 +7,6 @@ services:
     image: stalkers-api:latest
     ports:
       - "8080:8080"
-    depends_on:
-      mysqldb:
-        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_USERNAME=root
