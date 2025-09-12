@@ -1,0 +1,36 @@
+services:
+  stalkers-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stalkers-api
+    image: stalkers-api:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/stalkers?createDatabaseIfNotExist=true&serverTimezone=UTC&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - LOCAL_IMAGE_DIRECTORY=/app/images
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - OAUTH2_GOOGLE_HEADER=${OAUTH2_GOOGLE_HEADER}
+      - OAUTH2_GOOGLE_SECRET=${OAUTH2_GOOGLE_SECRET}
+      - ROBOT_HEADER=${ROBOT_HEADER}
+      - ROBOT_SECRET=${ROBOT_SECRET}
+    volumes:
+      - api-images:/app/images
+    networks:
+      - stalkers-network
+
+volumes:
+  api-images:
+networks:
+  stalkers-network:
+    name: stalkers-network
