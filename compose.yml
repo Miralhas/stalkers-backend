@@ -23,8 +23,11 @@ services:
       - OAUTH2_GOOGLE_SECRET=${OAUTH2_GOOGLE_SECRET}
       - ROBOT_HEADER=${ROBOT_HEADER}
       - ROBOT_SECRET=${ROBOT_SECRET}
+      - AUTH_PRIVATE_KEY_PATH=/app/keys/private.pem
+      - AUTH_PUBLIC_KEY_PATH=/app/keys/public.pem
     volumes:
       - api-images:/app/images
+      - /etc/stalkers/keys:/app/keys:ro
     networks:
       - stalkers-network
 
