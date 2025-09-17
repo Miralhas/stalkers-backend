@@ -10,7 +10,6 @@ public interface ChapterReviewRepository extends JpaRepository<ChapterReview, Lo
 	@Query("SELECT cr from ChapterReview cr " +
 			"LEFT JOIN FETCH cr.childComments ch " +
 			"LEFT JOIN FETCH cr.parentComment " +
-			"LEFT JOIN FETCH cr.votes up " +
 			"LEFT JOIN FETCH cr.commenter co " +
 			"WHERE cr.chapter.slug = :slug " +
 			"AND cr.parentComment.id IS NULL"
