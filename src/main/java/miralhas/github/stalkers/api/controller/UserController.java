@@ -19,6 +19,10 @@ import miralhas.github.stalkers.domain.service.NotificationService;
 import miralhas.github.stalkers.domain.service.UserService;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -124,17 +128,23 @@ public class UserController implements UserControllerSwagger {
 	@GetMapping("/comments")
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('USER')")
-	public List<UserCommentDTO> getUserChapterComments() {
+	public PageDTO<UserCommentDTO> getUserChapterComments(
+			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+	) {
 		var currentUser = validateAuthorization.getCurrentUser();
-		return userRepository.findAllUserChapterComments(currentUser.getId());
+		Page<UserCommentDTO> comments = userRepository.findAllUserChapterComments(currentUser.getId(), pageable);
+		return new PageDTO<>(comments);
 	}
 
 	@GetMapping("/reviews")
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('USER')")
-	public List<UserCommentDTO> getUserNovelReviews() {
+	public PageDTO<UserCommentDTO> getUserNovelReviews(
+			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+	) {
 		var currentUser = validateAuthorization.getCurrentUser();
-		return userRepository.findAllUserNovelReviews(currentUser.getId());
+		var comments =  userRepository.findAllUserNovelReviews(currentUser.getId(), pageable);
+		return new PageDTO<>(comments);
 	}
 
 	@GetMapping("/ratings/{novelId}")
