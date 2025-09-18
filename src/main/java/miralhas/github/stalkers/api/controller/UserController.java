@@ -128,18 +128,18 @@ public class UserController implements UserControllerSwagger {
 	@GetMapping("/comments")
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('USER')")
-	public PageDTO<UserCommentDTO> getUserChapterComments(
+	public PageDTO<UserChapterCommentDTO> getUserChapterComments(
 			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		var currentUser = validateAuthorization.getCurrentUser();
-		Page<UserCommentDTO> comments = userRepository.findAllUserChapterComments(currentUser.getId(), pageable);
+		Page<UserChapterCommentDTO> comments = userRepository.findAllUserChapterComments(currentUser.getId(), pageable);
 		return new PageDTO<>(comments);
 	}
 
 	@GetMapping("/reviews")
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('USER')")
-	public PageDTO<UserCommentDTO> getUserNovelReviews(
+	public PageDTO<UserReviewDTO> getUserNovelReviews(
 			@PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		var currentUser = validateAuthorization.getCurrentUser();
