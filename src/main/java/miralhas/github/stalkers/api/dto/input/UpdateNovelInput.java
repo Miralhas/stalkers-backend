@@ -11,6 +11,9 @@ public record UpdateNovelInput(
 
 		String author,
 
+		@Size(min = 2)
+		String alias,
+
 		@EnumPattern(enumClass = Status.class)
 		String status,
 
