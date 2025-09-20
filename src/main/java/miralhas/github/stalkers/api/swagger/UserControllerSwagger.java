@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import miralhas.github.stalkers.api.dto.UserDTO;
+import miralhas.github.stalkers.api.dto.UserInfoDTO;
 import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +28,7 @@ public interface UserControllerSwagger {
 			@ApiResponse(responseCode = "200", description = "Users array", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
 			@ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProblemDetail.class)))
 	})
-	List<UserDTO> getAllUsers();
+	Page<UserInfoDTO> getAllUsers();
 
 	@Operation(summary = "Update user")
 	@ApiResponses(value = {

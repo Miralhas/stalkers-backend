@@ -20,6 +20,7 @@ import miralhas.github.stalkers.domain.service.UserService;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -37,7 +38,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController implements UserControllerSwagger {
+public class UserController  {
 
 	private final UserMapper userMapper;
 	private final UserService userService;
@@ -50,13 +51,17 @@ public class UserController implements UserControllerSwagger {
 	private final RatingRepository ratingRepository;
 	private final MetricsService metricsService;
 
-	@Override
+//	@Override
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
-	public List<UserDTO> getAllUsers() {
-		var users = userService.findAll();
-		return userMapper.toCollectionResponse(users);
+	public PageDTO<UserInfoDTO> getAllUsers(
+			@PageableDefault(direction = Sort.Direction.ASC) Pageable pageable
+	) {
+		var users = userRepository.findAllUserInfo(pageable);
+		var x = users.getContent().stream().map(UserInfoProjection::getUserInfoDTO).toList();
+		var pg = new PageImpl<>(x, pageable, users.getTotalElements());
+		return new PageDTO<>(pg);
 	}
 
 	@GetMapping("/info")
@@ -74,7 +79,7 @@ public class UserController implements UserControllerSwagger {
 		return userMapper.toResponse(user);
 	}
 
-	@Override
+//	@Override
 	@PatchMapping
 	@ResponseStatus(HttpStatus.OK)
 	public UserDTO updateUser(@RequestBody @Valid UpdateUserInput updateUserInput, JwtAuthenticationToken token) {
