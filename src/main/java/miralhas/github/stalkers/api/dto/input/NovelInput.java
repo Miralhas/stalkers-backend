@@ -22,6 +22,7 @@ public record NovelInput(
 		@NotBlank
 		String description,
 
+		@Size(min = 2)
 		String alias,
 
 		@Valid
