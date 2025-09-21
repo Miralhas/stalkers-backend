@@ -1,0 +1,1 @@
+ALTER TABLE novel MODIFY COLUMN `alias` TEXT NULL COLLATE 'utf8mb4_0900_ai_ci';

@@ -52,7 +52,7 @@ public class Novel implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.ON_GOING;
 
-	@Column(nullable = true)
+	@Column(nullable = true, columnDefinition = "TEXT")
 	private String alias;
 
 	@Column(nullable = false, columnDefinition = "TEXT")
