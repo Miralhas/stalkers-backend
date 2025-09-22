@@ -2,7 +2,10 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.*;
+import miralhas.github.stalkers.api.dto.ChapterDTO;
+import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.dto.CommentDTO;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
@@ -68,6 +71,16 @@ public class ChapterController {
 		var novel = novelService.findBySlugOrException(novelSlug);
 		var chapters = chapterMapper.fromInputCollection(chapterInputs.chapters());
 		chapterService.saveBulk(novel, chapters);
+	}
+
+	@PutMapping("/update-bulk")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void updateBulk(
+			@RequestBody @Valid BulkChaptersInput chapterInputs, @PathVariable String novelSlug
+	) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		chapterService.updateBulk(chapterInputs, novel);
+
 	}
 
 	@PutMapping("/{chapterSlug}")

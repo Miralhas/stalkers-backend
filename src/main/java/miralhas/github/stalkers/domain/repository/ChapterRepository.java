@@ -60,4 +60,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	@Modifying
 	@Query("delete from Chapter c where c.slug = :slug")
 	void deleteBySlug(String slug);
+
+	@Query("FROM Chapter c where c.novel.slug = :novelSlug AND c.number = :number")
+	Optional<Chapter> findByNovelSlugAndChapterNumber(String novelSlug, Long number);
 }
