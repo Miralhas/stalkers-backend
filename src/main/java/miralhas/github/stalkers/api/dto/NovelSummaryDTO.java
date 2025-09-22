@@ -8,6 +8,7 @@ public record NovelSummaryDTO(
 		Long id,
 		String slug,
 		String title,
+		String alias,
 		String author,
 		String status,
 		String description,
