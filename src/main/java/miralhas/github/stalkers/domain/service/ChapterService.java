@@ -3,6 +3,7 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
+import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.domain.exception.ChapterNotFoundException;
@@ -64,6 +65,13 @@ public class ChapterService {
 				));
 	}
 
+	public Chapter findByNovelSlugAndChapterNumber(String novelSlug, Long number) {
+		return chapterRepository.findByNovelSlugAndChapterNumber(novelSlug, number)
+				.orElseThrow(() -> new ChapterNotFoundException(
+						errorMessages.get("chapter.notFound.novelSlug.number", novelSlug, number)
+				));
+	}
+
 	public Chapter findByIdOrException(Long id) {
 		return chapterRepository.findById(id).orElseThrow(() -> new ChapterNotFoundException(
 				errorMessages.get("chapter.notFound.id", id)
@@ -120,6 +128,23 @@ public class ChapterService {
 		Chapter saved = chapterRepository.save(chapter);
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 		return saved;
+	}
+
+	@Transactional
+	@Caching(
+			evict = {
+					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug"),
+					@CacheEvict(cacheNames = "chapters.detail", allEntries = true),
+			}
+	)
+	public void updateBulk(BulkChaptersInput chaptersInput, Novel novel) {
+		var editedChapters = chaptersInput.chapters().stream().map(input -> {
+			var chapter = findByNovelSlugAndChapterNumber(novel.getSlug(), input.number());
+			chapterMapper.update(input, chapter);
+			return chapter;
+		}).toList();
+		chapterRepository.saveAll(editedChapters);
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 	}
 
 	// Cache Breakdown:
