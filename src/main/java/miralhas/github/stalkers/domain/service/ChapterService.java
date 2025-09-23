@@ -3,6 +3,8 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
+import miralhas.github.stalkers.api.dto.LatestChaptersProjection;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
@@ -18,12 +20,11 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -37,15 +38,15 @@ public class ChapterService {
 	private final CacheManagerUtils cacheManager;
 	private final NotificationService notificationService;
 
-	public List<LatestChapterDTO> getLatestChaptersDTO() {
-		return chapterRepository.findAllLatestChaptersDTO()
-				.stream()
-				.map(c -> new LatestChapterDTO(
-						(Long) c[0], (Long) c[1], (String) c[2], (Long) c[3],
-						(String) c[4], (String) c[5], (String) c[6], (String) c[7],
-						((Timestamp) c[8]).toLocalDateTime().atOffset(ZoneOffset.UTC)
-				))
-				.toList();
+	@Cacheable(cacheNames = "latest.list", unless = "#result.getContent().isEmpty()")
+	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(Pageable pageable) {
+		var latestProjections = chapterRepository.findAllLatestChaptersDTO(pageable);
+
+		var latestDTO = latestProjections.getContent().stream()
+				.map(LatestChaptersProjection::getLatestChaptersDTO).toList();
+
+		var page = new PageImpl<>(latestDTO, pageable, latestProjections.getTotalElements());
+		return new PageDTO<>(page);
 	}
 
 	@Cacheable(value = "chapters.list", unless = "#result.getContent().isEmpty()", keyGenerator = "novelChaptersKeyGenerator")

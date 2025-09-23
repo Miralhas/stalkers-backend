@@ -8,7 +8,6 @@ import miralhas.github.stalkers.api.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.dto.interfaces.NotificationDTO;
 import miralhas.github.stalkers.api.dto_mapper.ImageMapper;
 import miralhas.github.stalkers.api.dto_mapper.UserMapper;
-import miralhas.github.stalkers.api.swagger.UserControllerSwagger;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.NotificationRepository;
 import miralhas.github.stalkers.domain.repository.RatingRepository;
