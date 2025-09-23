@@ -30,7 +30,7 @@ public class InfoController {
 
 	@GetMapping("/latest-chapters")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(
-			@PageableDefault(size = 100, sort = {"created_at", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 75, sort = {"created_at", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return chapterService.getLatestChaptersDTO(pageable);
 	}
