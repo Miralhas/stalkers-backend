@@ -38,7 +38,7 @@ public class ChapterService {
 	private final CacheManagerUtils cacheManager;
 	private final NotificationService notificationService;
 
-	@Cacheable(cacheNames = "latest.list", unless = "#result.getContent().isEmpty()")
+	@Cacheable(cacheNames = "latest.list", unless = "#result.getResults().isEmpty()")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(Pageable pageable) {
 		var latestProjections = chapterRepository.findAllLatestChaptersDTO(pageable);
 
