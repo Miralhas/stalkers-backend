@@ -1,9 +1,6 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
-import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.api.dto.MetricsDTO;
-import miralhas.github.stalkers.api.dto.NovelDTO;
-import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto.input.UpdateNovelInput;
 import miralhas.github.stalkers.domain.model.novel.Genre;
@@ -41,6 +38,8 @@ public abstract class NovelMapper {
 	public abstract NovelDTO toResponse(Novel novel);
 
 	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
+
+	public abstract NovelInfoDTO toInfoResponse(Novel novel);
 
 	public abstract List<NovelDTO> toCollectionResponse(List<Novel> novels);
 
