@@ -2,6 +2,7 @@ package miralhas.github.stalkers.api.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public record NovelDTO(
@@ -11,6 +12,8 @@ public record NovelDTO(
 		String author,
 		String status,
 		String alias,
+		OffsetDateTime createdAt,
+		OffsetDateTime updatedAt,
 		Boolean isHidden,
 		String description,
 		long chaptersCount,

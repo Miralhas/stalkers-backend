@@ -16,6 +16,7 @@ public record NovelSummaryDTO(
 		long chaptersCount,
 		Double ratingValue,
 		OffsetDateTime createdAt,
+		OffsetDateTime updatedAt,
 		int views,
 		Double bayesianScore
 ) implements Serializable {
