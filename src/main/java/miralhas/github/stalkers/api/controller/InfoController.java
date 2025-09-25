@@ -2,6 +2,7 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.GenreWithNovelsDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.NovelInfoDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
@@ -16,10 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -59,5 +57,17 @@ public class InfoController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<Genre> getAllGenres() {
 		return infoService.findAllGenres();
+	}
+
+	@GetMapping("/genres/{slug}")
+	@ResponseStatus(HttpStatus.OK)
+	public Genre getGenreBySlug(@PathVariable String slug) {
+		return infoService.findGenreBySlug(slug);
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/genres-with-novels")
+	public List<GenreWithNovelsDTO> getGenresWithNovels() {
+		return infoService.getNovelGenres();
 	}
 }
