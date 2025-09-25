@@ -1,7 +1,6 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.GenreWithNovelsDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.exception.GenreNotFoundException;
 import miralhas.github.stalkers.domain.model.novel.Genre;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,13 +44,5 @@ public class InfoService {
 		return genreRepository.findBySlug(genreSlug).orElseThrow(() -> new GenreNotFoundException(
 				errorMessages.get("genre.notFound.slug", genreSlug)
 		));
-	}
-
-	@Cacheable(value = "genres-with-novels.list", unless = "#result.empty")
-	public List<GenreWithNovelsDTO> getNovelGenres() {
-		return genreRepository.findAll().stream().map(g -> {
-			var novels = genreRepository.findGenreNovels(g.getSlug(), 3).stream().filter(Objects::nonNull).toList();
-			return new GenreWithNovelsDTO(g, novels);
-		}).toList();
 	}
 }

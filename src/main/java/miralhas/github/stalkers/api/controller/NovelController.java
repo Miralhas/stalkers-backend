@@ -48,6 +48,14 @@ public class NovelController {
 		return new PageDTO<>(novelsPage);
 	}
 
+	@GetMapping("/slugs")
+	@ResponseStatus(HttpStatus.OK)
+	public PageDTO<String> findAllNovelSlugs(
+		@PageableDefault(size = 50, sort = {"bayesianScore", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		return novelService.findAllNovelSlugs(pageable);
+	}
+
 	@GetMapping("/{novelSlug}")
 	@ResponseStatus(HttpStatus.OK)
 	public NovelDTO findBySlug(@PathVariable String novelSlug) {

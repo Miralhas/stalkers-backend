@@ -3,6 +3,7 @@ package miralhas.github.stalkers.domain.service;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.NovelDTO;
 import miralhas.github.stalkers.api.dto.NovelSummaryDTO;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.input.NovelInput;
 import miralhas.github.stalkers.api.dto.input.UpdateNovelInput;
@@ -18,13 +19,11 @@ import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -50,6 +49,12 @@ public class NovelService {
 		Page<Novel> novelsPage = novelRepository.findAll(filter.toSpecification(), pageable);
 		List<NovelSummaryDTO> novelSummaryDTOS = novelMapper.toSummaryCollectionResponse(novelsPage.getContent());
 		return new PageImpl<>(novelSummaryDTOS, pageable, novelsPage.getTotalElements());
+	}
+
+	@Cacheable(cacheNames = "novels.slugs.list", unless = "#result.results.empty")
+	public PageDTO<String> findAllNovelSlugs(Pageable pageable) {
+		var slugsPage = novelRepository.findAllNovelSlugs(pageable);
+		return new PageDTO<>(slugsPage);
 	}
 
 	@Cacheable(cacheNames = "novels.detail")
