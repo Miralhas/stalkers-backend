@@ -12,6 +12,8 @@ import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.InfoService;
+import miralhas.github.stalkers.domain.service.TagsService;
+import miralhas.github.stalkers.domain.service.interfaces.GenreService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -29,6 +31,8 @@ public class InfoController {
 	private final ChapterService chapterService;
 	private final NovelRepository novelRepository;
 	private final NovelMapper novelMapper;
+	private final GenreService genreService;
+	private final TagsService tagsService;
 
 	@GetMapping("/latest-chapters")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(
@@ -58,9 +62,15 @@ public class InfoController {
 		return infoService.findAllGenres();
 	}
 
-	@GetMapping("/genres/{slug}")
+	@GetMapping("/genres/{name}")
 	@ResponseStatus(HttpStatus.OK)
-	public Genre getGenreBySlug(@PathVariable String slug) {
-		return infoService.findGenreBySlug(slug);
+	public Genre getGenreByName(@PathVariable String name) {
+		return genreService.findGenreByNameOrException(name);
+	}
+
+	@GetMapping("/tags/{name}")
+	@ResponseStatus(HttpStatus.OK)
+	public Tag getTagByName(@PathVariable String name) {
+		return tagsService.findTagByNameOrException(name);
 	}
 }
