@@ -3,6 +3,8 @@ package miralhas.github.stalkers.domain.repository;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,6 +25,10 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			value = "SELECT IF(EXISTS(SELECT 1 FROM novel n WHERE n.slug = :slug), 'true', 'false')"
 	)
 	Boolean checkIfSlugAlreadyExists(String slug);
+
+	@Query(value = "SELECT n.slug from Novel n")
+	Page<String> findAllNovelSlugs(Pageable pageable);
+
 
 	@Query(nativeQuery = true, value = "SELECT COUNT(*) FROM chapter c WHERE c.novel_id = :novelId ORDER BY c.id")
 	Long countNovelChapters(Long novelId);

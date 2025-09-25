@@ -2,7 +2,6 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.GenreWithNovelsDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.NovelInfoDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
@@ -63,11 +62,5 @@ public class InfoController {
 	@ResponseStatus(HttpStatus.OK)
 	public Genre getGenreBySlug(@PathVariable String slug) {
 		return infoService.findGenreBySlug(slug);
-	}
-
-	@ResponseStatus(HttpStatus.OK)
-	@GetMapping("/genres-with-novels")
-	public List<GenreWithNovelsDTO> getGenresWithNovels() {
-		return infoService.getNovelGenres();
 	}
 }
