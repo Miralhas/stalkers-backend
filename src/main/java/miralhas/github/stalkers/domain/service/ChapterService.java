@@ -161,7 +161,9 @@ public class ChapterService {
 			@CacheEvict(cacheNames = "novels.detail", key = "#novelSlug")
 	})
 	public void delete(String chapterSlug, String novelSlug) {
-		chapterRepository.deleteBySlug(chapterSlug);
+		var chapter = findChapterBySlug(chapterSlug);
+		chapterRepository.delete(chapter);
+//		chapterRepository.deleteBySlug(chapterSlug);
 		cacheManager.evictNovelChaptersEntry(novelSlug);
 	}
 

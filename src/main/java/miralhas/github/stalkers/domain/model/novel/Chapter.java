@@ -3,6 +3,7 @@ package miralhas.github.stalkers.domain.model.novel;
 
 import jakarta.persistence.*;
 import lombok.*;
+import miralhas.github.stalkers.domain.model.UserLibrary;
 import miralhas.github.stalkers.domain.model.comment.ChapterReview;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,8 +13,8 @@ import org.hibernate.proxy.HibernateProxy;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static miralhas.github.stalkers.StalkersApplication.SLG;
 
@@ -57,8 +58,11 @@ public class Chapter implements Serializable {
 	@Column(nullable = true)
 	private OffsetDateTime updatedAt;
 
-	@OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	private Set<ChapterReview> reviews;
+	@OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChapterReview> reviews;
+
+	@OneToMany(mappedBy = "currentChapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserLibrary> userLibraries;
 
 	public void addReview(ChapterReview review) {
 		this.reviews.add(review);

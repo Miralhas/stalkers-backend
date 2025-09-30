@@ -51,7 +51,7 @@ public abstract class ChapterMapper {
 	ChapterSummaryDTO getPreviousChapter(Chapter chapter) {
 		if (chapter.getNumber() <= 1) return null;
 		var chapterSummary = chapterRepository.findPreviousChapter(chapter.getNovel().getId(), chapter.getNumber());
-		if (Objects.isNull(chapterSummary.id())) return null;
+		if (Objects.isNull(chapterSummary) || Objects.isNull(chapterSummary.id())) return null;
 		return chapterSummary;
 	}
 
