@@ -58,6 +58,7 @@ public class ChapterController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ChapterDTO create(@RequestBody @Valid ChapterInput chapterInput, @PathVariable String novelSlug) {
 		var novel = novelService.findBySlugOrException(novelSlug);
@@ -66,6 +67,7 @@ public class ChapterController {
 	}
 
 	@PostMapping("/save-bulk")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void createBulk(@RequestBody @Valid BulkChaptersInput chapterInputs, @PathVariable String novelSlug) {
 		var novel = novelService.findBySlugOrException(novelSlug);
@@ -74,6 +76,7 @@ public class ChapterController {
 	}
 
 	@PutMapping("/update-bulk")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void updateBulk(
 			@RequestBody @Valid BulkChaptersInput chapterInputs, @PathVariable String novelSlug
@@ -84,6 +87,7 @@ public class ChapterController {
 	}
 
 	@PutMapping("/{chapterSlug}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.OK)
 	public ChapterDTO update(
 			@PathVariable String novelSlug,
@@ -97,6 +101,7 @@ public class ChapterController {
 	}
 
 	@DeleteMapping("/{chapterSlug}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable String novelSlug, @PathVariable String chapterSlug) {
 		chapterService.delete(chapterSlug, novelSlug);
