@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChapterRepository extends JpaRepository<Chapter, Long> {
@@ -62,4 +63,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 
 	@Query("FROM Chapter c where c.novel.slug = :novelSlug AND c.number = :number")
 	Optional<Chapter> findByNovelSlugAndChapterNumber(String novelSlug, Long number);
+
+	@Query("FROM Chapter c left join fetch c.novel " +
+		"where c.novel.slug = :novelSlug AND c.number BETWEEN :min AND :max"
+	)
+	List<Chapter> chaptersBetweenRange(String novelSlug, int min, int max);
 }

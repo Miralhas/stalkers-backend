@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.ChapterDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.CommentDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto.input.CommentInput;
@@ -98,6 +99,17 @@ public class ChapterController {
 		var chapter = chapterService.findChapterBySlug(chapterSlug);
 		chapter = chapterService.update(chapter, chapterInput, novel);
 		return chapterMapper.toResponse(chapter);
+	}
+
+	@DeleteMapping("/delete-bulk")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteBulk(
+			@PathVariable String novelSlug,
+			@RequestParam(required = true, name = "range") ChaptersRange range
+	) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		chapterService.deleteBulk(range, novel);
 	}
 
 	@DeleteMapping("/{chapterSlug}")
