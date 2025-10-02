@@ -5,6 +5,7 @@ import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.LatestChaptersProjection;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
@@ -148,6 +149,18 @@ public class ChapterService {
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
 	}
 
+	@Transactional
+	@Caching(evict = {
+			@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug")
+	})
+	public void deleteBulk(ChaptersRange range, Novel novel){
+		int min = range.getFirstValue().intValue();
+		int max = range.getSecondValue().intValue();
+		var chapters = chapterRepository.chaptersBetweenRange(novel.getSlug(), min, max);
+		chapterRepository.deleteAll(chapters);
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+	}
+
 	// Cache Breakdown:
 	// 1. Evict cache for chapters.detail (cache for a single chapter)
 	// 2. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
@@ -161,7 +174,9 @@ public class ChapterService {
 			@CacheEvict(cacheNames = "novels.detail", key = "#novelSlug")
 	})
 	public void delete(String chapterSlug, String novelSlug) {
-		chapterRepository.deleteBySlug(chapterSlug);
+		var chapter = findChapterBySlug(chapterSlug);
+		chapterRepository.delete(chapter);
+//		chapterRepository.deleteBySlug(chapterSlug);
 		cacheManager.evictNovelChaptersEntry(novelSlug);
 	}
 

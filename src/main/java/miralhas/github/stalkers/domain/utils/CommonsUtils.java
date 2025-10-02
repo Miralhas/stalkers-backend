@@ -8,6 +8,7 @@ import org.owasp.html.PolicyFactory;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -129,6 +130,10 @@ public class CommonsUtils {
 		var randomNumber = random.nextInt(WORDS_ARRAY_SIZE);
 		var randomNumbers = randomNumbersGenerator(4);
 		return WORDS_ARRAY.get(randomNumber) + WORDS_ARRAY_TWO.get(randomNumber) + randomNumbers;
+	}
+
+	public int randomIntegerInRange(int min, int max) {
+		return ThreadLocalRandom.current().nextInt(min, max);
 	}
 
 	public String randomNumbersGenerator(int length) {
