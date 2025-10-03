@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.AuthorProjection;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
@@ -39,7 +40,8 @@ public class InfoService {
 		return genreRepository.findAll();
 	}
 
-	public List<AuthorProjection> getAllAuthors() {
-		return novelRepository.findAllAuthors();
+	public PageDTO<AuthorProjection> getAllAuthors(Pageable pageable) {
+		Page<AuthorProjection> allAuthors = novelRepository.findAllAuthors(pageable);
+		return new PageDTO<>(allAuthors);
 	}
 }

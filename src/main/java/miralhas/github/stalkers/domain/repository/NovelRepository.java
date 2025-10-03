@@ -70,7 +70,6 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"COUNT(*) as novelsCount, " +
 			"n.author as name " +
 			"from Novel n " +
-			"GROUP BY n.author " +
-			"ORDER BY novelsCount DESC")
-	List<AuthorProjection> findAllAuthors();
+			"GROUP BY n.author ")
+	Page<AuthorProjection> findAllAuthors(Pageable pageable);
 }

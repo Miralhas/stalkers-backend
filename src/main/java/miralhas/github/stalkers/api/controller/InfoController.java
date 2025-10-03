@@ -43,8 +43,10 @@ public class InfoController {
 	}
 
 	@GetMapping("/authors")
-	public List<AuthorProjection> getAllAuthors() {
-		return infoService.getAllAuthors();
+	public PageDTO<AuthorProjection> getAllAuthors(
+			@PageableDefault(size = 50) Pageable pageable
+	) {
+		return infoService.getAllAuthors(pageable);
 	}
 
 	@GetMapping("/info/novels")
