@@ -66,14 +66,14 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	MetricsDTO findNovelMetrics(String slug);
 
 
-	@Query("SELECT DISTINCT " +
+	@Query(value = "SELECT " +
 			"COUNT(*) as novelsCount, " +
 			"n.author as name " +
 			"from Novel n " +
-			"GROUP BY n.author ")
+			"GROUP BY n.author")
 	Page<AuthorProjection> findAllAuthors(Pageable pageable);
 
-	@Query("SELECT DISTINCT " +
+	@Query("SELECT " +
 			"COUNT(*) as novelsCount, " +
 			"n.author as name " +
 			"from Novel n " +
