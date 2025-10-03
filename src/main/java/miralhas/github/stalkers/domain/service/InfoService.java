@@ -1,7 +1,7 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.AuthorProjection;
+import miralhas.github.stalkers.api.dto.AuthorDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.exception.AuthorNotFoundException;
@@ -43,12 +43,14 @@ public class InfoService {
 		return genreRepository.findAll();
 	}
 
-	public PageDTO<AuthorProjection> getAllAuthors(Pageable pageable) {
-		Page<AuthorProjection> allAuthors = novelRepository.findAllAuthors(pageable);
+	@Cacheable("authors.list")
+	public PageDTO<AuthorDTO> getAllAuthors(Pageable pageable) {
+		Page<AuthorDTO> allAuthors = novelRepository.findAllAuthors(pageable);
 		return new PageDTO<>(allAuthors);
 	}
 
-	public AuthorProjection findAuthorByName(String name) {
+	@Cacheable("authors.detail")
+	public AuthorDTO findAuthorByName(String name) {
 		return novelRepository.findAuthorByName(name).orElseThrow(() -> new AuthorNotFoundException(
 				errorMessages.get("author.notFound", name)
 		));
