@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.AuthorProjection;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
+import miralhas.github.stalkers.domain.exception.AuthorNotFoundException;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.GenreRepository;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.repository.TagRepository;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ public class InfoService {
 	private final TagRepository tagRepository;
 	private final GenreRepository genreRepository;
 	private final NovelRepository novelRepository;
+	private final ErrorMessages errorMessages;
 
 	@Cacheable(cacheNames = "tags.list")
 	public Page<Tag> findAllTags(TagFilter filter, Pageable pageable) {
@@ -43,5 +46,11 @@ public class InfoService {
 	public PageDTO<AuthorProjection> getAllAuthors(Pageable pageable) {
 		Page<AuthorProjection> allAuthors = novelRepository.findAllAuthors(pageable);
 		return new PageDTO<>(allAuthors);
+	}
+
+	public AuthorProjection findAuthorByName(String name) {
+		return novelRepository.findAuthorByName(name).orElseThrow(() -> new AuthorNotFoundException(
+				errorMessages.get("author.notFound", name)
+		));
 	}
 }

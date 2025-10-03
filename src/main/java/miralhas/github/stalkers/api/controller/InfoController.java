@@ -44,9 +44,13 @@ public class InfoController {
 
 	@GetMapping("/authors")
 	public PageDTO<AuthorProjection> getAllAuthors(
-			@PageableDefault(size = 50) Pageable pageable
+			@PageableDefault(size = 50, sort = {"novelsCount", "name"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return infoService.getAllAuthors(pageable);
+	}
+	@GetMapping("/authors/{name}")
+	public AuthorProjection getAuthorByName(@PathVariable String name) {
+		return infoService.findAuthorByName(name);
 	}
 
 	@GetMapping("/info/novels")
