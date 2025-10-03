@@ -2,6 +2,7 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.AuthorProjection;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.NovelInfoDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
@@ -39,6 +40,13 @@ public class InfoController {
 			@PageableDefault(size = 100, sort = {"created_at", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return chapterService.getLatestChaptersDTO(pageable);
+	}
+
+	@GetMapping("/authors")
+	public PageDTO<AuthorProjection> getAllAuthors(
+			@PageableDefault(size = 50) Pageable pageable
+	) {
+		return infoService.getAllAuthors(pageable);
 	}
 
 	@GetMapping("/info/novels")

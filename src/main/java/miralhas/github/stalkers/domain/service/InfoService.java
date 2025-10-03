@@ -1,10 +1,13 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.AuthorProjection;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.GenreRepository;
+import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.repository.TagRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,7 @@ public class InfoService {
 
 	private final TagRepository tagRepository;
 	private final GenreRepository genreRepository;
+	private final NovelRepository novelRepository;
 
 	@Cacheable(cacheNames = "tags.list")
 	public Page<Tag> findAllTags(TagFilter filter, Pageable pageable) {
@@ -36,4 +40,8 @@ public class InfoService {
 		return genreRepository.findAll();
 	}
 
+	public PageDTO<AuthorProjection> getAllAuthors(Pageable pageable) {
+		Page<AuthorProjection> allAuthors = novelRepository.findAllAuthors(pageable);
+		return new PageDTO<>(allAuthors);
+	}
 }

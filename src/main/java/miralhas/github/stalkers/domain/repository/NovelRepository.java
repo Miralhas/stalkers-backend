@@ -1,5 +1,6 @@
 package miralhas.github.stalkers.domain.repository;
 
+import miralhas.github.stalkers.api.dto.AuthorProjection;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.domain.model.novel.Novel;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -63,4 +65,11 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"from Novel n where n.slug = :slug")
 	MetricsDTO findNovelMetrics(String slug);
 
+
+	@Query("SELECT DISTINCT " +
+			"COUNT(*) as novelsCount, " +
+			"n.author as name " +
+			"from Novel n " +
+			"GROUP BY n.author ")
+	Page<AuthorProjection> findAllAuthors(Pageable pageable);
 }
