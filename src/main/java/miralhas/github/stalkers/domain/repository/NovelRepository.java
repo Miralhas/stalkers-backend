@@ -65,12 +65,13 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	MetricsDTO findNovelMetrics(String slug);
 
 	@SuppressWarnings("JpaQlInspection")
-	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author, COUNT(n) as novelsCount) " +
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author as name, COUNT(n) as novelsCount) " +
 			"from Novel n " +
 			"GROUP BY n.author")
 	Page<AuthorDTO> findAllAuthors(Pageable pageable);
 
-	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author, COUNT(n)) " +
+	@SuppressWarnings("JpaQlInspection")
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author as name, COUNT(n) as novelsCount) " +
 			"from Novel n " +
 			"where n.author = :name " +
 			"GROUP BY n.author ")
