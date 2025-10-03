@@ -1,6 +1,6 @@
 package miralhas.github.stalkers.domain.repository;
 
-import miralhas.github.stalkers.api.dto.AuthorProjection;
+import miralhas.github.stalkers.api.dto.AuthorDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.domain.model.novel.Novel;
@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,19 +64,15 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"from Novel n where n.slug = :slug")
 	MetricsDTO findNovelMetrics(String slug);
 
-
-	@Query(value = "SELECT " +
-			"COUNT(*) as novelsCount, " +
-			"n.author as name " +
+	@SuppressWarnings("JpaQlInspection")
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author, COUNT(n) as novelsCount) " +
 			"from Novel n " +
 			"GROUP BY n.author")
-	Page<AuthorProjection> findAllAuthors(Pageable pageable);
+	Page<AuthorDTO> findAllAuthors(Pageable pageable);
 
-	@Query("SELECT " +
-			"COUNT(*) as novelsCount, " +
-			"n.author as name " +
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author, COUNT(n)) " +
 			"from Novel n " +
 			"where n.author = :name " +
 			"GROUP BY n.author ")
-	Optional<AuthorProjection> findAuthorByName(String name);
+	Optional<AuthorDTO> findAuthorByName(String name);
 }
