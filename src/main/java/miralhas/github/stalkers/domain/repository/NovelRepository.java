@@ -72,4 +72,12 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"from Novel n " +
 			"GROUP BY n.author ")
 	Page<AuthorProjection> findAllAuthors(Pageable pageable);
+
+	@Query("SELECT DISTINCT " +
+			"COUNT(*) as novelsCount, " +
+			"n.author as name " +
+			"from Novel n " +
+			"where n.author = :name " +
+			"GROUP BY n.author ")
+	Optional<AuthorProjection> findAuthorByName(String name);
 }
