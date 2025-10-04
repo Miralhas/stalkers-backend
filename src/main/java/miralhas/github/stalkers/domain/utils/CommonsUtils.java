@@ -158,7 +158,7 @@ public class CommonsUtils {
 		if (words.length <= 2) {
 			return Arrays.stream(words)
 				.filter(org.springframework.util.StringUtils::hasText)
-				.map(word -> word.length() > 2 ? word.substring(0, 2) : word.substring(0, 1))
+				.map(word -> word.length() <= 12 ? word : word.charAt(0) + randomNumbersGenerator(3))
 				.collect(Collectors.joining());
 		}
 
