@@ -1,5 +1,7 @@
 package miralhas.github.stalkers.domain.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
@@ -38,6 +40,9 @@ public class ChapterService {
 	private final ChapterMapper chapterMapper;
 	private final CacheManagerUtils cacheManager;
 	private final NotificationService notificationService;
+
+	@PersistenceContext
+	private final EntityManager entityManager;
 
 	@Cacheable(cacheNames = "latest.list", unless = "#result.getResults().isEmpty()")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(Pageable pageable) {
@@ -147,6 +152,34 @@ public class ChapterService {
 		}).toList();
 		chapterRepository.saveAll(editedChapters);
 		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+	}
+
+	@Transactional
+	@Caching(
+			evict = {
+					@CacheEvict(cacheNames = "novels.detail", key = "#novel.slug"),
+					@CacheEvict(cacheNames = "chapters.detail", allEntries = true),
+			}
+	)
+	public void updateBulkChuking(BulkChaptersInput chaptersInput, Novel novel) {
+		var chunkSize = 500;
+		for (int i = 0; i < chaptersInput.chapters().size(); i+= chunkSize) {
+			var chunk = chaptersInput.chapters().subList(i, Math.min(i + chunkSize, chaptersInput.chapters().size()));
+			updateChunk(chunk, novel);
+		}
+		cacheManager.evictNovelChaptersEntry(novel.getSlug());
+	}
+
+	private void updateChunk(List<ChapterInput> chunk, Novel novel) {
+		var editedChapters = chunk.stream().map(input -> {
+			var chapter = findByNovelSlugAndChapterNumber(novel.getSlug(), input.number());
+			chapterMapper.update(input, chapter);
+			return chapter;
+		}).toList();
+
+		chapterRepository.saveAll(editedChapters);
+		chapterRepository.flush(); // Force flush to avoid memory buildup
+		entityManager.clear(); // Clear persistence context to free memory
 	}
 
 	@Transactional

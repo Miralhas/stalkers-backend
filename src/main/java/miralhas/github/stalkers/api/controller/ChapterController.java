@@ -83,7 +83,7 @@ public class ChapterController {
 			@RequestBody @Valid BulkChaptersInput chapterInputs, @PathVariable String novelSlug
 	) {
 		var novel = novelService.findBySlugOrException(novelSlug);
-		chapterService.updateBulk(chapterInputs, novel);
+		chapterService.updateBulkChuking(chapterInputs, novel);
 
 	}
 
