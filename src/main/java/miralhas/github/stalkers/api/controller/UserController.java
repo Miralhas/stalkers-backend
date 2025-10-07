@@ -105,6 +105,14 @@ public class UserController  {
 		return imageMapper.toResponse(image);
 	}
 
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
+	public void deleteUser(@PathVariable Long id) {
+		var user = userService.findUserByIdOrException(id);
+		userService.deleteUser(user);
+	}
+
 	@DeleteMapping("/{id}/image")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteUserImage(@PathVariable Long id) {
