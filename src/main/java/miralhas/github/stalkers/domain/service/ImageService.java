@@ -84,7 +84,6 @@ public class ImageService {
 	public void delete(Image image) {
 		image = getImageJsonByEntityOrException(image);
 		imageRepository.delete(image);
-		imageRepository.flush();
 		imageStorageService.remove(image.getFileName());
 	}
 }
