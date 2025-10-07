@@ -7,6 +7,7 @@ import miralhas.github.stalkers.api.dto_mapper.UserMapper;
 import miralhas.github.stalkers.domain.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.repository.ImageRepository;
 import miralhas.github.stalkers.domain.repository.UserRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import miralhas.github.stalkers.domain.utils.ValidateAuthorization;
@@ -34,6 +35,7 @@ public class UserService  {
 	private final UserMapper userMapper;
 	private final ImageService imageService;
 	private final ValidateAuthorization validateAuthorization;
+	private final ImageRepository imageRepository;
 
 	@Cacheable
 	public List<User> findAll() {
@@ -102,6 +104,14 @@ public class UserService  {
 		user.setImage(image);
 		userRepository.saveAndFlush(user);
 		return imageService.getImageJsonOrException(image.getId());
+	}
+
+	@Transactional
+	public void deleteUser(User user) {
+		if (imageRepository.checkIfUserHasImage(user.getId())) {
+			imageService.delete(user.getImage());
+		}
+		userRepository.delete(user);
 	}
 
 	@Transactional
