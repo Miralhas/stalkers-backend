@@ -36,7 +36,7 @@ public class AuthenticationService {
 	@Transactional
 	public AuthenticationDTO generateTokens(User user) {
 		var jwt = tokenService.generateToken(user);
-		var refreshToken = refreshTokenService.save(user);
+//		var refreshToken = refreshTokenService.save(user);
 		return new AuthenticationDTO(
 				jwt.getTokenValue(),
 //				refreshToken.getId().toString(),

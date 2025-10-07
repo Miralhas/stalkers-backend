@@ -14,4 +14,9 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 	@Modifying
 	@Query(value = "delete from Image i where i.fileName = :fileName")
 	void deleteImageByFileName(String fileName);
+
+	@Query("SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END FROM Image i " +
+			"LEFT JOIN User u ON u.image.id = i.id " +
+			"WHERE u.id = :userId")
+	boolean checkIfUserHasImage(Long userId);
 }
