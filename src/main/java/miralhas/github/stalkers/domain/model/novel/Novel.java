@@ -131,7 +131,7 @@ public class Novel implements Serializable {
 	}
 
 	public void viewsPlusRandom() {
-		this.views += CommonsUtils.randomIntegerInRange(1, 25);
+		this.views += CommonsUtils.randomIntegerInRange(1, 5);
 	}
 
 	public void addReview(NovelReview review) {
