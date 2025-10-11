@@ -1,5 +1,6 @@
 package miralhas.github.stalkers.domain.repository;
 
+import miralhas.github.stalkers.api.dto.ChapterSlimProjection;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.LatestChaptersProjection;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
@@ -68,4 +69,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 		"where c.novel.slug = :novelSlug AND c.number BETWEEN :min AND :max"
 	)
 	List<Chapter> chaptersBetweenRange(String novelSlug, int min, int max);
+
+	@Query("FROM Chapter c left join fetch c.novel " +
+			"where c.novel.slug = :novelSlug AND c.number BETWEEN :min AND :max"
+	)
+	List<ChapterSlimProjection> slimChaptersBetweenRange(String novelSlug, int min, int max);
 }

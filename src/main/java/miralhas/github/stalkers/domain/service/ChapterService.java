@@ -3,10 +3,7 @@ package miralhas.github.stalkers.domain.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.api.dto.LatestChapterDTO;
-import miralhas.github.stalkers.api.dto.LatestChaptersProjection;
-import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
@@ -85,10 +82,10 @@ public class ChapterService {
 		));
 	}
 
-	public List<Chapter> getChaptersInRange(ChaptersRange range, Novel novel) {
+	public List<ChapterSlimProjection> getSlimChaptersInRange(ChaptersRange range, Novel novel) {
 		int min = range.getFirstValue().intValue();
 		int max = range.getSecondValue().intValue();
-		return chapterRepository.chaptersBetweenRange(novel.getSlug(), min, max);
+		return chapterRepository.slimChaptersBetweenRange(novel.getSlug(), min, max);
 	}
 
 	// Cache Breakdown:

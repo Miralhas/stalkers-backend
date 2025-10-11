@@ -3,7 +3,6 @@ package miralhas.github.stalkers.domain.service;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
-import miralhas.github.stalkers.domain.exception.BusinessException;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -22,7 +21,7 @@ public class DownloadService {
 	private final TemplateEngine templateEngine;
 
 	public void novelHTMLToPDF(Novel novel, ChaptersRange range, OutputStream outputStream) {
-		var chapters = chapterService.getChaptersInRange(range, novel);
+		var chapters = chapterService.getSlimChaptersInRange(range, novel);
 		try {
 			var context = new Context();
 			context.setVariable("novel", novel);

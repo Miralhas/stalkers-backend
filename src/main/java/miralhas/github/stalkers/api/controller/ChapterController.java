@@ -2,10 +2,7 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ChapterDTO;
-import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.api.dto.CommentDTO;
-import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.*;
 import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.api.dto.input.BulkChaptersInput;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
@@ -56,6 +53,13 @@ public class ChapterController {
 	public ChapterDTO getChapterBySlug(@PathVariable String chapterSlug, @PathVariable String novelSlug) {
 		var chapter = chapterService.findChapterBySlugOrExceptionCacheable(chapterSlug);
 		return chapterMapper.toResponse(chapter);
+	}
+
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/range")
+	public List<ChapterSlimProjection> getChaptersInRange(@PathVariable String novelSlug, @RequestParam(name = "range") ChaptersRange range) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		return chapterService.getSlimChaptersInRange(range, novel);
 	}
 
 	@PostMapping
