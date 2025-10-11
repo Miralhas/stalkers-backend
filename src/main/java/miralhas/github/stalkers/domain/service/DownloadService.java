@@ -37,7 +37,7 @@ public class DownloadService {
 				builder.run();
 			}
 		} catch (Exception e) {
-			throw new BusinessException("Error generating HTML PDF", e);
+			throw new RuntimeException("Error generating HTML PDF", e);
 		}
 	}
 
