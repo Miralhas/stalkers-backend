@@ -42,7 +42,7 @@ public class ChapterController {
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<ChapterSummaryDTO> getAllChaptersByNovelId(
 			@PathVariable String novelSlug,
-			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.ASC) Pageable pageable
+			@PageableDefault(size = 100, sort = {"number", "id"}, direction = Sort.Direction.ASC) Pageable pageable
 	) {
 		var chaptersPage = chapterService.findAllByNovelSlug(novelSlug, pageable);
 		List<ChapterSummaryDTO> chapterSummaryDTOs = chaptersPage.getContent();

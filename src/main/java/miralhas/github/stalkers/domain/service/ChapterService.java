@@ -85,6 +85,12 @@ public class ChapterService {
 		));
 	}
 
+	public List<Chapter> getChaptersInRange(ChaptersRange range, Novel novel) {
+		int min = range.getFirstValue().intValue();
+		int max = range.getSecondValue().intValue();
+		return chapterRepository.chaptersBetweenRange(novel.getSlug(), min, max);
+	}
+
 	// Cache Breakdown:
 	// 2. Evict cache for novels.detail (cache for a single novel). This entry is deleted because the object cached
 	// 		in novels.detail contains 2 fields that are related to chapters (firstChapter and lastChapter).
