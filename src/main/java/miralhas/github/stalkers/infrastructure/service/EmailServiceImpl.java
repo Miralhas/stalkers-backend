@@ -41,9 +41,10 @@ public class EmailServiceImpl implements SendEmailService {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 		helper.setText(body, true);
+		helper.setFrom("DevilSect <noreply@devilsect.com>");
 		helper.setSubject(message.getSubject());
 		helper.setTo(recipients);
-		helper.addInline("logo", new ClassPathResource("static/images/stalkers-logo-resized.png"));
+		helper.addInline("logo", new ClassPathResource("static/images/stalkers-logo.png"));
 		return mimeMessage;
 	}
 
