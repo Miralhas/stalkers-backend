@@ -24,6 +24,8 @@ services:
       - "--slow_query_log=ON"
       - "--slow_query_log_file=/var/log/mysql-slow.log"
       - "--long_query_time=3"
+      - "--log_queries_not_using_indexes=ON"
+      - "--min_examined_row_limit=1000"
     container_name: "mysqldb"
     ports:
       - "3307:3306"
