@@ -14,13 +14,22 @@ services:
 
   mysqldb:
     image: mysql:8.0.33
-    command: --skip-performance-schema --skip-mysqlx
+    command:
+      - "--performance-schema=ON"
+      - "--skip-mysqlx"
+      - "--innodb-buffer-pool-size=2G"
+      - "--innodb-log-buffer-size=256M"
+      - "--innodb-buffer-pool-instances=2"
+      - "--join-buffer-size=1M"
+      - "--slow_query_log=ON"
+      - "--slow_query_log_file=/var/log/mysql-slow.log"
+      - "--long_query_time=3"
     container_name: "mysqldb"
     ports:
       - "3307:3306"
     environment:
       - MYSQL_DATABASE=stalkers
-      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_ROOT_PASSWORD=${DATASOURCE_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
