@@ -65,10 +65,10 @@ public class NovelController {
 	@ResponseStatus(HttpStatus.OK)
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{novelSlug}")
-	public NovelDTO updateNovel(@PathVariable String novelSlug, @RequestBody @Valid UpdateNovelInput input) {
+	public NovelSummaryDTO updateNovel(@PathVariable String novelSlug, @RequestBody @Valid UpdateNovelInput input) {
 		var novel = novelService.findBySlugOrException(novelSlug);
 		novel = novelService.update(input, novel);
-		return novelMapper.toResponse(novel);
+		return novelMapper.toSummaryResponse(novel);
 	}
 
 	@DeleteMapping("/{novelSlug}")
@@ -81,9 +81,9 @@ public class NovelController {
 	@PostMapping
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@ResponseStatus(HttpStatus.CREATED)
-	public NovelDTO createNovel(@RequestBody @Valid NovelInput novelInput) {
+	public NovelSummaryDTO createNovel(@RequestBody @Valid NovelInput novelInput) {
 		Novel novel = novelService.save(novelInput);
-		return novelMapper.toResponse(novel);
+		return novelMapper.toSummaryResponse(novel);
 	}
 
 	@ResponseStatus(HttpStatus.OK)
