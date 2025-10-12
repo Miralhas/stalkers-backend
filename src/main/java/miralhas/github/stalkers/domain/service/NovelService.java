@@ -59,11 +59,17 @@ public class NovelService {
 
 	@Cacheable(cacheNames = "novels.detail")
 	public NovelDTO findBySlugOrExceptionCacheable(String slug) {
-		return novelMapper.toResponse(findBySlugOrException(slug));
+		return novelMapper.toResponse(findBySlugWithTagsAndGenresOrException(slug));
 	}
 
 	public Novel findBySlugOrException(String slug) {
 		return novelRepository.findBySlug(slug).orElseThrow(() -> new NovelNotFoundException(
+				errorMessages.get("novel.notFound.slug", slug)
+		));
+	}
+
+	public Novel findBySlugWithTagsAndGenresOrException(String slug) {
+		return novelRepository.findBySlugWithTagsAndGenres(slug).orElseThrow(() -> new NovelNotFoundException(
 				errorMessages.get("novel.notFound.slug", slug)
 		));
 	}
