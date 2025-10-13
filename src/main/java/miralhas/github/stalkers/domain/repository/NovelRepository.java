@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,8 +20,11 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 	@Query("SELECT DISTINCT n FROM Novel n WHERE n.slug = :slug")
 	Optional<Novel> findBySlug(String slug);
 
-	@Query("SELECT DISTINCT n FROM Novel n LEFT JOIN FETCH n.tags LEFT JOIN FETCH n.genres WHERE n.slug = :slug")
-	Optional<Novel> findBySlugWithTagsAndGenres(String slug);
+	@Query("SELECT t.name from Novel n left join n.tags t where n.id = :id")
+	List<String> findAllNovelTagsByNovelId(Long id);
+
+	@Query("SELECT t.name from Novel n left join n.genres t where n.id = :id")
+	List<String> findAllNovelGenresByNovelId(Long id);
 
 	@Query(nativeQuery = true,
 			value = "SELECT IF(EXISTS(SELECT 1 FROM novel n WHERE n.slug = :slug), 'true', 'false')"
