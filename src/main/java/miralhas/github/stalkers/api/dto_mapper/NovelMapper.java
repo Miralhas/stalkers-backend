@@ -29,18 +29,16 @@ public abstract class NovelMapper {
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel fromInput(NovelInput novelInput);
 
-	@Mapping(target = "tags", qualifiedByName = "tagsMapper")
-	@Mapping(target = "genres", qualifiedByName = "genresMapper")
+	@Mapping(target = "tags", expression = "java(tagsMapper(tags))")
+	@Mapping(target = "genres", expression = "java(genresMapper(genres))")
 	@Mapping(target = "firstChapter", expression = "java(getFirstChapter(novel))")
 	@Mapping(target = "lastChapter", expression = "java(getLastChapter(novel))")
 	@Mapping(target = "metrics", expression = "java(metricsMapper(novel))")
-	public abstract NovelDTO toResponse(Novel novel);
+	public abstract NovelDTO toResponse(Novel novel, List<String> genres, List<String> tags);
 
 	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
 
 	public abstract NovelInfoDTO toInfoResponse(Novel novel);
-
-	public abstract List<NovelDTO> toCollectionResponse(List<Novel> novels);
 
 	public abstract List<NovelSummaryDTO> toSummaryCollectionResponse(List<Novel> novels);
 
@@ -73,13 +71,13 @@ public abstract class NovelMapper {
 	}
 
 	@Named("tagsMapper")
-	String tagsMapper(Tag tag) {
-		return tag.getName();
+	List<String> tagsMapper(List<String> tags) {
+		return tags;
 	}
 
 	@Named("genresMapper")
-	String genresMapper(Genre genre) {
-		return genre.getName();
+	List<String> genresMapper(List<String> genres) {
+		return genres;
 	}
 
 	@Named("tagsInputMapper")
