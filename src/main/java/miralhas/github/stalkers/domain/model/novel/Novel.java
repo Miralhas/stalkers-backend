@@ -97,7 +97,7 @@ public class Novel implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Image image;
 
-	@Formula("(SELECT COUNT(*) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
+	@Formula("(SELECT COUNT(DISTINCT c.id) FROM chapter c WHERE c.novel_id = id ORDER BY c.id)")
 	private long chaptersCount;
 
 	@Formula("(SELECT ROUND(AVG(r.rating_value),2) FROM rating r WHERE r.novel_id = id)")
