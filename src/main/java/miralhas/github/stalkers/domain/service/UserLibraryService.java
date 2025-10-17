@@ -41,8 +41,6 @@ public class UserLibraryService {
 		));
 	}
 
-
-
 	@Cacheable(
 			cacheNames = "user.library.list",
 			key = "{#user.getEmail(), #filter, #pageable}",
@@ -68,11 +66,9 @@ public class UserLibraryService {
 		var optionalNovelHistory = userLibraryRepository
 				.findNovelInUserLibraryByUserIdAndNovelId(novel.getId(), user.getId());
 
-		UserLibrary userLibrary;
-
 		cacheManagerUtils.evictUserLibraryEntry(user.getEmail());
 
-		// user já tem essa novel na biblioteca.
+		// user already has this novel in their library.
 		if (optionalNovelHistory.isPresent()) {
 			var novelHistory = optionalNovelHistory.get();
 			novelHistory.setCurrentChapter(chapter);
@@ -81,7 +77,7 @@ public class UserLibraryService {
 			return;
 		}
 
-		userLibrary = UserLibrary.builder()
+		UserLibrary userLibrary = UserLibrary.builder()
 				.user(user)
 				.currentChapter(chapter)
 				.novel(novel)
@@ -159,6 +155,7 @@ public class UserLibraryService {
 
 	private Page<Object[]> getUserLibrary(User user, LibraryFilter filter, Pageable pageable) {
 		Page<Object[]> userLibrary;
+
 		if (filter.isBookmarked()) {
 			userLibrary = userLibraryRepository.findUserLibraryBookmarkByUserId(user.getId(), pageable);
 		} else if (filter.isCompleted()) {
@@ -168,6 +165,7 @@ public class UserLibraryService {
 		} else {
 			userLibrary = userLibraryRepository.findUserLibraryByUserId(user.getId(), pageable);
 		}
+
 		return userLibrary;
 	}
 

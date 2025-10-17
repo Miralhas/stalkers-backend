@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.AuthorDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.NovelInfoDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.model.novel.Genre;
@@ -54,8 +55,8 @@ public class InfoController {
 	}
 
 	@GetMapping("/info/novels")
-	public List<NovelInfoDTO> getAllNovelsInfo() {
-		return novelRepository.findAll().stream().map(novelMapper::toInfoResponse).toList();
+	public List<NovelInfoDTO> getAllNovelsInfo(@Valid NovelFilter filter) {
+		return novelRepository.findAll(filter.toSpecification()).stream().map(novelMapper::toInfoResponse).toList();
 	}
 
 	@GetMapping("/tags")
