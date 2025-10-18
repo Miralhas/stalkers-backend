@@ -17,10 +17,6 @@ services:
     command:
       - "--skip-performance-schema"
       - "--skip-mysqlx"
-      - "--innodb-buffer-pool-size=2G"
-      - "--innodb-log-buffer-size=512M"
-      - "--innodb-buffer-pool-instances=2"
-      - "--join-buffer-size=2M"
     container_name: "mysqldb"
     ports:
       - "3307:3306"
