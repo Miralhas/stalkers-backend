@@ -2,17 +2,19 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
 import miralhas.github.stalkers.domain.service.NovelService;
 import miralhas.github.stalkers.domain.service.RequestService;
 import miralhas.github.stalkers.domain.service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +27,10 @@ public class RequestController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<RequestDTO> findAllRequests() {
-		return requestService.findAll();
+	public PageDTO<RequestDTO> findAllRequests(
+			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		return requestService.findAll(pageable);
 	}
 
 	@PostMapping("/novels")
@@ -50,6 +54,20 @@ public class RequestController {
 		var user = userService.findUserByEmailOrException(authToken.getName());
 		var novel = novelService.findBySlugOrException(novelSlug);
 		requestService.createChapterRequest(novel, user);
+	}
+
+	@PutMapping("/{id}/complete")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void completeRequest(@PathVariable Long id) {
+		requestService.complete(id);
+	}
+
+	@PutMapping("/{id}/deny")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void denyRequest(@PathVariable Long id) {
+		requestService.deny(id);
 	}
 
 }

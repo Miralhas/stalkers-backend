@@ -6,10 +6,10 @@ import java.time.OffsetDateTime;
 
 public record NovelRequestDTO(
 		Long id,
+		String status,
+		String type,
 		OffsetDateTime createdAt,
 		String novelTitle,
-		String type,
-		String status,
 		UserDTO user
 ) implements RequestDTO {
 }

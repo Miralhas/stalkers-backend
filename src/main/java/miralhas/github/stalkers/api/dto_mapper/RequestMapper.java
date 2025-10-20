@@ -23,10 +23,9 @@ public class RequestMapper {
 		return switch (request) {
 			case ChapterRequest chapterRequest -> mapToChapterRequest(chapterRequest);
 			case NovelRequest novelRequest -> mapToNovelRequest(novelRequest);
-			case null, default ->
-					throw new InternalServerError(
-							"Unsupported Request type: " + Objects.requireNonNull(request).getClass().getName()
-					);
+			case null, default -> throw new InternalServerError(
+					"Unsupported Request type: " + Objects.requireNonNull(request).getClass().getName()
+			);
 
 		};
 	}
@@ -36,11 +35,11 @@ public class RequestMapper {
 		var userDTO = userMapper.toResponse(chapterRequest.getUser());
 		return new ChapterRequestDTO(
 				chapterRequest.getId(),
+				chapterRequest.getStatus().name(),
+				chapterRequest.getRequestType(),
 				chapterRequest.getCreatedAt(),
 				novelInfoDTO,
-				chapterRequest.getRequestType(),
-				userDTO,
-				chapterRequest.getStatus().name()
+				userDTO
 		);
 	}
 
@@ -48,10 +47,10 @@ public class RequestMapper {
 		var userDTO = userMapper.toResponse(novelRequest.getUser());
 		return new NovelRequestDTO(
 				novelRequest.getId(),
+				novelRequest.getStatus().name(),
+				novelRequest.getRequestType(),
 				novelRequest.getCreatedAt(),
 				novelRequest.getNovelTitle(),
-				novelRequest.getRequestType(),
-				novelRequest.getStatus().name(),
 				userDTO
 		);
 	}

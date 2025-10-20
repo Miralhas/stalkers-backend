@@ -6,11 +6,11 @@ import java.time.OffsetDateTime;
 
 public record ChapterRequestDTO(
 		Long id,
+		String status,
+		String type,
 		OffsetDateTime createdAt,
 		NovelInfoDTO novel,
-		String type,
-		UserDTO user,
-		String status
+		UserDTO user
 ) implements RequestDTO {
 
 }

@@ -1,17 +1,24 @@
 package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
 import miralhas.github.stalkers.api.dto_mapper.RequestMapper;
+import miralhas.github.stalkers.domain.exception.BusinessException;
+import miralhas.github.stalkers.domain.exception.NovelNotFoundException;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.model.requests.BaseRequest;
 import miralhas.github.stalkers.domain.model.requests.ChapterRequest;
 import miralhas.github.stalkers.domain.repository.RequestRepository;
+import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +27,24 @@ public class RequestService {
 
 	private final RequestRepository requestRepository;
 	private final RequestMapper requestMapper;
+	private final ErrorMessages errorMessages;
 
-	public List<RequestDTO> findAll() {
-		return requestRepository.findAll().stream().map(requestMapper::toResponse).toList();
+	@Cacheable(cacheNames = "requests.list", unless = "#result.results.empty")
+	public PageDTO<RequestDTO> findAll(Pageable pageable) {
+		var pages = requestRepository.findAll(pageable);
+		var dtos = pages.getContent().stream().map(requestMapper::toResponse).toList();
+		var dtosPaged = new PageImpl<>(dtos, pageable, pages.getTotalElements());
+		return new PageDTO<>(dtosPaged);
+	}
+
+	public BaseRequest findRequestByIdOrException(Long id) {
+		return requestRepository.findById(id).orElseThrow(() -> new NovelNotFoundException(
+				errorMessages.get("request.notFound", id)
+		));
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = "requests.list", allEntries = true)
 	public void createNovelRequest(NovelRequestInput input, User user) {
 		var request = input.toNovelRequest();
 		request.setUser(user);
@@ -33,18 +52,34 @@ public class RequestService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = "requests.list", allEntries = true)
 	public void createChapterRequest(Novel novel, User user) {
+		validateNovelRequest(novel);
 		ChapterRequest request = new ChapterRequest();
 		request.setUser(user);
 		request.setNovel(novel);
 		requestRepository.save(request);
 	}
 
-	public void complete() {
-
+	@Transactional
+	@CacheEvict(cacheNames = "requests.list", allEntries = true)
+	public void complete(Long id) {
+		var request = findRequestByIdOrException(id);
+		request.complete();
+		requestRepository.save(request);
 	}
 
-	public void deny() {
+	@Transactional
+	@CacheEvict(cacheNames = "requests.list", allEntries = true)
+	public void deny(Long id) {
+		var request = findRequestByIdOrException(id);
+		request.deny();
+		requestRepository.save(request);
+	}
 
+	private void validateNovelRequest(Novel novel) {
+		if (novel.isCompleted()) throw new BusinessException(
+				errorMessages.get("request.chapters.invalidStatus")
+		);
 	}
 }

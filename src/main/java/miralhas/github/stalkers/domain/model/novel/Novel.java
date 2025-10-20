@@ -126,6 +126,10 @@ public class Novel implements Serializable {
 		++this.views;
 	}
 
+	public boolean isCompleted() {
+		return this.status.equals(Status.COMPLETED);
+	}
+
 	public void viewsPlusThousand() {
 		this.views += 1000;
 	}
