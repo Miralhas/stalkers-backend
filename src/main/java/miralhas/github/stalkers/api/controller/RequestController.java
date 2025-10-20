@@ -2,6 +2,8 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.dto.ChapterRequestDTO;
+import miralhas.github.stalkers.api.dto.NovelRequestDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.RequestFilter;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
@@ -38,24 +40,24 @@ public class RequestController {
 	@PostMapping("/novels")
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createNovelRequest(
+	public RequestDTO createNovelRequest(
 			@RequestBody @Valid NovelRequestInput input,
 			JwtAuthenticationToken authToken
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
-		requestService.createNovelRequest(input, user);
+		return requestService.createNovelRequest(input, user);
 	}
 
 	@PostMapping("/novels/{novelSlug}")
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createChapterRequest(
+	public RequestDTO createChapterRequest(
 			JwtAuthenticationToken authToken,
 			@PathVariable String novelSlug
 	) {
 		var user = userService.findUserByEmailOrException(authToken.getName());
 		var novel = novelService.findBySlugOrException(novelSlug);
-		requestService.createChapterRequest(novel, user);
+		return requestService.createChapterRequest(novel, user);
 	}
 
 	@PutMapping("/{id}/complete")

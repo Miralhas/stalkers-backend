@@ -21,15 +21,14 @@ public record RequestFilter(
 
 	@Getter
 	@RequiredArgsConstructor
-	enum TypeEnum {
+	public enum TypeEnum {
 		CHAPTER(BaseRequest.CHAPTER_REQUEST),
 		NOVEL(BaseRequest.NOVEL_REQUEST);
 		private final String requestType;
 	}
 
 	public Specification<BaseRequest> toSpecification() {
-		var requestType = TypeEnum.valueOf(this.type).getRequestType();
-		return statusEquals(status).and(requestTypeEquals(requestType));
+		return statusEquals(status).and(requestTypeEquals(type));
 	}
 
 }

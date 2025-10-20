@@ -46,20 +46,22 @@ public class RequestService {
 
 	@Transactional
 	@CacheEvict(cacheNames = "requests.list", allEntries = true)
-	public void createNovelRequest(NovelRequestInput input, User user) {
+	public RequestDTO createNovelRequest(NovelRequestInput input, User user) {
 		var request = input.toNovelRequest();
 		request.setUser(user);
-		requestRepository.save(request);
+		request = requestRepository.saveAndFlush(request);
+		return requestMapper.toResponse(request);
 	}
 
 	@Transactional
 	@CacheEvict(cacheNames = "requests.list", allEntries = true)
-	public void createChapterRequest(Novel novel, User user) {
+	public RequestDTO createChapterRequest(Novel novel, User user) {
 		validateNovelRequest(novel);
 		ChapterRequest request = new ChapterRequest();
 		request.setUser(user);
 		request.setNovel(novel);
-		requestRepository.save(request);
+		request = requestRepository.saveAndFlush(request);
+		return requestMapper.toResponse(request);
 	}
 
 	@Transactional

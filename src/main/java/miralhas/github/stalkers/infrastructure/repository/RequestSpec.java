@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.infrastructure.repository;
 
 import lombok.experimental.UtilityClass;
+import miralhas.github.stalkers.api.dto.filter.RequestFilter;
 import miralhas.github.stalkers.domain.model.requests.BaseRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -19,7 +20,8 @@ public class RequestSpec {
 	public static Specification<BaseRequest> requestTypeEquals(String type) {
 		return (root, query, builder) -> {
 			if (!hasText(type)) return null;
-			return builder.equal(root.get("requestType"), type);
+			var requestType = RequestFilter.TypeEnum.valueOf(type).getRequestType();
+			return builder.equal(root.get("requestType"), requestType);
 		};
 	}
 
