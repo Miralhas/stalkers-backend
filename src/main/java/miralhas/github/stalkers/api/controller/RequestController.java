@@ -3,6 +3,7 @@ package miralhas.github.stalkers.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.RequestFilter;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
 import miralhas.github.stalkers.domain.service.NovelService;
@@ -28,9 +29,10 @@ public class RequestController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<RequestDTO> findAllRequests(
-			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
-	) {
-		return requestService.findAll(pageable);
+			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable,
+			@Valid RequestFilter filter
+			) {
+		return requestService.findAll(pageable, filter);
 	}
 
 	@PostMapping("/novels")

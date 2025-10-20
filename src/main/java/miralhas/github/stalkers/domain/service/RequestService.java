@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.RequestFilter;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
 import miralhas.github.stalkers.api.dto_mapper.RequestMapper;
@@ -30,8 +31,8 @@ public class RequestService {
 	private final ErrorMessages errorMessages;
 
 	@Cacheable(cacheNames = "requests.list", unless = "#result.results.empty")
-	public PageDTO<RequestDTO> findAll(Pageable pageable) {
-		var pages = requestRepository.findAll(pageable);
+	public PageDTO<RequestDTO> findAll(Pageable pageable, RequestFilter filter) {
+		var pages = requestRepository.findAll(filter.toSpecification(), pageable);
 		var dtos = pages.getContent().stream().map(requestMapper::toResponse).toList();
 		var dtosPaged = new PageImpl<>(dtos, pageable, pages.getTotalElements());
 		return new PageDTO<>(dtosPaged);
