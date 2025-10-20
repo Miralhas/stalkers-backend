@@ -5,8 +5,8 @@ CREATE TABLE request
     created_at   datetime              NULL,
     user_id      BIGINT                NOT NULL,
     novel_id     BIGINT                NULL,
-    novel_title  VARCHAR(255)          NOT NULL,
-    `status` ENUM('PENDING','COMPLETED','CANCELED') NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+    novel_title  VARCHAR(255)          NULL,
+    `status` ENUM('PENDING','COMPLETED','DENIED') NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
     CONSTRAINT pk_request PRIMARY KEY (id),
     INDEX `FK_REQUEST_TYPE` (`request_type`) USING BTREE
 );

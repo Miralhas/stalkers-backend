@@ -27,7 +27,7 @@ public class NovelRequest extends BaseRequest implements Serializable {
 		super();
 	}
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String novelTitle;
 
 }

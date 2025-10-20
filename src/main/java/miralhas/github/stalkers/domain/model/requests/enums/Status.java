@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Status {
 	PENDING("Pending"),
-	CANCELED("Canceled"),
+	DENIED("Denied"),
 	COMPLETED("Completed");
 	private final String value;
 }

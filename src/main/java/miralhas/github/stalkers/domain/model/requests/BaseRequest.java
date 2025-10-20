@@ -40,6 +40,17 @@ public class BaseRequest implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Status status = Status.PENDING;
 
+	@Column(name="request_type", insertable = false, updatable = false)
+	protected String requestType;
+
+	public void complete() {
+		this.status = Status.COMPLETED;
+	}
+
+	public void deny() {
+		this.status = Status.DENIED;
+	}
+
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
