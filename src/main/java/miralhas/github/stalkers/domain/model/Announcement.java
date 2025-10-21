@@ -3,12 +3,17 @@ package miralhas.github.stalkers.domain.model;
 import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.auth.User;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static miralhas.github.stalkers.StalkersApplication.SLG;
 
 @Entity
 @Getter
@@ -19,6 +24,12 @@ public class Announcement {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false)
 	private Long id;
+
+	@Column(nullable = false, unique = true)
+	private String slug;
+
+	@Column(nullable = false)
+	private String title;
 
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String body;
@@ -38,6 +49,12 @@ public class Announcement {
 
 	@Column(nullable = false)
 	private boolean pinned = false;
+
+	public void generateSlug() {
+		var titleArr = this.title.split(" ");
+		var truncatedTitle = Arrays.stream(titleArr).limit(9).collect(Collectors.joining(" "));
+		this.slug = SLG.slugify(truncatedTitle);
+	}
 
 	@Override
 	public final boolean equals(Object o) {
