@@ -12,6 +12,12 @@ import miralhas.github.stalkers.domain.model.Announcement;
 import miralhas.github.stalkers.domain.model.auth.User;
 import miralhas.github.stalkers.domain.repository.AnnouncementRepository;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +30,18 @@ public class AnnouncementService {
 	private final AnnouncementRepository announcementRepository;
 	private final ErrorMessages errorMessages;
 
-	public PageDTO<AnnouncementDTO> findAll() {
-		return null;
+	@Cacheable(cacheNames = "announcements.list", unless = "#result.results.empty")
+	public PageDTO<AnnouncementDTO> findAll(Pageable pageable) {
+		var pages = announcementRepository.findAll(pageable);
+		var dtos = pages.getContent().stream().map(announcementMapper::toResponse).toList();
+		var dtosPaged = new PageImpl<>(dtos, pageable, pages.getTotalElements());
+		return new PageDTO<>(dtosPaged);
 	}
+
+	@Cacheable(cacheNames = "announcements.detail")
+	public AnnouncementDTO findDTOBySlugCacheable(String slug) {
+		return announcementMapper.toResponse(findBySlugOrException(slug));
+	};
 
 	public Announcement findBySlugOrException(String slug) {
 		return announcementRepository.findBySlug(slug).orElseThrow(() -> new AnnouncementNotFoundException(
@@ -41,6 +56,7 @@ public class AnnouncementService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = "announcements.list", allEntries = true)
 	public AnnouncementDTO create(AnnouncementInput input, User user) {
 		var announcement = announcementMapper.fromInput(input);
 		announcement.setUser(user);
@@ -53,6 +69,10 @@ public class AnnouncementService {
 	}
 
 	@Transactional
+	@Caching(
+			evict = {@CacheEvict(cacheNames = "announcements.list", allEntries = true)},
+			put = {@CachePut(cacheNames = "announcements.detail", key = "#result.slug")}
+	)
 	public AnnouncementDTO update(UpdateAnnouncementInput input, Long id) {
 		var announcement = findByIdOrException(id);
 		var initialTitle = announcement.getTitle();
@@ -70,6 +90,7 @@ public class AnnouncementService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = "announcements.list", allEntries = true)
 	public void delete(Long id) {
 		announcementRepository.deleteById(id);
 	}

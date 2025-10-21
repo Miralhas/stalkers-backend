@@ -14,6 +14,10 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
 	)
 	boolean checkIfSlugAlreadyExists(String slug);
 
-	@Query("SELECT DISTINCT n FROM Announcement n WHERE n.slug = :slug")
+	@Query("SELECT DISTINCT n FROM Announcement n " +
+			"LEFT JOIN FETCH n.user u " +
+			"LEFT JOIN FETCH u.roles " +
+			"WHERE n.slug = :slug"
+	)
 	Optional<Announcement> findBySlug(String slug);
 }
