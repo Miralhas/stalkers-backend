@@ -25,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -154,5 +155,11 @@ public class NovelController {
 	@GetMapping("/{novelSlug}/metric")
 	public MetricsDTO getNovelMetrics(@PathVariable String novelSlug) {
 		return novelRepository.findNovelMetrics(novelSlug);
+	}
+
+	@GetMapping("/{novelSlug}/check-slug")
+	public Map<String, Boolean> checkIfNovelSlugAlreadyExists(@PathVariable String novelSlug) {
+		Boolean b = novelRepository.checkIfSlugAlreadyExists(novelSlug);
+		return Map.of("exists", b);
 	}
 }
