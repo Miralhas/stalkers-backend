@@ -2,8 +2,6 @@ package miralhas.github.stalkers.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.dto.ChapterRequestDTO;
-import miralhas.github.stalkers.api.dto.NovelRequestDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.RequestFilter;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;

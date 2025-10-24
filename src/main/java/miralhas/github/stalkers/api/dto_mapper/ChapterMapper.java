@@ -32,8 +32,9 @@ public abstract class ChapterMapper {
 	public abstract List<Chapter> fromInputCollection(List<ChapterInput> chapterInputList);
 
 	@Mapping(target = "novelSlug", source = "novel.slug")
-	@Mapping(target = "novelId", source = "novel.id")
 	@Mapping(target = "novelTitle", source = "novel.title")
+	@Mapping(target = "novelId", source = "novel.id")
+	@Mapping(target = "novelStatus", source = "novel.status")
 	@Mapping(target = "novelChaptersCount", source = "novel.chaptersCount")
 	@Mapping(target = "previous", expression = "java(getPreviousChapter(chapter))")
 	@Mapping(target = "next", expression = "java(getNextChapter(chapter))")
