@@ -23,7 +23,8 @@ public record RequestFilter(
 	@RequiredArgsConstructor
 	public enum TypeEnum {
 		CHAPTER(BaseRequest.CHAPTER_REQUEST),
-		NOVEL(BaseRequest.NOVEL_REQUEST);
+		NOVEL(BaseRequest.NOVEL_REQUEST),
+		FIX_CHAPTER(BaseRequest.FIX_CHAPTER_REQUEST);
 		private final String requestType;
 	}
 

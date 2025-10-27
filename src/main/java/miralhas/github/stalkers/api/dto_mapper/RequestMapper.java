@@ -2,11 +2,14 @@ package miralhas.github.stalkers.api.dto_mapper;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.ChapterRequestDTO;
+import miralhas.github.stalkers.api.dto.FixChapterRequestDTO;
 import miralhas.github.stalkers.api.dto.NovelRequestDTO;
+import miralhas.github.stalkers.api.dto.UserDTO;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
 import miralhas.github.stalkers.domain.exception.InternalServerError;
 import miralhas.github.stalkers.domain.model.requests.BaseRequest;
 import miralhas.github.stalkers.domain.model.requests.ChapterRequest;
+import miralhas.github.stalkers.domain.model.requests.FixChapterRequest;
 import miralhas.github.stalkers.domain.model.requests.NovelRequest;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +21,13 @@ public class RequestMapper {
 
 	private final NovelMapper novelMapper;
 	private final UserMapper userMapper;
+	private final ChapterMapper chapterMapper;
 
 	public RequestDTO toResponse(BaseRequest request) {
 		return switch (request) {
 			case ChapterRequest chapterRequest -> mapToChapterRequest(chapterRequest);
 			case NovelRequest novelRequest -> mapToNovelRequest(novelRequest);
+			case FixChapterRequest fixChapterRequest -> mapToFixChapterRequestDTO(fixChapterRequest);
 			case null, default -> throw new InternalServerError(
 					"Unsupported Request type: " + Objects.requireNonNull(request).getClass().getName()
 			);
@@ -43,15 +48,30 @@ public class RequestMapper {
 		);
 	}
 
-	private NovelRequestDTO mapToNovelRequest(NovelRequest novelRequest) {
-		var userDTO = userMapper.toResponse(novelRequest.getUser());
+	private NovelRequestDTO mapToNovelRequest(NovelRequest request) {
+		var userDTO = userMapper.toResponse(request.getUser());
 		return new NovelRequestDTO(
-				novelRequest.getId(),
-				novelRequest.getStatus().name(),
-				novelRequest.getRequestType(),
-				novelRequest.getCreatedAt(),
-				novelRequest.getNovelTitle(),
+				request.getId(),
+				request.getStatus().name(),
+				request.getRequestType(),
+				request.getCreatedAt(),
+				request.getNovelTitle(),
 				userDTO
+		);
+	}
+
+	private FixChapterRequestDTO mapToFixChapterRequestDTO(FixChapterRequest request) {
+		var userDTO = userMapper.toResponse(request.getUser());
+		var chapterSummary = chapterMapper.toSummaryResponse(request.getChapter());
+		return new FixChapterRequestDTO(
+				request.getId(),
+				request.getStatus().name(),
+				request.getRequestType(),
+				request.getCreatedAt(),
+				userDTO,
+				chapterSummary,
+				request.getErrors(),
+				request.getAnotherReason()
 		);
 	}
 }
