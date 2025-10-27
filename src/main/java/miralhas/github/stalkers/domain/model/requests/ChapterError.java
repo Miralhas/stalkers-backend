@@ -1,55 +1,43 @@
 package miralhas.github.stalkers.domain.model.requests;
 
 import jakarta.persistence.*;
-import lombok.*;
-import miralhas.github.stalkers.domain.model.auth.User;
-import miralhas.github.stalkers.domain.model.requests.enums.Status;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.Objects;
+
+import static miralhas.github.stalkers.StalkersApplication.SLG;
 
 @Getter
 @Setter
-@Entity(name = "request")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "request_type")
-public class BaseRequest implements Serializable {
+@ToString
+@RequiredArgsConstructor
+@Entity
+public class ChapterError implements Serializable {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
-	public static final String NOVEL_REQUEST = "NOVEL_REQUEST";
-	public static final String CHAPTER_REQUEST = "CHAPTER_REQUEST";
-	public static final String FIX_CHAPTER_REQUEST = "FIX_CHAPTER_REQUEST";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@CreationTimestamp
-	@Column(nullable = true)
-	private OffsetDateTime createdAt;
-
-	@JoinColumn(nullable = false)
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User user;
+	@Column(nullable = false, unique = true)
+	private String slug;
 
 	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private Status status = Status.PENDING;
+	private String name;
 
-	@Column(name="request_type", insertable = false, updatable = false)
-	protected String requestType;
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String description;
 
-	public void complete() {
-		this.status = Status.COMPLETED;
-	}
-
-	public void deny() {
-		this.status = Status.DENIED;
+	public void generateSlug() {
+		this.slug = SLG.slugify(this.name);
 	}
 
 	@Override
@@ -59,7 +47,7 @@ public class BaseRequest implements Serializable {
 		Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
 		Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
 		if (thisEffectiveClass != oEffectiveClass) return false;
-		BaseRequest that = (BaseRequest) o;
+		ChapterError that = (ChapterError) o;
 		return getId() != null && Objects.equals(getId(), that.getId());
 	}
 

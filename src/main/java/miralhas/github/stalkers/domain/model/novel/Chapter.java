@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import miralhas.github.stalkers.domain.model.UserLibrary;
 import miralhas.github.stalkers.domain.model.comment.ChapterReview;
+import miralhas.github.stalkers.domain.model.requests.FixChapterRequest;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -63,6 +64,9 @@ public class Chapter implements Serializable {
 
 	@OneToMany(mappedBy = "currentChapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserLibrary> userLibraries;
+
+	@OneToMany(mappedBy = "chapter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FixChapterRequest> chapterRequests;
 
 	public void addReview(ChapterReview review) {
 		this.reviews.add(review);

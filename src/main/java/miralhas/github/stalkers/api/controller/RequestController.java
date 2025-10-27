@@ -4,11 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.RequestFilter;
+import miralhas.github.stalkers.api.dto.input.ChapterErrorInput;
+import miralhas.github.stalkers.api.dto.input.FixChapterRequestInput;
 import miralhas.github.stalkers.api.dto.input.NovelRequestInput;
 import miralhas.github.stalkers.api.dto.interfaces.RequestDTO;
-import miralhas.github.stalkers.domain.service.NovelService;
-import miralhas.github.stalkers.domain.service.RequestService;
-import miralhas.github.stalkers.domain.service.UserService;
+import miralhas.github.stalkers.domain.service.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -25,6 +25,8 @@ public class RequestController {
 	private final UserService userService;
 	private final RequestService requestService;
 	private final NovelService novelService;
+	private final ChapterErrorService chapterErrorService;
+	private final ChapterService chapterService;
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
@@ -58,6 +60,19 @@ public class RequestController {
 		return requestService.createChapterRequest(novel, user);
 	}
 
+	@PostMapping("/novels/{novelSlug}/{chapterSlug}")
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.CREATED)
+	public RequestDTO createFixChapterRequest(
+			@RequestBody @Valid FixChapterRequestInput input,
+			JwtAuthenticationToken authToken,
+			@PathVariable String chapterSlug
+	) {
+		var user = userService.findUserByEmailOrException(authToken.getName());
+		var chapter = chapterService.findChapterBySlug(chapterSlug);
+		return requestService.createFixChapterRequest(input, chapter, user);
+	}
+
 	@PutMapping("/{id}/complete")
 	@PreAuthorize("hasRole('ADMIN')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
@@ -70,6 +85,13 @@ public class RequestController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void denyRequest(@PathVariable Long id) {
 		requestService.deny(id);
+	}
+
+	@PostMapping("/chapter-errors")
+	@PreAuthorize("hasRole('ADMIN')")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void createChapterError(@RequestBody @Valid ChapterErrorInput input) {
+		chapterErrorService.create(input);
 	}
 
 }
