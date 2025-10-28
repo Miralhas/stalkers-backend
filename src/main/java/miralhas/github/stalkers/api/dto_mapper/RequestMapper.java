@@ -62,14 +62,14 @@ public class RequestMapper {
 
 	private FixChapterRequestDTO mapToFixChapterRequestDTO(FixChapterRequest request) {
 		var userDTO = userMapper.toResponse(request.getUser());
-		var chapterSummary = chapterMapper.toSummaryResponse(request.getChapter());
+		var chapterInfo = chapterMapper.toInfo(request.getChapter());
 		return new FixChapterRequestDTO(
 				request.getId(),
 				request.getStatus().name(),
 				request.getRequestType(),
 				request.getCreatedAt(),
 				userDTO,
-				chapterSummary,
+				chapterInfo,
 				request.getErrors(),
 				request.getAnotherReason()
 		);

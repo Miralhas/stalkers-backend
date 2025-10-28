@@ -14,7 +14,7 @@ public record FixChapterRequestDTO(
 		String type,
 		OffsetDateTime createdAt,
 		UserDTO user,
-		ChapterSummaryDTO chapterSummaryDTO,
+		ChapterInfoDTO chapterInfoDTO,
 		Set<ChapterError> errors,
 		String anotherReason
 ) implements Serializable, RequestDTO {

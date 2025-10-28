@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.api.dto_mapper;
 
 import miralhas.github.stalkers.api.dto.ChapterDTO;
+import miralhas.github.stalkers.api.dto.ChapterInfoDTO;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
 import miralhas.github.stalkers.api.dto.input.ChapterInput;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
@@ -41,6 +42,12 @@ public abstract class ChapterMapper {
 	public abstract ChapterDTO toResponse(Chapter chapter);
 
 	public abstract ChapterSummaryDTO toSummaryResponse(Chapter chapter);
+
+	@Mapping(target = "novelSlug", source = "novel.slug")
+	@Mapping(target = "novelTitle", source = "novel.title")
+	@Mapping(target = "chapterSlug", source = "slug")
+	@Mapping(target = "chapterTitle", source = "title")
+	public abstract ChapterInfoDTO toInfo(Chapter chapter);
 
 	public abstract List<ChapterSummaryDTO> toSummaryCollectionResponse(List<Chapter> chapters);
 
