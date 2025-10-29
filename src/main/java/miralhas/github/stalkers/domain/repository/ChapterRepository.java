@@ -2,7 +2,7 @@ package miralhas.github.stalkers.domain.repository;
 
 import miralhas.github.stalkers.api.dto.ChapterSlimProjection;
 import miralhas.github.stalkers.api.dto.ChapterSummaryDTO;
-import miralhas.github.stalkers.api.dto.LatestChaptersProjection;
+import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.domain.model.novel.Chapter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,18 +42,15 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 	)
 	ChapterSummaryDTO findNextChapter(Long novelId, Long chapterNumber);
 
-	@Query(nativeQuery = true, value = """
-			SELECT c.id, n.id as novelId, c.slug, c.number as chapterNumber, c.title, n.author, n.title as novelTitle, n.slug as novelSlug, c.created_at
-			FROM chapter c
-			JOIN (
-			    SELECT novel_id, MAX(created_at) AS latest_created_at
-			    FROM chapter
-			    GROUP BY novel_id
-			) AS latest ON c.novel_id = latest.novel_id AND c.created_at = latest.latest_created_at
-			JOIN novel n ON n.id = c.novel_id
-			"""
-	)
-	Page<LatestChaptersProjection> findAllLatestChaptersDTO(Pageable pageable);
+	@Query("SELECT MAX(c.id) FROM Chapter c GROUP BY c.novel.id ORDER BY MAX(c.createdAt) DESC")
+	List<Long> findAllLastestChaptersIDS();
+
+	@Query("""
+		SELECT new miralhas.github.stalkers.api.dto.LatestChapterDTO(
+			c.id, c.novel.id, c.slug, c.number, c.title, c.novel.author, c.novel.title, c.novel.slug, c.createdAt
+		) FROM Chapter c WHERE c.id IN (:ids)
+	""")
+	Page<LatestChapterDTO> findLatestChapters(List<Long> ids, Pageable pageable);
 
 	@Query("SELECT c FROM Chapter c LEFT JOIN FETCH c.novel WHERE c.slug = :slug")
 	Optional<Chapter> findBySlug(String slug);

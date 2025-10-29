@@ -43,13 +43,9 @@ public class ChapterService {
 
 	@Cacheable(cacheNames = "latest.list", unless = "#result.getResults().isEmpty()")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(Pageable pageable) {
-		var latestProjections = chapterRepository.findAllLatestChaptersDTO(pageable);
-
-		var latestDTO = latestProjections.getContent().stream()
-				.map(LatestChaptersProjection::getLatestChaptersDTO).toList();
-
-		var page = new PageImpl<>(latestDTO, pageable, latestProjections.getTotalElements());
-		return new PageDTO<>(page);
+		var ids = chapterRepository.findAllLastestChaptersIDS();
+		var latestPaginated = chapterRepository.findLatestChapters(ids, pageable);
+		return new PageDTO<>(latestPaginated);
 	}
 
 	@Cacheable(value = "chapters.list", unless = "#result.getContent().isEmpty()", keyGenerator = "novelChaptersKeyGenerator")

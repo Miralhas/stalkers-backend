@@ -11,6 +11,7 @@ import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Tag;
+import miralhas.github.stalkers.domain.repository.ChapterRepository;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
 import miralhas.github.stalkers.domain.service.ChapterService;
 import miralhas.github.stalkers.domain.service.InfoService;
@@ -35,10 +36,18 @@ public class InfoController {
 	private final NovelMapper novelMapper;
 	private final GenreService genreService;
 	private final TagsService tagsService;
+	private final ChapterRepository chapterRepository;
+
+	@GetMapping("/latest-ids")
+	public List<Long> getLatestIDS(
+			@PageableDefault(size = 100, sort = {"created_at", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+	) {
+		return chapterRepository.findAllLastestChaptersIDS();
+	}
 
 	@GetMapping("/latest-chapters")
 	public PageDTO<LatestChapterDTO> getLatestChaptersDTO(
-			@PageableDefault(size = 100, sort = {"created_at", "id"}, direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 100, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		return chapterService.getLatestChaptersDTO(pageable);
 	}

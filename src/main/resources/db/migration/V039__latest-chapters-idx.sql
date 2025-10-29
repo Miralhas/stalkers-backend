@@ -1,0 +1,1 @@
+ALTER TABLE chapter ADD INDEX idx_novel_created (novel_id, created_at DESC, id DESC);
