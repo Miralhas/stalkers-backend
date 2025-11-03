@@ -1,6 +1,7 @@
 package miralhas.github.stalkers.domain.utils;
 
 import lombok.experimental.UtilityClass;
+import miralhas.github.stalkers.domain.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
@@ -121,6 +122,10 @@ public class CommonsUtils {
 			"Pitcher"
 	);
 
+	private boolean hasText(String string) {
+		return org.springframework.util.StringUtils.hasText(string);
+	}
+
 	private static final PolicyFactory TEXT_ONLY_POLICY = new HtmlPolicyBuilder()
 			.allowElements("p", "br", "b", "strong", "i", "em", "s", "strike", "u")
 			.toFactory();
@@ -153,20 +158,28 @@ public class CommonsUtils {
 	}
 
 	public static String getInitialsFromSlug(String slug) {
-		String[] words = slug.split("-");
-
-		if (words.length <= 3) {
-			return Arrays.stream(words)
-				.filter(org.springframework.util.StringUtils::hasText)
-				.map(word -> word.length() >= 3 ? word.substring(0,3) : word.charAt(0) + randomNumbersGenerator(2))
-				.collect(Collectors.joining());
+		if (!hasText(slug)) {
+			throw new BusinessException("Slug is empty or null");
 		}
 
-		return Arrays.stream(slug.split("-"))
-				.filter(word -> !word.isEmpty())
-				.map(word -> word.substring(0, 1))
+		String[] words = slug.toLowerCase().split("-");
+		List<String> filtered = Arrays.stream(words)
+				.filter(CommonsUtils::hasText)
+				.toList();
+
+		if (filtered.size() <= 3) {
+			// Up to 4 chars each
+			return filtered.stream()
+					.map(w -> w.length() <= 4 ? w : w.substring(0, 4))
+					.collect(Collectors.joining());
+		}
+
+		// 4+ words → 2 chars each
+		return filtered.stream()
+				.map(w -> w.length() <= 2 ? w : w.substring(0, 2))
 				.collect(Collectors.joining());
 	}
+
 
 	public static String sanitize(String dirtyHtml) {
 		return TEXT_ONLY_POLICY.sanitize(dirtyHtml);
