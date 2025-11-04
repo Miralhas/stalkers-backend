@@ -17,8 +17,8 @@ public class FileContentTypeValidator implements ConstraintValidator<FileContent
 		acceptedMediaTypes.addAll(List.of(
 				MediaType.IMAGE_JPEG_VALUE,
 				MediaType.IMAGE_PNG_VALUE,
-				MediaType.IMAGE_JPEG_VALUE,
-				"image/webp"
+				"image/webp",
+				"image/jpg"
 		));
 	}
 
