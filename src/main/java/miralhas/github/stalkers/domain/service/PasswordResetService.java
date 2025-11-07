@@ -46,16 +46,18 @@ public class PasswordResetService {
 	@Transactional
 	public void createOrUpdateToken(String email) {
 		User user =  userService.findUserByEmailOrException(email);
-		passwordResetTokenRepository.deleteById(user.getId());
-		passwordResetTokenRepository.flush();
-		var token = passwordResetTokenRepository.save(createResetTokenObject(user));
+		PasswordResetToken token = passwordResetTokenRepository.findById(user.getId())
+				.orElseGet(() -> createResetTokenObject(user));
+
+		token.setToken(OneTimePasswordUtils.generate());
+
+		token = passwordResetTokenRepository.save(token);
 		var passwordResetDTO = new PasswordResetDTO(userMapper.toResponse(user), token.getToken());
 		events.publishEvent(new SendMessageEvent(passwordResetDTO, "rk.password.reset", "stalkers"));
 	}
 
 	private PasswordResetToken createResetTokenObject(User user) {
 		PasswordResetToken resetToken = new PasswordResetToken();
-		resetToken.setToken(OneTimePasswordUtils.generate());
 		resetToken.setUser(user);
 		return resetToken;
 	}
