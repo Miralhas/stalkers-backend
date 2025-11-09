@@ -41,7 +41,7 @@ public class Tag implements Serializable {
 	private String slug;
 
 	public void generateSlug() {
-		this.slug = SLG.slugify("tag " + this.name);
+		this.slug = SLG.slugify(this.name);
 	}
 
 	@Override

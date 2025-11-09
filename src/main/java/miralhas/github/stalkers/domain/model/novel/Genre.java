@@ -40,7 +40,7 @@ public class Genre implements Serializable {
 	private String slug;
 
 	public void generateSlug() {
-		this.slug = SLG.slugify("genre " + this.name);
+		this.slug = SLG.slugify(this.name);
 	}
 
 	@Override
