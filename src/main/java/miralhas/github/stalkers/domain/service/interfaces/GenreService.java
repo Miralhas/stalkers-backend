@@ -23,4 +23,11 @@ public class GenreService {
 				errorMessages.get("genre.notFound.name", name)
 		));
 	}
+
+	@Cacheable("genres.detail")
+	public Genre findGenreBySlugOrException(String slug){
+		return genreRepository.findBySlug(slug).orElseThrow(() -> new GenreNotFoundException(
+				errorMessages.get("genre.notFound.slug", slug)
+		));
+	}
 }

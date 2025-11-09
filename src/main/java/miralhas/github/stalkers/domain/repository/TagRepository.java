@@ -12,6 +12,9 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 	@Query(value = "from Tag t where t.name = :name")
 	Optional<Tag> findByName(String name);
 
+	@Query(value = "from Tag t where t.slug = :slug")
+	Optional<Tag> findBySlug(String slug);
+
 	@Query("from Tag t where t.name like concat(:character, '%')")
 	Page<Tag> findAllTagsWithTheFirstLetter(String character, Pageable pageable);
 }

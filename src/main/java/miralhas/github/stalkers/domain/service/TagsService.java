@@ -24,4 +24,11 @@ public class TagsService {
 		));
 	}
 
+	@Cacheable("tags.detail")
+	public Tag findTagBySlugOrException(String slug){
+		return tagRepository.findBySlug(slug).orElseThrow(() -> new TagNotFoundException(
+				errorMessages.get("tag.notFound.slug", slug)
+		));
+	}
+
 }

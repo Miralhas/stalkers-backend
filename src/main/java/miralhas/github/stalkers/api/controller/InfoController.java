@@ -84,15 +84,15 @@ public class InfoController {
 		return infoService.findAllGenres();
 	}
 
-	@GetMapping("/genres/{name}")
+	@GetMapping("/genres/{slug}")
 	@ResponseStatus(HttpStatus.OK)
-	public Genre getGenreByName(@PathVariable String name) {
-		return genreService.findGenreByNameOrException(name);
+	public Genre getGenreByName(@PathVariable String slug) {
+		return genreService.findGenreBySlugOrException(slug);
 	}
 
-	@GetMapping("/tags/{name}")
+	@GetMapping("/tags/{slug}")
 	@ResponseStatus(HttpStatus.OK)
-	public Tag getTagByName(@PathVariable String name) {
-		return tagsService.findTagByNameOrException(name);
+	public Tag getTagByName(@PathVariable String slug) {
+		return tagsService.findTagBySlugOrException(slug);
 	}
 }
