@@ -167,6 +167,11 @@ public class CommonsUtils {
 				.filter(CommonsUtils::hasText)
 				.toList();
 
+		if (filtered.size() <= 1) {
+			// if it has only one word, then return full word
+			return filtered.getFirst();
+		}
+
 		if (filtered.size() <= 3) {
 			// Up to 4 chars each
 			return filtered.stream()
