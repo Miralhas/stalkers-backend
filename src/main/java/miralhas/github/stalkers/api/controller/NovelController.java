@@ -64,7 +64,7 @@ public class NovelController {
 	}
 
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	@PutMapping("/{novelSlug}")
 	public NovelSummaryDTO updateNovel(@PathVariable String novelSlug, @RequestBody @Valid UpdateNovelInput input) {
 		var novel = novelService.findBySlugOrException(novelSlug);
