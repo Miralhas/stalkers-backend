@@ -177,6 +177,7 @@ public class NovelService {
 	private void validateTags(Novel novel) {
 		var tags = novel.getTags()
 				.stream()
+				.filter(t -> tagsService.tagExists(t.getName()))
 				.map(t -> tagsService.findTagByNameOrException(t.getName()))
 				.collect(Collectors.toSet());
 		novel.setTags(tags);

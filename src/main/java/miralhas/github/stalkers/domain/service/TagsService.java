@@ -31,4 +31,8 @@ public class TagsService {
 		));
 	}
 
+	public boolean tagExists(String name) {
+		return tagRepository.findByName(name).isPresent();
+	}
+
 }
