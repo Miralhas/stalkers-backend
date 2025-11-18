@@ -29,6 +29,15 @@ public class NovelSpec {
 		};
 	}
 
+	public static Specification<Novel> authorContains(String authorQ) {
+		return (root, query, builder) -> {
+			if (!hasText(authorQ)) return null;
+			return builder.or(
+					builder.like(root.get("author"), "%" + authorQ.toLowerCase() + "%")
+			);
+		};
+	}
+
 	public static Specification<Novel> chaptersCount(ChapterCount count) {
 		return (root, query, builder) -> {
 			if (Objects.isNull(count)) return null;

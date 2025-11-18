@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.PageDTO;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.domain.exception.AuthorNotFoundException;
 import miralhas.github.stalkers.domain.model.novel.Genre;
+import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.model.novel.Tag;
 import miralhas.github.stalkers.domain.repository.GenreRepository;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
@@ -14,6 +15,7 @@ import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -32,9 +34,13 @@ public class InfoService {
 
 	@Cacheable(cacheNames = "tags.list")
 	public Page<Tag> findAllTags(TagFilter filter, Pageable pageable) {
-		if (StringUtils.hasText(filter.firstLetter())) {
+
+		if (StringUtils.hasText(filter.q())) {
+			return tagRepository.findAllTagsByNameContaining(filter.q(), pageable);
+		} else if(StringUtils.hasText(filter.firstLetter())) {
 			return tagRepository.findAllTagsWithTheFirstLetter(filter.firstLetter(), pageable);
 		}
+
 		return tagRepository.findAll(pageable);
 	}
 
@@ -44,7 +50,13 @@ public class InfoService {
 	}
 
 	@Cacheable("authors.list")
-	public PageDTO<AuthorDTO> getAllAuthors(Pageable pageable) {
+	public PageDTO<AuthorDTO> getAllAuthors(Pageable pageable, String authorQuery) {
+
+		if (StringUtils.hasText(authorQuery)) {
+			Page<AuthorDTO> allAuthors = novelRepository.findAllAuthorsWithName(pageable, authorQuery);
+			return new PageDTO<>(allAuthors);
+		}
+
 		Page<AuthorDTO> allAuthors = novelRepository.findAllAuthors(pageable);
 		return new PageDTO<>(allAuthors);
 	}

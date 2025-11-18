@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.AuthorDTO;
 import miralhas.github.stalkers.api.dto.LatestChapterDTO;
 import miralhas.github.stalkers.api.dto.NovelInfoDTO;
 import miralhas.github.stalkers.api.dto.PageDTO;
+import miralhas.github.stalkers.api.dto.filter.AuthorFilter;
 import miralhas.github.stalkers.api.dto.filter.NovelFilter;
 import miralhas.github.stalkers.api.dto.filter.TagFilter;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,9 +56,10 @@ public class InfoController {
 
 	@GetMapping("/authors")
 	public PageDTO<AuthorDTO> getAllAuthors(
-			@PageableDefault(size = 50, sort = {"novelsCount", "name"}, direction = Sort.Direction.DESC) Pageable pageable
+			@PageableDefault(size = 50, sort = {"novelsCount", "name"}, direction = Sort.Direction.DESC) Pageable pageable,
+			AuthorFilter filter
 	) {
-		return infoService.getAllAuthors(pageable);
+		return infoService.getAllAuthors(pageable, filter.getQ());
 	}
 	@GetMapping("/authors/{name}")
 	public AuthorDTO getAuthorByName(@PathVariable String name) {
