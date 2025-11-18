@@ -6,6 +6,7 @@ import miralhas.github.stalkers.api.dto.MetricsDTO;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -73,6 +74,13 @@ public interface NovelRepository extends JpaRepository<Novel, Long>, JpaSpecific
 			"from Novel n " +
 			"GROUP BY n.author")
 	Page<AuthorDTO> findAllAuthors(Pageable pageable);
+
+	@SuppressWarnings("JpaQlInspection")
+	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author as name, COUNT(n) as novelsCount) " +
+			"from Novel n " +
+			"where n.author like concat('%', :authorQ ,'%') " +
+			"GROUP BY n.author")
+	Page<AuthorDTO> findAllAuthorsWithName(Pageable pageable, String authorQ);
 
 	@SuppressWarnings("JpaQlInspection")
 	@Query(value = "SELECT new miralhas.github.stalkers.api.dto.AuthorDTO(n.author as name, COUNT(n) as novelsCount) " +

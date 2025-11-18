@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 public record TagFilter(
 		@Size(max = 1)
 		@Pattern(regexp = "^[a-zA-Z]+$")
-		String firstLetter
+		String firstLetter,
+		String q
 ) {
 }
