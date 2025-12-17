@@ -40,7 +40,7 @@ public class AuthenticationService {
 		return new AuthenticationDTO(
 				jwt.getTokenValue(),
 //				refreshToken.getId().toString(),
-				tokenPropertiesConfig.accessToken().expirationTime()
+				tokenPropertiesConfig.getAccessToken().expirationTime()
 //				tokenPropertiesConfig.refreshToken().expirationTime()
 		);
 	}
