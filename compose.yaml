@@ -58,6 +58,8 @@ services:
       - OAUTH2_GOOGLE_SECRET=${OAUTH2_GOOGLE_SECRET}
       - ROBOT_HEADER=${ROBOT_HEADER}
       - ROBOT_SECRET=${ROBOT_SECRET}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+      - PUBLIC_KEY=${PUBLIC_KEY}
     volumes:
       - api-images:/app/images
     networks:

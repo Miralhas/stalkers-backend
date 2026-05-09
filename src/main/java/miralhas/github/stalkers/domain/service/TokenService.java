@@ -29,7 +29,7 @@ public class TokenService {
 				.issuer("stalkers")
 				.subject(user.getEmail())
 				.issuedAt(now)
-				.expiresAt(now.plusSeconds(tokenPropertiesConfig.accessToken().expirationTime()))
+				.expiresAt(now.plusSeconds(tokenPropertiesConfig.getAccessToken().expirationTime()))
 				.claim("user", mappedUser)
 				.claim("scope", scopes)
 				.build();
