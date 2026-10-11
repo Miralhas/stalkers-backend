@@ -7,7 +7,6 @@ public record SeriesDTO(
 		String title,
 		String slug,
 		OffsetDateTime createdAt,
-		OffsetDateTime updatedAt,
-		List<NovelSummaryDTO> books
+		OffsetDateTime updatedAt
 ) {
 }

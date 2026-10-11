@@ -29,6 +29,11 @@ public class SeriesController {
 		return seriesService.findAll().stream().map(seriesMapper::toResponse).toList();
 	}
 
+	@GetMapping("/{slug}")
+	public SeriesDTO find(@PathVariable String slug) {
+		return seriesMapper.toResponse(seriesService.findBySlugOrException(slug));
+	}
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
