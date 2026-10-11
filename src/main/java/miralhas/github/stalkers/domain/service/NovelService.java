@@ -11,9 +11,12 @@ import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.exception.NovelAlreadyExistsException;
 import miralhas.github.stalkers.domain.exception.NovelNotFoundException;
+import miralhas.github.stalkers.domain.exception.SeriesNotFoundException;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.novel.Novel;
+import miralhas.github.stalkers.domain.model.series.Series;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
+import miralhas.github.stalkers.domain.repository.SeriesRepository;
 import miralhas.github.stalkers.domain.service.interfaces.GenreService;
 import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.List;
@@ -43,6 +47,7 @@ public class NovelService {
 	private final TagsService tagsService;
 	private final GenreService genreService;
 	private final CacheManagerUtils cacheManagerUtils;
+	private final SeriesRepository seriesRepository;
 
 	@Cacheable(cacheNames = "novels.list", unless = "#result.getContent().isEmpty()")
 	public Page<NovelSummaryDTO> findAll(Pageable pageable, NovelFilter filter) {
@@ -77,12 +82,23 @@ public class NovelService {
 		));
 	}
 
+	private Series findSeriesBySlugOrException(String slug) {
+		return seriesRepository.findBySlug(slug).orElseThrow(() -> new SeriesNotFoundException(
+				errorMessages.get("series.notFound.slug", slug))
+		);
+	}
+
 	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
 	public Novel save(NovelInput novelInput) {
 		var novel = novelMapper.fromInput(novelInput);
 		novel.generateSlug();
-		performValidations(novel);
+		performValidations(novel, novelInput);
+
+		if (StringUtils.hasText(novelInput.series())) {
+			var series = findSeriesBySlugOrException(novelInput.series());
+			series.addBook(novel);
+		}
 
 		var chapters = chapterMapper.fromInputCollection(novelInput.chapters());
 
@@ -157,9 +173,17 @@ public class NovelService {
 		}
 	}
 
-	private void performValidations(Novel novel) {
+	private void performValidations(Novel novel, NovelInput input) {
+		validateSeries(novel, input.series());
 		validateSlug(novel.getSlug());
 		validateTagsAndGenres(novel);
+	}
+
+	private void validateSeries(Novel novel, String slug) {
+		if (StringUtils.hasText(slug)) {
+			var series = findSeriesBySlugOrException(slug);
+			series.addBook(novel);
+		}
 	}
 
 	private void validateTagsAndGenres(Novel novel) {

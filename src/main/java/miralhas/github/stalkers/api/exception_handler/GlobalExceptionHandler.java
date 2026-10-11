@@ -102,6 +102,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
 		problemDetail.setTitle("Invalid Request");
 		problemDetail.setType(URI.create(getBaseUrl(webRequest)+"/errors/invalid-request"));
+		if (Objects.nonNull(ex.getErrors())) {
+			problemDetail.setProperty("errors", ex.getErrors());
+		}
 		return problemDetail;
 	}
 

@@ -1,17 +1,11 @@
 package miralhas.github.stalkers.domain.exception;
 
-import lombok.Getter;
-
 import java.util.Map;
 
-@Getter
 public class UserAlreadyExistsException extends BusinessException {
 
-	private Map<String, String> errors;
-
 	public UserAlreadyExistsException(String message, Map<String, String> errors) {
-		super(message);
-		this.errors = errors;
+		super(message, errors);
 	}
 
 	public UserAlreadyExistsException(String message) {
@@ -22,9 +16,8 @@ public class UserAlreadyExistsException extends BusinessException {
 		super(message, cause);
 	}
 
-	public UserAlreadyExistsException(String message, Map<String, String> errors, Throwable cause) {
-		super(message, cause);
-		this.errors = errors;
+	public UserAlreadyExistsException(String message, Throwable cause, Map<String, String> errors) {
+		super(message, cause, errors);
 	}
 
 }

@@ -21,7 +21,8 @@ public record NovelDTO(
 		List<String> genres,
 		List<String> tags,
 		ChapterSummaryDTO firstChapter,
-		ChapterSummaryDTO lastChapter
+		ChapterSummaryDTO lastChapter,
+		SeriesSummaryDTO series
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;

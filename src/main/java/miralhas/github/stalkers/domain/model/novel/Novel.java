@@ -7,6 +7,7 @@ import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.comment.NovelReview;
 import miralhas.github.stalkers.domain.model.metrics.Rating;
 import miralhas.github.stalkers.domain.model.novel.enums.Status;
+import miralhas.github.stalkers.domain.model.series.Series;
 import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
@@ -118,24 +119,33 @@ public class Novel implements Serializable {
 	)
 	private Set<Rating> ratings = new HashSet<>();
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Series series;
+
 	@Column
 	@Builder.Default
 	private int views = 0;
-
-	public void viewsPlusOne() {
-		++this.views;
-	}
 
 	public boolean isCompleted() {
 		return this.status.equals(Status.COMPLETED);
 	}
 
-	public void viewsPlusThousand() {
-		this.views += 1000;
-	}
-
 	public void viewsPlusRandom() {
 		this.views += CommonsUtils.randomIntegerInRange(1, 5);
+	}
+
+	public boolean hasSeries() {
+		return Objects.nonNull(series);
+	}
+
+	public String getSeriesSlug() {
+		if (!hasSeries()) return null;
+		return this.series.getSlug();
+	}
+
+	public String getSeriesTitle() {
+		if (!hasSeries()) return null;
+		return this.series.getTitle();
 	}
 
 	public void addReview(NovelReview review) {

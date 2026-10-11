@@ -18,7 +18,8 @@ public record NovelSummaryDTO(
 		OffsetDateTime createdAt,
 		OffsetDateTime updatedAt,
 		int views,
-		Double bayesianScore
+		Double bayesianScore,
+		SeriesSummaryDTO series
 ) implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;

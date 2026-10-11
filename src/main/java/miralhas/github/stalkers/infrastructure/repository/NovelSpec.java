@@ -8,6 +8,7 @@ import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
 import miralhas.github.stalkers.domain.model.novel.Genre;
 import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.model.novel.Tag;
+import miralhas.github.stalkers.domain.model.series.Series;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 
@@ -25,15 +26,6 @@ public class NovelSpec {
 			return builder.or(
 					builder.like(root.get("title"), "%" + q.toLowerCase() + "%"),
 					builder.like(root.get("alias"), "%" + q.toLowerCase() + "%")
-			);
-		};
-	}
-
-	public static Specification<Novel> authorContains(String authorQ) {
-		return (root, query, builder) -> {
-			if (!hasText(authorQ)) return null;
-			return builder.or(
-					builder.like(root.get("author"), "%" + authorQ.toLowerCase() + "%")
 			);
 		};
 	}
@@ -107,4 +99,14 @@ public class NovelSpec {
 		};
 	}
 
+	public static Specification<Novel> seriesSlugEqual(String slug) {
+		return (root, query, builder) -> {
+			if (hasText(slug) && Objects.nonNull(query)) {
+				Join<Novel, Series> seriesJoin = root.join("series");
+				query.groupBy(root.get("id"));
+				return builder.equal(seriesJoin.get("slug"), slug);
+			}
+			return null;
+		};
+	}
 }

@@ -25,6 +25,7 @@ public abstract class NovelMapper {
 	@Autowired
 	protected NovelRepository novelRepository;
 
+	@Mapping(target = "series", ignore = true)
 	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
 	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
 	public abstract Novel fromInput(NovelInput novelInput);

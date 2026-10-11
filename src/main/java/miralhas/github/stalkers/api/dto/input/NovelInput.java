@@ -35,6 +35,8 @@ public record NovelInput(
 
 		@NotNull
 		@Size(min = 1)
-		List<String> tags
+		List<String> tags,
+
+		String series
 ) {
 }
