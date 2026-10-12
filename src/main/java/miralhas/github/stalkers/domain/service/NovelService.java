@@ -11,12 +11,9 @@ import miralhas.github.stalkers.api.dto_mapper.ChapterMapper;
 import miralhas.github.stalkers.api.dto_mapper.NovelMapper;
 import miralhas.github.stalkers.domain.exception.NovelAlreadyExistsException;
 import miralhas.github.stalkers.domain.exception.NovelNotFoundException;
-import miralhas.github.stalkers.domain.exception.SeriesNotFoundException;
 import miralhas.github.stalkers.domain.model.Image;
 import miralhas.github.stalkers.domain.model.novel.Novel;
-import miralhas.github.stalkers.domain.model.series.Series;
 import miralhas.github.stalkers.domain.repository.NovelRepository;
-import miralhas.github.stalkers.domain.repository.SeriesRepository;
 import miralhas.github.stalkers.domain.service.interfaces.GenreService;
 import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
@@ -47,7 +44,7 @@ public class NovelService {
 	private final TagsService tagsService;
 	private final GenreService genreService;
 	private final CacheManagerUtils cacheManagerUtils;
-	private final SeriesRepository seriesRepository;
+	private final SeriesService seriesService;
 
 	@Cacheable(cacheNames = "novels.list", unless = "#result.getContent().isEmpty()")
 	public Page<NovelSummaryDTO> findAll(Pageable pageable, NovelFilter filter) {
@@ -82,23 +79,12 @@ public class NovelService {
 		));
 	}
 
-	private Series findSeriesBySlugOrException(String slug) {
-		return seriesRepository.findBySlug(slug).orElseThrow(() -> new SeriesNotFoundException(
-				errorMessages.get("series.notFound.slug", slug))
-		);
-	}
-
 	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
 	public Novel save(NovelInput novelInput) {
 		var novel = novelMapper.fromInput(novelInput);
 		novel.generateSlug();
 		performValidations(novel, novelInput);
-
-		if (StringUtils.hasText(novelInput.series())) {
-			var series = findSeriesBySlugOrException(novelInput.series());
-			series.addBook(novel);
-		}
 
 		var chapters = chapterMapper.fromInputCollection(novelInput.chapters());
 
@@ -181,7 +167,7 @@ public class NovelService {
 
 	private void validateSeries(Novel novel, String slug) {
 		if (StringUtils.hasText(slug)) {
-			var series = findSeriesBySlugOrException(slug);
+			var series = seriesService.findOrCreateNewSeries(slug);
 			series.addBook(novel);
 		}
 	}

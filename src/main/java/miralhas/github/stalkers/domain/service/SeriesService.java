@@ -11,6 +11,7 @@ import miralhas.github.stalkers.domain.model.novel.Novel;
 import miralhas.github.stalkers.domain.model.series.Series;
 import miralhas.github.stalkers.domain.repository.SeriesRepository;
 import miralhas.github.stalkers.domain.utils.CacheManagerUtils;
+import miralhas.github.stalkers.domain.utils.CommonsUtils;
 import miralhas.github.stalkers.domain.utils.ErrorMessages;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,6 @@ public class SeriesService {
 	private final SeriesRepository repository;
 	private final ErrorMessages errorMessages;
 	private final SeriesMapper seriesMapper;
-	private final NovelService novelService;
 	private final CacheManagerUtils cacheManagerUtils;
 
 	public Series findBySlugOrException(String slug) {
@@ -41,13 +42,20 @@ public class SeriesService {
 	}
 
 	@Transactional
+	public Series findOrCreateNewSeries(String slug) {
+		return repository.findBySlug(slug).orElseGet(() -> {
+			var title = CommonsUtils.capitalize(slug.replace("-", " "));
+			var series = new SeriesInput(title, Set.of());
+			return save(series, List.of());
+		});
+	}
+
+	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
-	public Series save(SeriesInput input) {
+	public Series save(SeriesInput input, List<Novel> books) {
 		var series = seriesMapper.fromInput(input);
 		series.generateSlug();
 		this.validateSlug(series.getSlug());
-
-		var books = input.slugs().stream().map(novelService::findBySlugOrException).toList();
 
 		validateBooks(books);
 		series.addAllBooks(books);
@@ -75,18 +83,16 @@ public class SeriesService {
 
 	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
-	public void add(Series series, String slug) {
-		var novel = novelService.findBySlugOrException(slug);
-		validateBooks(List.of(novel));
-		series.addBook(novel);
+	public void add(Series series, Novel book) {
+		validateBooks(List.of(book));
+		series.addBook(book);
 		repository.save(series);
-		cacheManagerUtils.evictSingleEntry("novels.detail::%s".formatted(novel.getSlug()));
+		cacheManagerUtils.evictSingleEntry("novels.detail::%s".formatted(book.getSlug()));
 	}
 
 	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
-	public void addAll(Series series, List<String> slugs) {
-		var books = slugs.stream().map(novelService::findBySlugOrException).toList();
+	public void addAll(Series series, List<Novel> books) {
 		validateBooks(books);
 		series.addAllBooks(books);
 		repository.save(series);
@@ -97,11 +103,10 @@ public class SeriesService {
 
 	@Transactional
 	@CacheEvict(cacheNames = "novels.list", allEntries = true)
-	public void removeBook(Series series, String slug) {
-		Novel novel = novelService.findBySlugOrException(slug);
-		series.removeBook(novel);
+	public void removeBook(Series series, Novel book) {
+		series.removeBook(book);
 		repository.save(series);
-		cacheManagerUtils.evictSingleEntry("novels.detail::%s".formatted(novel.getSlug()));
+		cacheManagerUtils.evictSingleEntry("novels.detail::%s".formatted(book.getSlug()));
 	}
 
 	private void validateBooks(List<Novel> books) {

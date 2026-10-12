@@ -8,6 +8,7 @@ import miralhas.github.stalkers.api.dto.input.SeriesInput;
 import miralhas.github.stalkers.api.dto.input.SeriesSlugsInput;
 import miralhas.github.stalkers.api.dto.input.UpdateSeriesInput;
 import miralhas.github.stalkers.api.dto_mapper.SeriesMapper;
+import miralhas.github.stalkers.domain.service.NovelService;
 import miralhas.github.stalkers.domain.service.SeriesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class SeriesController {
 
 	private final SeriesService seriesService;
 	private final SeriesMapper seriesMapper;
+	private final NovelService novelService;
 
 	@GetMapping
 	public List<SeriesDTO> findAll() {
@@ -38,7 +40,8 @@ public class SeriesController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	public SeriesDTO createSeries(@RequestBody @Valid SeriesInput input) {
-		return seriesMapper.toResponse(seriesService.save(input));
+		var books = input.slugs().stream().map(novelService::findBySlugOrException).toList();
+		return seriesMapper.toResponse(seriesService.save(input, books));
 	}
 
 	@PutMapping("/{slug}")
@@ -60,7 +63,8 @@ public class SeriesController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	public void addAllBooks(@PathVariable String slug, @RequestBody @Valid SeriesSlugsInput input) {
 		var series = seriesService.findBySlugOrException(slug);
-		seriesService.addAll(series, input.slugs().stream().toList());
+		var books = input.slugs().stream().map(novelService::findBySlugOrException).toList();
+		seriesService.addAll(series, books);
 	}
 
 	@PutMapping("/{slug}/{novelSlug}")
@@ -68,7 +72,8 @@ public class SeriesController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	public void addBook(@PathVariable String slug, @PathVariable String novelSlug) {
 		var series = seriesService.findBySlugOrException(slug);
-		seriesService.add(series, novelSlug);
+		var book = novelService.findBySlugOrException(novelSlug);
+		seriesService.add(series, book);
 	}
 
 	@DeleteMapping("/{slug}/{novelSlug}")
@@ -76,6 +81,7 @@ public class SeriesController {
 	@PreAuthorize("hasAnyRole('ADMIN', 'ROBOT')")
 	public void removeBook(@PathVariable String slug, @PathVariable String novelSlug) {
 		var series = seriesService.findBySlugOrException(slug);
-		seriesService.removeBook(series, novelSlug);
+		var book = novelService.findBySlugOrException(novelSlug);
+		seriesService.removeBook(series, book);
 	}
 }
