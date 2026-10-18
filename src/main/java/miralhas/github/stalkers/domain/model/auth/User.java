@@ -19,6 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -54,15 +55,8 @@ public class User implements Serializable {
 	@CreationTimestamp
 	private OffsetDateTime createdAt;
 
-	@ManyToMany(
-			fetch = FetchType.LAZY,
-			cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
-	)
-	@JoinTable(
-			name = "user_roles",
-			joinColumns = @JoinColumn(name = "user_id"),
-			inverseJoinColumns = @JoinColumn(name = "role_id")
-	)
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -89,8 +83,11 @@ public class User implements Serializable {
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<BaseRequest> requests;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "user")
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private PasswordResetToken passwordResetToken;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<RefreshToken> refreshTokens = new ArrayList<>();
 
 	public List<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream().map(r -> r.getName().getAuthority()).toList();

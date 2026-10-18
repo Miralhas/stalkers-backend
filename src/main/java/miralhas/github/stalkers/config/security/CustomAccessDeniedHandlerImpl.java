@@ -24,7 +24,9 @@ public class CustomAccessDeniedHandlerImpl implements AccessDeniedHandler {
 	private final ErrorMessages errorMessages;
 
 	@Override
-	public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex) throws IOException {
+	public void handle(
+			HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex
+	) throws IOException {
 		var detail = errorMessages.get("AbstractAccessDecisionManager.accessDenied");
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
 		problem.setTitle("Forbidden");

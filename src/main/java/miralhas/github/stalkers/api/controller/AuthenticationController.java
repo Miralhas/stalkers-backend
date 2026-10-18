@@ -62,21 +62,20 @@ public class AuthenticationController implements AuthenticationControllerSwagger
 		passwordResetService.resetPassword(token, changePasswordInput);
 	}
 
-//	@Override
-//	@PostMapping("/refresh-token")
-//	@ResponseStatus(HttpStatus.OK)
-//	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {
-//		var refreshToken = refreshTokenService.validateRefreshToken(refreshTokenInput.refreshToken());
-//		var user = userService.findUserByEmailOrException(refreshToken.getUser().getEmail());
-//		var newAccessToken = tokenService.generateToken(user);
-//		var newRefreshToken = refreshTokenService.update(refreshToken, user);
-//		return new AuthenticationDTO(
-//				newAccessToken.getTokenValue(),
-//				newRefreshToken.getId().toString(),
-//				tokenPropertiesConfig.accessToken().expirationTime(),
-//				tokenPropertiesConfig.refreshToken().expirationTime()
-//		);
-//	}
+	@PostMapping("/refresh-token")
+	@ResponseStatus(HttpStatus.OK)
+	public AuthenticationDTO refreshToken(@RequestBody @Valid RefreshTokenInput refreshTokenInput) {
+		var refreshToken = refreshTokenService.validateRefreshToken(refreshTokenInput.refreshToken());
+		var user = userService.findUserByEmailOrException(refreshToken.getUser().getEmail());
+		var newAccessToken = tokenService.generateToken(user);
+		var newRefreshToken = refreshTokenService.update(refreshToken, user);
+		return new AuthenticationDTO(
+				newAccessToken.getTokenValue(),
+				newRefreshToken.getId().toString(),
+				tokenPropertiesConfig.getAccessToken().expirationTime(),
+				tokenPropertiesConfig.getRefreshToken().expirationTime()
+		);
+	}
 
 	@PostMapping("/google")
 	@ResponseStatus(HttpStatus.OK)

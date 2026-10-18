@@ -33,7 +33,6 @@ public class RefreshToken implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 
-
 	public boolean isInvalid() {
 		return expiresAt.isBefore(OffsetDateTime.now());
 	}

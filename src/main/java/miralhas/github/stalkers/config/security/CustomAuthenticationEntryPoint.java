@@ -52,7 +52,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		problem.setTitle("Unauthorized");
 		problem.setInstance(URI.create(request.getRequestURI()));
 		problem.setType(URI.create("http://localhost:8080/jwt-error"));
-		String problemDetailAsString = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_ABSENT).writeValueAsString(problem);
+		String problemDetailAsString = new ObjectMapper()
+				.setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+				.writeValueAsString(problem);
 		String wwwAuthenticate = computeWWWAuthenticateHeaderValue(parameters);
 		response.addHeader("WWW-Authenticate", wwwAuthenticate);
 		response.setStatus(problem.getStatus());

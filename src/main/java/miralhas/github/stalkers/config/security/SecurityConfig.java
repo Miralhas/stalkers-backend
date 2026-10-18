@@ -9,7 +9,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
@@ -52,9 +51,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(
 			HttpSecurity httpSecurity,
 			CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
-			CustomOauth2FailureHandler customOauth2FailureHandler,
-			RobotFilter robotFilter,
-			OAuth2Filter oAuth2Filter
+			CustomOAuth2FailureHandler customOAuth2FailureHandler,
+			RobotFilter robotFilter
 	) throws Exception {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
@@ -84,7 +82,7 @@ public class SecurityConfig {
 				})
 				.oauth2Login(oauth2 -> oauth2
 						.successHandler(customOAuth2SuccessHandler)
-						.failureHandler((customOauth2FailureHandler))
+						.failureHandler(customOAuth2FailureHandler)
 				)
 				.authorizeHttpRequests(authz -> {
 					authz.requestMatchers("/secured").authenticated();
@@ -104,7 +102,6 @@ public class SecurityConfig {
 					authz.anyRequest().authenticated();
 				})
 				.addFilterBefore(robotFilter, OAuth2AuthorizationRequestRedirectFilter.class)
-				.addFilterBefore(oAuth2Filter, OAuth2AuthorizationRequestRedirectFilter.class)
 				.build();
 	}
 
