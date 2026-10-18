@@ -1,0 +1,44 @@
+spring:
+  flyway:
+    locations: classpath:db/migration
+
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      leak-detection-threshold: 60000
+      # Close idle connections
+      keepalive-time: 30000
+
+  transaction:
+    default-timeout: 30
+
+  jpa:
+    properties:
+      javax:
+        persistence:
+          query:
+            timeout: 30000
+
+# Expiration Time in seconds - One Week
+authentication:
+  token:
+    refresh-token:
+      expiration-time: 604800
+    # Expiration Time in seconds - One day
+    access-token:
+      expiration-time: 86400
+
+# Path to store images locally
+stalkers:
+  storage:
+    local:
+      dir:
+        images: ${LOCAL_IMAGE_DIRECTORY}
+
+client:
+  domain: devilsect.com
+  oauth2RedirectAfter: https://devilsect.com/login/google/success

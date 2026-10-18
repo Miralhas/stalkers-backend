@@ -45,9 +45,10 @@ public class RefreshTokenService {
 
 	@Transactional
 	public RefreshToken save(User user) {
+		var expiresAt = OffsetDateTime.now().plusSeconds(tokenPropertiesConfig.getRefreshToken().expirationTime());
 		var refreshToken = RefreshToken.builder()
 				.user(user)
-				.expiresAt(OffsetDateTime.now().plusSeconds(tokenPropertiesConfig.getRefreshToken().expirationTime()))
+				.expiresAt(expiresAt)
 				.build();
 		return refreshTokenRepository.save(refreshToken);
 	}

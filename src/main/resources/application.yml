@@ -1,0 +1,95 @@
+spring:
+  application:
+    name: stalkers
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          batch_size: 250
+          fetch_size: 250
+        order_updates: true
+        order_inserts: true
+        default_batch_fetch_size: 10
+      org:
+        hibernate:
+          flushMode: COMMIT
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    connection-timeout: 10000
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      connect-timeout: 10000
+    web:
+      pageable:
+        max-page-size: 10000
+
+  cache:
+    redis:
+      time-to-live: 3600000
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
+
+  mail:
+    port: 587
+    protocol: smtp
+    host: smtp-relay.brevo.com
+    username: 991113001@smtp-brevo.com
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp-relay.brevo.com
+
+  servlet:
+    multipart:
+      max-file-size: 1MB
+
+springdoc:
+  swagger-ui:
+    path: /
+
+logging:
+  level:
+    org:
+      hibernate:
+        orm:
+          deprecation: ERROR
+
+robot:
+  header: ${ROBOT_HEADER}
+  secret: ${ROBOT_SECRET}
+
+oauth2:
+  google:
+    header: ${OAUTH2_GOOGLE_HEADER}
+    secret: ${OAUTH2_GOOGLE_SECRET}
+
+# Authentication Tokens
+# Keys should be stored as single line.
+# Multi-line to single-line converter: https://tools.onecompiler.com/multiline-to-singleline
+authentication:
+  token:
+    private-key: ${PRIVATE_KEY}
+    public-key: ${PUBLIC_KEY}

@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
-public class CustomOauth2FailureHandler implements AuthenticationFailureHandler {
+public class CustomOAuth2FailureHandler implements AuthenticationFailureHandler {
 
 	private final ErrorMessages errorMessages;
 
