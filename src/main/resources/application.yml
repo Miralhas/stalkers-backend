@@ -83,8 +83,8 @@ robot:
 
 oauth2:
   google:
-    header: ${OAUTH2_GOOGLE_HEADER}
-    secret: ${OAUTH2_GOOGLE_SECRET}
+
+
 
 # Authentication Tokens
 # Keys should be stored as single line.

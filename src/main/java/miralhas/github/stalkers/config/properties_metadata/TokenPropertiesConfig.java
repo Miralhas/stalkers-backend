@@ -2,7 +2,7 @@ package miralhas.github.stalkers.config.properties_metadata;
 
 import lombok.Getter;
 import lombok.Setter;
-import miralhas.github.stalkers.domain.utils.RsaKeyConverter;
+import miralhas.github.stalkers.shared.utils.RsaKeyConverter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.security.interfaces.RSAPrivateKey;

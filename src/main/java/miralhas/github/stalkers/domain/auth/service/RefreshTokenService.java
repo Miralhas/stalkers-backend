@@ -1,0 +1,62 @@
+package miralhas.github.stalkers.domain.auth.service;
+
+import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.config.properties_metadata.TokenPropertiesConfig;
+import miralhas.github.stalkers.domain.auth.exception.RefreshTokenExpiredException;
+import miralhas.github.stalkers.domain.auth.exception.RefreshTokenNotFoundException;
+import miralhas.github.stalkers.domain.auth.model.RefreshToken;
+import miralhas.github.stalkers.domain.user.model.User;
+import miralhas.github.stalkers.domain.auth.repository.RefreshTokenRepository;
+import miralhas.github.stalkers.shared.utils.ErrorMessages;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class RefreshTokenService {
+
+	private final TokenPropertiesConfig tokenPropertiesConfig;
+	private final RefreshTokenRepository refreshTokenRepository;
+	private final ErrorMessages errorMessages;
+
+	public RefreshToken getRefreshTokenOrExcepiton(UUID id) {
+		var message = errorMessages.get("refreshToken.notFound", id);
+		return refreshTokenRepository.findById(id)
+				.orElseThrow(() -> new RefreshTokenNotFoundException(message));
+	}
+
+	@Transactional(noRollbackFor = RefreshTokenExpiredException.class)
+	public RefreshToken validateRefreshToken(String refreshTokenToBeValidated) {
+		var refreshToken = getRefreshTokenOrExcepiton(UUID.fromString(refreshTokenToBeValidated));
+		if (refreshToken.isInvalid()) {
+			refreshTokenRepository.deleteAllUserRefreshTokens(refreshToken.getUser());
+			refreshTokenRepository.flush();
+			var message = errorMessages.get(
+					"refreshToken.expired", refreshToken.getId(), refreshToken.getExpiresAt()
+			);
+			throw new RefreshTokenExpiredException(message);
+		}
+		return refreshToken;
+	}
+
+	@Transactional
+	public RefreshToken save(User user) {
+		var expiresAt = OffsetDateTime.now().plusSeconds(tokenPropertiesConfig.getRefreshToken().expirationTime());
+		var refreshToken = RefreshToken.builder()
+				.user(user)
+				.expiresAt(expiresAt)
+				.build();
+		return refreshTokenRepository.save(refreshToken);
+	}
+
+	@Transactional
+	public RefreshToken update(RefreshToken refreshToken, User user) {
+		refreshTokenRepository.delete(refreshToken);
+		refreshTokenRepository.flush();
+		return save(user);
+	}
+}

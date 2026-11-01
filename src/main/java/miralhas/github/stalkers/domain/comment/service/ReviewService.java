@@ -1,0 +1,195 @@
+package miralhas.github.stalkers.domain.comment.service;
+
+import lombok.RequiredArgsConstructor;
+import miralhas.github.stalkers.api.comment.dto.CommentDTO;
+import miralhas.github.stalkers.api.shared.dto.PageDTO;
+import miralhas.github.stalkers.api.comment.dto.input.CommentInput;
+import miralhas.github.stalkers.api.comment.dto.input.UpdateCommentInput;
+import miralhas.github.stalkers.api.comment.mapper.CommentMapper;
+import miralhas.github.stalkers.domain.chapter.repository.ChapterRepository;
+import miralhas.github.stalkers.domain.chapter.service.ChapterService;
+import miralhas.github.stalkers.domain.comment.repository.ChapterReviewRepository;
+import miralhas.github.stalkers.domain.comment.repository.CommentRepository;
+import miralhas.github.stalkers.domain.comment.repository.NovelReviewRepository;
+import miralhas.github.stalkers.domain.comment.exception.CommentNotFoundException;
+import miralhas.github.stalkers.domain.comment.model.ChapterReview;
+import miralhas.github.stalkers.domain.comment.model.Comment;
+import miralhas.github.stalkers.domain.comment.model.NovelReview;
+import miralhas.github.stalkers.domain.chapter.model.Chapter;
+import miralhas.github.stalkers.domain.novel.model.Novel;
+import miralhas.github.stalkers.domain.notification.service.NotificationService;
+import miralhas.github.stalkers.domain.novel.repository.NovelRepository;
+import miralhas.github.stalkers.domain.novel.service.NovelService;
+import miralhas.github.stalkers.shared.utils.CacheManagerUtils;
+import miralhas.github.stalkers.shared.utils.CommonsUtils;
+import miralhas.github.stalkers.shared.utils.ErrorMessages;
+import miralhas.github.stalkers.shared.utils.ValidateAuthorization;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ReviewService {
+
+	private final CommentRepository commentRepository;
+	private final NovelReviewRepository novelReviewRepository;
+	private final ChapterReviewRepository chapterReviewRepository;
+	private final CommentMapper commentMapper;
+	private final NovelService novelService;
+	private final ErrorMessages errorMessages;
+	private final NovelRepository novelRepository;
+	private final ChapterService chapterService;
+	private final ValidateAuthorization validateAuthorization;
+	private final ChapterRepository chapterRepository;
+	private final CacheManagerUtils cacheManagerUtils;
+	private final NotificationService notificationService;
+
+	public List<Comment> findCommentsByParentId(Long id) {
+		return commentRepository.findByParentCommentId(id);
+	}
+
+	public Comment findCommentByIdOrThrowException(Long id) {
+		return commentRepository.findById(id).orElseThrow(() -> new CommentNotFoundException(
+				errorMessages.get("comment.notFound.id", id)
+		));
+	}
+
+	@Cacheable(cacheNames = "reviews.list", unless = "#result.getResults().isEmpty()")
+	public PageDTO<CommentDTO> findNovelReviewsBySlug(String slug, Pageable pageable) {
+		var novelReviewsPage = novelReviewRepository.findRootReviewsByNovelSlug(slug, pageable);
+		var commentsDTO = novelReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
+		var pageImpl = new PageImpl<>(commentsDTO, pageable, novelReviewsPage.getTotalElements());
+		return new PageDTO<>(pageImpl);
+	}
+
+	@Cacheable(cacheNames = "reviews.list", unless = "#result.getResults().isEmpty()")
+	public PageDTO<CommentDTO> findChapterReviewsBySlug(String slug, Pageable pageable) {
+		var chapterReviewsPage = chapterReviewRepository.findRootReviewsByChapterSlug(slug, pageable);
+		var commentsDTO = chapterReviewsPage.getContent().stream().map(commentMapper::toResponse).toList();
+		var pageImpl = new PageImpl<>(commentsDTO, pageable, chapterReviewsPage.getTotalElements());
+		return new PageDTO<>(pageImpl);
+	}
+
+	@Transactional
+	public Comment addNovelReview(CommentInput input, String novelSlug) {
+		var novel = novelService.findBySlugOrException(novelSlug);
+		var user = validateAuthorization.getCurrentUser();
+		NovelReview novelReview = commentMapper.fromInputToNovelReview(input);
+
+		sanitizeComment(novelReview);
+
+		var parentComment = novelReview.hasParent() ? findCommentByIdOrThrowException(novelReview.getParentId()) : null;
+
+		novelReview.setParentComment(parentComment);
+		if (parentComment == null) {
+			// it's a root comment
+			novelReview.setNovel(novel);
+		}
+		novelReview.setCommenter(user);
+		novelReview = commentRepository.save(novelReview);
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
+		notificationService.sendCommentReplyNotification(novelReview);
+		return novelReview;
+	}
+
+	@Transactional
+	public Comment addChapterReview(CommentInput input, String chapterSlug) {
+		var chapter = chapterService.findChapterBySlug(chapterSlug);
+		ChapterReview chapterReview = commentMapper.fromInputToChapterReview(input);
+
+		sanitizeComment(chapterReview);
+
+		var parentComment = chapterReview.hasParent()
+				? findCommentByIdOrThrowException(chapterReview.getParentId())
+				: null;
+
+		chapterReview.setParentComment(parentComment);
+		if (parentComment == null) {
+			chapterReview.setChapter(chapter);
+		}
+
+		chapterReview.setCommenter(validateAuthorization.getCurrentUser());
+		chapterReviewRepository.save(chapterReview);
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		notificationService.sendCommentReplyNotification(chapterReview);
+		return chapterReview;
+	}
+
+	@Transactional
+	public Comment updateNovelReview(UpdateCommentInput input, Long commentId, String novelSlug) {
+		var comment = findCommentByIdOrThrowException(commentId);
+		validateAuthorization.validate(comment.getCommenter());
+		comment = commentMapper.update(input, comment);
+		comment = commentRepository.save(comment);
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
+		return comment;
+	}
+
+	@Transactional
+	public Comment updateChapterComment(UpdateCommentInput input, Long commentId, String chapterSlug) {
+		var comment = findCommentByIdOrThrowException(commentId);
+		validateAuthorization.validate(comment.getCommenter());
+		comment = commentMapper.update(input, comment);
+		comment = commentRepository.save(comment);
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		return comment;
+	}
+
+	@Transactional
+	public void deleteNovelReview(Long reviewId, String novelSlug) {
+		var comment = findCommentByIdOrThrowException(reviewId);
+		validateAuthorization.validate(comment.getCommenter());
+		cacheManagerUtils.evictNovelReviewsEntry(novelSlug);
+		if (comment instanceof NovelReview novelReview) {
+			Novel novel = novelReview.getNovel();
+			if (novel != null) {
+				novel.removeReview(novelReview);
+				novelRepository.save(novel);
+			}
+		}
+		deleteCommentAndChildren(comment.getId());
+	}
+
+	@Transactional
+	public void deleteChapterComment(Long commentId, String chapterSlug) {
+		var comment = findCommentByIdOrThrowException(commentId);
+		validateAuthorization.validate(comment.getCommenter());
+		cacheManagerUtils.evictNovelReviewsEntry(chapterSlug);
+		if (comment instanceof ChapterReview chapterReview) {
+			Chapter chapter = chapterReview.getChapter();
+			if (chapter != null) {
+				chapter.removeReview(chapterReview);
+				chapterRepository.save(chapter);
+			}
+		}
+
+		deleteCommentAndChildren(comment.getId());
+	}
+
+	// Recursion to delete all children comments
+	private void deleteCommentAndChildren(Long commentId) {
+		List<Comment> childComments = findCommentsByParentId(commentId);
+		for (Comment comment : childComments) {
+			deleteCommentAndChildren(comment.getId());
+		}
+		commentRepository.deleteById(commentId);
+	}
+
+	private void invalidateCommentCacheEntry(Comment comment) {
+		if (comment instanceof NovelReview novelReview) {
+			cacheManagerUtils.evictNovelReviewsEntry(novelReview.getNovel().getSlug());
+		} else if (comment instanceof ChapterReview chapterReview) {
+			cacheManagerUtils.evictNovelReviewsEntry(chapterReview.getChapter().getSlug());
+		}
+	}
+
+	private void sanitizeComment(Comment comment) {
+		comment.setMessage(CommonsUtils.sanitize(comment.getMessage()));
+	}
+}

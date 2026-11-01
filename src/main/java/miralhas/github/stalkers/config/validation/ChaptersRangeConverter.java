@@ -1,6 +1,6 @@
 package miralhas.github.stalkers.config.validation;
 
-import miralhas.github.stalkers.api.dto.filter.ChaptersRange;
+import miralhas.github.stalkers.api.chapter.dto.filter.ChaptersRange;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
