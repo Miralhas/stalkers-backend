@@ -1,6 +1,6 @@
 package miralhas.github.stalkers.config.security;
 
-import miralhas.github.stalkers.domain.exception.BusinessException;
+import miralhas.github.stalkers.domain.shared.exception.BusinessException;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 

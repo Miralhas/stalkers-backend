@@ -1,0 +1,100 @@
+package miralhas.github.stalkers.api.novel.mapper;
+
+import miralhas.github.stalkers.api.chapter.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.novel.dto.input.NovelInput;
+import miralhas.github.stalkers.api.novel.dto.input.UpdateNovelInput;
+import miralhas.github.stalkers.api.metrics.dto.MetricsDTO;
+import miralhas.github.stalkers.api.novel.dto.NovelDTO;
+import miralhas.github.stalkers.api.novel.dto.NovelInfoDTO;
+import miralhas.github.stalkers.api.novel.dto.NovelSummaryDTO;
+import miralhas.github.stalkers.domain.novel.model.Genre;
+import miralhas.github.stalkers.domain.novel.model.Novel;
+import miralhas.github.stalkers.domain.novel.model.Tag;
+import miralhas.github.stalkers.domain.novel.repository.NovelRepository;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Mapper(
+		unmappedTargetPolicy = ReportingPolicy.IGNORE,
+		componentModel = MappingConstants.ComponentModel.SPRING
+)
+public abstract class NovelMapper {
+
+	@Autowired
+	protected NovelRepository novelRepository;
+
+	@Mapping(target = "series", ignore = true)
+	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
+	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
+	public abstract Novel fromInput(NovelInput novelInput);
+
+	@Mapping(target = "tags", expression = "java(tagsMapper(tags))")
+	@Mapping(target = "genres", expression = "java(genresMapper(genres))")
+	@Mapping(target = "firstChapter", expression = "java(getFirstChapter(novel))")
+	@Mapping(target = "lastChapter", expression = "java(getLastChapter(novel))")
+	@Mapping(target = "metrics", expression = "java(metricsMapper(novel))")
+	public abstract NovelDTO toResponse(Novel novel, List<String> genres, List<String> tags);
+
+	public abstract NovelSummaryDTO toSummaryResponse(Novel novel);
+
+	public abstract NovelInfoDTO toInfoResponse(Novel novel);
+
+	public abstract List<NovelSummaryDTO> toSummaryCollectionResponse(List<Novel> novels);
+
+	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	@Mapping(target = "tags", qualifiedByName = "tagsInputMapper")
+	@Mapping(target = "genres", qualifiedByName = "genresInputMapper")
+	public abstract Novel update(UpdateNovelInput input, @MappingTarget Novel novel);
+
+	MetricsDTO metricsMapper(Novel novel) {
+		return new MetricsDTO(
+				novel.getViews(),
+				novel.getRatingValue(),
+				novel.getRatings().size(),
+				novel.getBayesianScore()
+		);
+	}
+
+	@Named("getFirstChapter")
+	ChapterSummaryDTO getFirstChapter(Novel novel) {
+		var chapter = novelRepository.findNovelFirstChapterByNovelId(novel.getId());
+		if (Objects.isNull(chapter.id())) return null;
+		return chapter;
+	}
+
+	@Named("getLastChapter")
+	ChapterSummaryDTO getLastChapter(Novel novel) {
+		var chapter = novelRepository.findNovelLastChapterByNovelId(novel.getId());
+		if (Objects.isNull(chapter.id())) return null;
+		return chapter;
+	}
+
+	@Named("tagsMapper")
+	List<String> tagsMapper(List<String> tags) {
+		return tags;
+	}
+
+	@Named("genresMapper")
+	List<String> genresMapper(List<String> genres) {
+		return genres;
+	}
+
+	@Named("tagsInputMapper")
+	Set<Tag> tagsInputToEntityMapper(List<String> tags) {
+		if (ObjectUtils.isEmpty(tags)) return null;
+		return tags.stream().map(Tag::new).collect(Collectors.toSet());
+	}
+
+	@Named("genresInputMapper")
+	Set<Genre> genresInputToEntityMapper(List<String> genres) {
+		if (ObjectUtils.isEmpty(genres)) return null;
+		return genres.stream().map(Genre::new).collect(Collectors.toSet());
+	}
+
+}

@@ -1,0 +1,33 @@
+package miralhas.github.stalkers.api.novel.dto;
+
+import miralhas.github.stalkers.api.chapter.dto.ChapterSummaryDTO;
+import miralhas.github.stalkers.api.series.dto.SeriesSummaryDTO;
+import miralhas.github.stalkers.api.metrics.dto.MetricsDTO;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.List;
+
+public record NovelDTO(
+		Long id,
+		String slug,
+		String title,
+		String author,
+		String status,
+		String alias,
+		OffsetDateTime createdAt,
+		OffsetDateTime updatedAt,
+		Boolean isHidden,
+		String description,
+		long chaptersCount,
+		MetricsDTO metrics,
+		List<String> genres,
+		List<String> tags,
+		ChapterSummaryDTO firstChapter,
+		ChapterSummaryDTO lastChapter,
+		SeriesSummaryDTO series
+) implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 1L;
+}
