@@ -20,8 +20,8 @@ public class DownloadJobValidator {
 
 	public static void validateStatus(DownloadJob job, ErrorMessages m) {
 		List<ValidationRule> rules = List.of(
-				new ValidationRule(DownloadJob::pending, m.get("download.job.failed")),
-				new ValidationRule(DownloadJob::failed, m.get("download.job.pending"))
+				new ValidationRule(DownloadJob::pending, m.get("download.job.pending")),
+				new ValidationRule(DownloadJob::failed, m.get("download.job.failed"))
 		);
 
 		for (ValidationRule rule : rules) {
