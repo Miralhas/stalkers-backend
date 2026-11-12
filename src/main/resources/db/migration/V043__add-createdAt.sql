@@ -1,0 +1,1 @@
+ALTER TABLE download_job ADD created_at datetime(6) NULL;

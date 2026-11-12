@@ -37,6 +37,7 @@ stalkers:
     local:
       dir:
         images: /home/bob/Documents/stalkers
+        download: /home/bob/Documents/epub_downloader
 
 client:
   domain: localhost

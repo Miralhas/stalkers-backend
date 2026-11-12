@@ -41,6 +41,7 @@ stalkers:
     local:
       dir:
         images: ${LOCAL_IMAGE_DIRECTORY}
+        download: ${LOCAL_DOWNLOAD_DIRECTORY}
 
 client:
   domain: devilsect.com

@@ -84,8 +84,6 @@ robot:
 oauth2:
   google:
 
-
-
 # Authentication Tokens
 # Keys should be stored as single line.
 # Multi-line to single-line converter: https://tools.onecompiler.com/multiline-to-singleline

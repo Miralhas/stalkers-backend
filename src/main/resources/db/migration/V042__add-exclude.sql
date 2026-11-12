@@ -1,0 +1,1 @@
+ALTER TABLE download_job ADD exclude VARCHAR(255) NULL;

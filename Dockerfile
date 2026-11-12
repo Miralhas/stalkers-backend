@@ -13,5 +13,6 @@ ARG JAR_FILE=target/*.jar
 COPY --from=build /app/${JAR_FILE} app.jar
 
 RUN mkdir -p /app/images
+RUN mkdir -p /app/downloads
 
 ENTRYPOINT ["java","-jar","/app.jar"]
