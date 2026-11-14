@@ -18,7 +18,7 @@ import java.nio.file.Path;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/download")
+@RequestMapping("/api/jobs")
 public class DownloadJobController {
 	@Value("${stalkers.storage.local.dir.download}")
 	private Path downloadStoragePath;
@@ -26,7 +26,7 @@ public class DownloadJobController {
 	private final DownloadJobService downloadJobService;
 	private final DownloadJobMapper downloadJobMapper;
 
-	@GetMapping("/{id}")
+	@GetMapping("/{id}/download")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) {
 		var job = downloadJobService.findByIdOrException(id);
@@ -45,13 +45,13 @@ public class DownloadJobController {
 				.body(responseBody);
 	}
 
-	@GetMapping("/job/{id}")
+	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public DownloadJobDTO getById(@PathVariable Long id) {
 		return downloadJobMapper.toResponse(downloadJobService.findByIdOrException(id));
 	}
 
-	@PostMapping("/job")
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public DownloadJobDTO create(@RequestBody @Valid DownloadJobInput input) {
 		return downloadJobService.createDownloadJob(input);
