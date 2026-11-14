@@ -17,7 +17,6 @@ public record DownloadJobInput(
 		@Min(0)
 		Integer end,
 
-		@Size(min = 1)
 		List<@Positive Integer> exclude
 ) {
 }

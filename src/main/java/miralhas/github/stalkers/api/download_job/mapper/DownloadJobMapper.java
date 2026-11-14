@@ -25,6 +25,6 @@ public interface DownloadJobMapper {
 
 	@Named("excludeNumbers")
 	default String excludeToString(List<Integer> exclude) {
-		return String.join(";", exclude.stream().map(Object::toString).toList());
+		return exclude.isEmpty() ? null : String.join(";", exclude.stream().map(Object::toString).toList());
 	}
 }
