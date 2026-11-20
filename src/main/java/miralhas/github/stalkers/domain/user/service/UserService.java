@@ -2,6 +2,7 @@ package miralhas.github.stalkers.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import miralhas.github.stalkers.api.user.dto.UserInfoDTO;
+import miralhas.github.stalkers.api.user.dto.UserInfoReadOnlyDTO;
 import miralhas.github.stalkers.api.user.dto.input.UpdateUserInput;
 import miralhas.github.stalkers.api.user.mapper.UserMapper;
 import miralhas.github.stalkers.domain.auth.service.RoleService;
@@ -28,7 +29,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @CacheConfig(cacheNames = "users")
-public class UserService  {
+public class UserService {
 
 	private final RoleService roleService;
 	private final PasswordEncoder passwordEncoder;
@@ -52,6 +53,14 @@ public class UserService  {
 		return infoOptional.getUserInfoDTO();
 	}
 
+	public UserInfoReadOnlyDTO getUserInfoReadOnlyOrException(String username) {
+		var infoOptional = userRepository.findUserInfoReadOnlyByUsername(username).orElseThrow(() -> {
+			var message = errorMessages.get("user.info.username.notFound", username);
+			return new UsernameNotFoundException(message);
+		});
+		return infoOptional.getReadOnlyUserInfoDTO();
+	}
+
 	public User findUserByEmailOrException(String email) {
 		return userRepository.findUserByEmail(email).orElseThrow(() -> {
 			var message = errorMessages.get("user.email.notFound", email);
@@ -62,6 +71,13 @@ public class UserService  {
 	public User findUserByIdOrException(Long id) {
 		return userRepository.findById(id).orElseThrow(() -> {
 			var message = errorMessages.get("user.id.notFound", id);
+			return new UsernameNotFoundException(message);
+		});
+	}
+
+	public User findUserByUsernameOrException(String username) {
+		return userRepository.findUserByUsername(username).orElseThrow(() -> {
+			var message = errorMessages.get("user.username.notFound", username);
 			return new UsernameNotFoundException(message);
 		});
 	}

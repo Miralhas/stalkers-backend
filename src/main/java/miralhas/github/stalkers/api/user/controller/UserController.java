@@ -2,22 +2,21 @@ package miralhas.github.stalkers.api.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import miralhas.github.stalkers.api.metrics.dto.UserRatingDTO;
-import miralhas.github.stalkers.api.user.dto.*;
-import miralhas.github.stalkers.api.image.dto.input.ImageInput;
-import miralhas.github.stalkers.api.user.dto.input.UpdateUserInput;
-import miralhas.github.stalkers.domain.notification.interfaces.Notification;
-import miralhas.github.stalkers.api.image.mapper.ImageMapper;
-import miralhas.github.stalkers.api.user.mapper.UserMapper;
 import miralhas.github.stalkers.api.image.dto.ImageDTO;
+import miralhas.github.stalkers.api.image.dto.input.ImageInput;
+import miralhas.github.stalkers.api.image.mapper.ImageMapper;
+import miralhas.github.stalkers.api.metrics.dto.UserRatingDTO;
 import miralhas.github.stalkers.api.shared.dto.PageDTO;
-import miralhas.github.stalkers.domain.user.model.User;
-import miralhas.github.stalkers.domain.notification.repository.NotificationRepository;
-import miralhas.github.stalkers.domain.metrics.repository.RatingRepository;
-import miralhas.github.stalkers.domain.user.repository.UserRepository;
+import miralhas.github.stalkers.api.user.dto.*;
+import miralhas.github.stalkers.api.user.dto.input.UpdateUserInput;
+import miralhas.github.stalkers.api.user.mapper.UserMapper;
 import miralhas.github.stalkers.domain.image.service.ImageService;
 import miralhas.github.stalkers.domain.metrics.service.MetricsService;
+import miralhas.github.stalkers.domain.notification.interfaces.Notification;
+import miralhas.github.stalkers.domain.notification.repository.NotificationRepository;
 import miralhas.github.stalkers.domain.notification.service.NotificationService;
+import miralhas.github.stalkers.domain.user.model.User;
+import miralhas.github.stalkers.domain.user.repository.UserRepository;
 import miralhas.github.stalkers.domain.user.service.UserService;
 import miralhas.github.stalkers.shared.utils.ValidateAuthorization;
 import org.springframework.core.io.InputStreamResource;
@@ -50,7 +49,6 @@ public class UserController  {
 	private final ValidateAuthorization validateAuthorization;
 	private final UserRepository userRepository;
 	private final NotificationRepository notificationRepository;
-	private final RatingRepository ratingRepository;
 	private final MetricsService metricsService;
 
 //	@Override
@@ -72,6 +70,14 @@ public class UserController  {
 	public UserInfoDTO getUserInfo(JwtAuthenticationToken authToken) {
 		return userService.getUserInfoOrException(authToken.getName());
 	}
+
+	@GetMapping("/{username}/info")
+	@ResponseStatus(HttpStatus.OK)
+	@PreAuthorize("hasRole('USER')")
+	public UserInfoReadOnlyDTO getReadOnlyUserInfo(@PathVariable String username) {
+		return userService.getUserInfoReadOnlyOrException(username);
+	}
+
 
 	@GetMapping("/validate")
 	@ResponseStatus(HttpStatus.OK)
