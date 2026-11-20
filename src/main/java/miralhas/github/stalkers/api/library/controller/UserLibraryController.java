@@ -45,7 +45,6 @@ public class UserLibraryController {
 	}
 
 	@GetMapping("/{username}")
-	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.OK)
 	public PageDTO<UserLibraryDTO> findUserLibraryByUsername(
 			@PageableDefault(size = 20, sort = {"lastReadAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable,

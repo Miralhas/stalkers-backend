@@ -73,7 +73,6 @@ public class UserController  {
 
 	@GetMapping("/{username}/info")
 	@ResponseStatus(HttpStatus.OK)
-	@PreAuthorize("hasRole('USER')")
 	public UserInfoReadOnlyDTO getReadOnlyUserInfo(@PathVariable String username) {
 		return userService.getUserInfoReadOnlyOrException(username);
 	}
