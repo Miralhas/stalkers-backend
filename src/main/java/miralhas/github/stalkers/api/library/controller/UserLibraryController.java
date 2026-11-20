@@ -44,6 +44,19 @@ public class UserLibraryController {
 		return new PageDTO<>(userLibraryDTOPage);
 	}
 
+	@GetMapping("/{username}")
+	@PreAuthorize("hasRole('USER')")
+	@ResponseStatus(HttpStatus.OK)
+	public PageDTO<UserLibraryDTO> findUserLibraryByUsername(
+			@PageableDefault(size = 20, sort = {"lastReadAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable,
+			@Valid LibraryFilter filter,
+			@PathVariable String username
+	) {
+		var user = userService.findUserByUsernameOrException(username);
+		Page<UserLibraryDTO> userLibraryDTOPage = userLibraryService.findUserLibrary(user, filter, pageable);
+		return new PageDTO<>(userLibraryDTOPage);
+	}
+
 	@PutMapping
 	@PreAuthorize("hasRole('USER')")
 	@ResponseStatus(HttpStatus.NO_CONTENT)

@@ -9,6 +9,7 @@ import miralhas.github.stalkers.domain.auth.service.RoleService;
 import miralhas.github.stalkers.domain.user.exception.UserAlreadyExistsException;
 import miralhas.github.stalkers.domain.image.service.ImageService;
 import miralhas.github.stalkers.domain.image.model.Image;
+import miralhas.github.stalkers.domain.user.exception.UserNotFoundException;
 import miralhas.github.stalkers.domain.user.model.User;
 import miralhas.github.stalkers.domain.image.repository.ImageRepository;
 import miralhas.github.stalkers.domain.user.repository.UserRepository;
@@ -56,7 +57,7 @@ public class UserService {
 	public UserInfoReadOnlyDTO getUserInfoReadOnlyOrException(String username) {
 		var infoOptional = userRepository.findUserInfoReadOnlyByUsername(username).orElseThrow(() -> {
 			var message = errorMessages.get("user.info.username.notFound", username);
-			return new UsernameNotFoundException(message);
+			return new UserNotFoundException(message);
 		});
 		return infoOptional.getReadOnlyUserInfoDTO();
 	}
